@@ -11,7 +11,7 @@ class CustomTextFormFieldTheme {
     prefixIconColor: AppColors.darkGrey,
     suffixIconColor: AppColors.darkGrey,
     labelStyle: const TextStyle().copyWith(
-        fontSize: CustomSize.fontSizeMd,
+        fontSize: CustomSize.fontSizeSm,
         color: AppColors.textPrimary,
         fontFamily: 'Urbanist'),
     hintStyle: const TextStyle().copyWith(

@@ -113,7 +113,7 @@ class CustomDrawer extends StatelessWidget {
                     content: Column(
                       children: [
                         ListTile(
-                          onTap: () {},
+                          onTap: () => Get.toNamed('/master-kapal'),
                           leading: const Icon(
                             Iconsax.record,
                             color: AppColors.darkExpandableContent,
@@ -155,7 +155,7 @@ class CustomDrawer extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () => Get.toNamed('/master-motor'),
                           leading: const Icon(
                             Iconsax.record,
                             color: AppColors.darkExpandableContent,
@@ -169,7 +169,7 @@ class CustomDrawer extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () => Get.toNamed('/master-wilayah'),
                           leading: const Icon(
                             Iconsax.record,
                             color: AppColors.darkExpandableContent,
@@ -189,7 +189,7 @@ class CustomDrawer extends StatelessWidget {
               icon: Iconsax.add,
               textTitle: 'Dooring',
               content: ListTile(
-                onTap: () {},
+                onTap: () => Get.toNamed('/data-dooring'),
                 leading: const Icon(
                   Iconsax.record,
                   color: AppColors.darkExpandableContent,

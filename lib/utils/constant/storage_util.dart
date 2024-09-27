@@ -9,7 +9,7 @@ import '../popups/snackbar.dart';
 
 class StorageUtil {
   final prefs = GetStorage();
-  final baseURL = 'http://langgeng.dyndns.biz';
+  final baseURL = 'http://langgeng.dyndns.biz/Dooring/Api';
 
   UserModel? getUserDetails() {
     final data = prefs.read('user');

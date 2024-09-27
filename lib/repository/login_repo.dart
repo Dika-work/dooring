@@ -17,7 +17,7 @@ class LoginRepository {
     try {
       final response = await http.get(
         Uri.parse(
-          '${storageUtil.baseURL}/DO/api/api_user.php?action=Login&username=$username&password=$password',
+          '${storageUtil.baseURL}/user.php?action=Login&username=$username&password=$password',
         ),
       );
 
