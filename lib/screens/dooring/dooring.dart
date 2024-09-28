@@ -75,7 +75,28 @@ class Dooring extends GetView<DooringController> {
               ));
             },
             onEdited: (DooringModel model) {
-              print('ini edit dooring');
+              showGeneralDialog(
+                context: context,
+                barrierLabel: "Barrier",
+                barrierDismissible: true,
+                barrierColor: Colors.black.withOpacity(0.5),
+                transitionDuration: const Duration(milliseconds: 300),
+                pageBuilder: (_, __, ___) {
+                  return EditDooring(
+                    model: model,
+                    controller: controller,
+                  );
+                },
+                transitionBuilder: (_, anim, __, child) {
+                  return ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: anim,
+                      curve: Curves.easeOutBack,
+                    ),
+                    child: child,
+                  );
+                },
+              );
             },
             dooringModel: controller.dooringModel,
           );
@@ -234,7 +255,7 @@ class Dooring extends GetView<DooringController> {
         }
       }),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xff03dac6),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.black,
         onPressed: () async {
           await Navigator.of(context).push(PageRouteBuilder(
@@ -257,8 +278,15 @@ class Dooring extends GetView<DooringController> {
             },
           ));
         },
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah Kapal'),
+        icon: const Icon(
+          Icons.add,
+          color: AppColors.white,
+        ),
+        label: Text('Tambah Dooring',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.apply(color: AppColors.white)),
       ),
     );
   }
@@ -330,7 +358,7 @@ class TambahDooring extends StatelessWidget {
                     showSearchBox: true,
                     searchFieldProps: TextFieldProps(
                       decoration: InputDecoration(
-                        hintText: 'Search Kendaraan...',
+                        hintText: 'Cari nama kapal...',
                       ),
                     ),
                   ),
@@ -782,9 +810,9 @@ class TambahDefect extends StatelessWidget {
                   return const CustomCircularLoader();
                 } else {
                   final dataSource = DefectSource(
-                    onDeleted: (DefectModel model) {
-                      print('ini edit defect');
-                    },
+                    onDeleted: (DefectModel modelDefect) =>
+                        controller.deleteDefectTable(
+                            modelDefect.idDooring, modelDefect.idDefect),
                     defectModel: controller.defectModel,
                     startIndex: 0 * 5,
                   );
@@ -1039,9 +1067,8 @@ class TambahDefect extends StatelessWidget {
                         Expanded(
                           flex: 2, // Tombol selesai flex 2
                           child: OutlinedButton(
-                            onPressed: () {
-                              // Tambahkan logika untuk menyelesaikan proses
-                            },
+                            onPressed: () =>
+                                controller.selesaiDefect(model.idDooring),
                             style: OutlinedButton.styleFrom(
                                 side:
                                     const BorderSide(color: AppColors.success)),
@@ -1091,6 +1118,442 @@ class TambahDefect extends StatelessWidget {
               ),
             ],
           )),
+    );
+  }
+}
+
+class EditDooring extends StatefulWidget {
+  const EditDooring({super.key, required this.controller, required this.model});
+
+  final DooringController controller;
+  final DooringModel model;
+
+  @override
+  State<EditDooring> createState() => _EditDooringState();
+}
+
+class _EditDooringState extends State<EditDooring> {
+  late int idDooring;
+  late String namaKapal;
+  late String wilayah;
+  late String etd;
+  late String tglBongkar;
+  late TextEditingController unit;
+  late TextEditingController helm1;
+  late TextEditingController accu1;
+  late TextEditingController spion1;
+  late TextEditingController buser1;
+  late TextEditingController toolset1;
+  late TextEditingController helmKurang;
+  late TextEditingController accuKurang;
+  late TextEditingController spionKurang;
+  late TextEditingController buserKurang;
+  late TextEditingController toolsetKurang;
+
+  @override
+  void initState() {
+    super.initState();
+    idDooring = widget.model.idDooring;
+    namaKapal = widget.model.namaKapal;
+    wilayah = widget.model.wilayah;
+    etd = widget.model.etd;
+    tglBongkar = widget.model.tglBongkar;
+    unit = TextEditingController(text: widget.model.unit.toString());
+    helm1 = TextEditingController(text: widget.model.helm1.toString());
+    accu1 = TextEditingController(text: widget.model.accu1.toString());
+    spion1 = TextEditingController(text: widget.model.spion1.toString());
+    buser1 = TextEditingController(text: widget.model.buser1.toString());
+    toolset1 = TextEditingController(text: widget.model.toolset1.toString());
+    helmKurang =
+        TextEditingController(text: widget.model.helmKurang.toString());
+    accuKurang =
+        TextEditingController(text: widget.model.accuKurang.toString());
+    spionKurang =
+        TextEditingController(text: widget.model.spionKurang.toString());
+    buserKurang =
+        TextEditingController(text: widget.model.buserKurang.toString());
+    toolsetKurang =
+        TextEditingController(text: widget.model.totalsetKurang.toString());
+  }
+
+  @override
+  void dispose() {
+    unit.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final kapalController = Get.put(KapalController());
+    final wilayahController = Get.put(WilayahController());
+    return AlertDialog(
+      title: Text(
+        'Edit data DO Global',
+        style: Theme.of(context).textTheme.headlineMedium,
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Nama Kapal'),
+            Obx(() {
+              return DropdownSearch<KapalModel>(
+                items: kapalController.filteredKapalModel,
+                itemAsString: (KapalModel kendaraan) => kendaraan.namaKapal,
+                selectedItem: kapalController.filteredKapalModel.firstWhere(
+                  (kendaraan) => kendaraan.namaKapal == namaKapal,
+                  orElse: () => KapalModel(
+                    idPelayaran: 0,
+                    namaKapal: '',
+                    namaPelayaran: '',
+                  ),
+                ),
+                dropdownBuilder: (context, KapalModel? selectedItem) {
+                  return Text(
+                    selectedItem != null
+                        ? selectedItem.namaKapal
+                        : 'Pilih nama kapal',
+                    style: TextStyle(
+                      fontSize: CustomSize.fontSizeSm,
+                      color: selectedItem == null ? Colors.grey : Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  );
+                },
+                onChanged: (KapalModel? kendaraan) {
+                  setState(() {
+                    if (kendaraan != null) {
+                      namaKapal = kendaraan.namaKapal;
+                      kapalController.selectedKapal.value = kendaraan.namaKapal;
+                    } else {
+                      kapalController.resetSelectedKendaraan();
+                      namaKapal = '';
+                    }
+                  });
+                },
+                popupProps: const PopupProps.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    decoration: InputDecoration(
+                      hintText: 'Search Kapal...',
+                    ),
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('ETD'),
+            TextFormField(
+              keyboardType: TextInputType.none,
+              readOnly: true,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    DateTime? selectedDate = DateTime.tryParse(etd);
+                    showDatePicker(
+                      context: context,
+                      locale: const Locale("id", "ID"),
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1850),
+                      lastDate: DateTime(2040),
+                    ).then((newSelectedDate) {
+                      if (newSelectedDate != null) {
+                        etd = CustomHelperFunctions.getFormattedDateDatabase(
+                            newSelectedDate);
+                        print('Ini tanggal yang dipilih : $etd');
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.calendar_today),
+                ),
+                hintText: etd.isNotEmpty
+                    ? DateFormat('d/M/yyyy').format(
+                        DateTime.tryParse('$etd 00:00:00') ?? DateTime.now(),
+                      )
+                    : 'ETD',
+              ),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Tgl Bongkar'),
+            TextFormField(
+              keyboardType: TextInputType.none,
+              readOnly: true,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    DateTime? selectedDate = DateTime.tryParse(tglBongkar);
+                    showDatePicker(
+                      context: context,
+                      locale: const Locale("id", "ID"),
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1850),
+                      lastDate: DateTime(2040),
+                    ).then((newSelectedDate) {
+                      if (newSelectedDate != null) {
+                        tglBongkar =
+                            CustomHelperFunctions.getFormattedDateDatabase(
+                                newSelectedDate);
+                        print('Ini tanggal yang dipilih : $tglBongkar');
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.calendar_today),
+                ),
+                hintText: tglBongkar.isNotEmpty
+                    ? DateFormat('d/M/yyyy').format(
+                        DateTime.tryParse('$tglBongkar 00:00:00') ??
+                            DateTime.now(),
+                      )
+                    : 'Tanggal Bongkar',
+              ),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Jumlah Unit'),
+            TextFormField(
+              controller: unit,
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                setState(() {
+                  unit.text = value;
+                });
+              },
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Wilayah'),
+            Obx(() {
+              return DropdownSearch<WilayahModel>(
+                items: wilayahController.filteredWilayahModel,
+                itemAsString: (WilayahModel wilayahItem) => wilayahItem.wilayah,
+                selectedItem: wilayah.isNotEmpty
+                    ? wilayahController.filteredWilayahModel.firstWhere(
+                        (wilayahItem) => wilayahItem.wilayah == wilayah,
+                        orElse: () => WilayahModel(
+                          idWilayah: 0,
+                          wilayah: '',
+                        ),
+                      )
+                    : null,
+                dropdownBuilder: (context, WilayahModel? selectedItem) {
+                  return Text(
+                    selectedItem != null ? selectedItem.wilayah : 'Wilayah',
+                    style: TextStyle(
+                      fontSize: CustomSize.fontSizeSm,
+                      color: selectedItem == null ? Colors.grey : Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  );
+                },
+                onChanged: (WilayahModel? wilayahItem) {
+                  setState(() {
+                    if (wilayahItem != null) {
+                      wilayah = wilayahItem.wilayah;
+                      wilayahController.selectedWilayah.value =
+                          wilayahItem.wilayah;
+                    } else {
+                      wilayahController.resetSelectedKendaraan();
+                      wilayah = '';
+                    }
+                  });
+                },
+                popupProps: const PopupProps.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    decoration: InputDecoration(
+                      hintText: 'Cari wilayah...',
+                    ),
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text('KSU KELEBIHAN',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.apply(color: AppColors.success)),
+                      const SizedBox(height: CustomSize.md),
+                      TextFormField(
+                        controller: helm1,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Helm')),
+                        onChanged: (value) {
+                          setState(() {
+                            helm1.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: accu1,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Accu')),
+                        onChanged: (value) {
+                          setState(() {
+                            accu1.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: spion1,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Spion')),
+                        onChanged: (value) {
+                          setState(() {
+                            spion1.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: buser1,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Buser')),
+                        onChanged: (value) {
+                          setState(() {
+                            buser1.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: toolset1,
+                        keyboardType: TextInputType.number,
+                        decoration:
+                            const InputDecoration(label: Text('ToolSet')),
+                        onChanged: (value) {
+                          setState(() {
+                            toolset1.text = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: CustomSize.md),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text('KSU KURANG',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.apply(color: AppColors.error)),
+                      const SizedBox(height: CustomSize.md),
+                      TextFormField(
+                        controller: helmKurang,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Helm')),
+                        onChanged: (value) {
+                          setState(() {
+                            helmKurang.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: accuKurang,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Accu')),
+                        onChanged: (value) {
+                          setState(() {
+                            accuKurang.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: spionKurang,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Spion')),
+                        onChanged: (value) {
+                          setState(() {
+                            spionKurang.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: buserKurang,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text('Buser')),
+                        onChanged: (value) {
+                          setState(() {
+                            buserKurang.text = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: toolsetKurang,
+                        keyboardType: TextInputType.number,
+                        decoration:
+                            const InputDecoration(label: Text('ToolSet')),
+                        onChanged: (value) {
+                          setState(() {
+                            toolsetKurang.text = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+        TextButton(
+          // onPressed: () {
+          //   print('ini id dooring $idDooring');
+          //   print('ini nama kapal nya :$namaKapal');
+          //   print('ini wilayahnya :$wilayah');
+          //   print('ini etd nya :$etd');
+          //   print('ini tanggal bongkarnya :$tglBongkar');
+          //   print('ini jumlah unitnya :${int.parse(unit.text)}');
+          //   print('ini helm nya: ${int.parse(helm1.text)}');
+          //   print('ini accu nya: ${int.parse(accu1.text)}');
+          //   print('ini spion nya :${int.parse(spion1.text)}');
+          //   print('ini buser nya :${int.parse(buser1.text)}');
+          //   print('ini toolset nya :${int.parse(toolset1.text)}');
+          //   print('ini hlm kurang :${int.parse(helmKurang.text)}');
+          //   print('ini accu kurang :${int.parse(accuKurang.text)}');
+          //   print('ini spion kurang :${int.parse(spionKurang.text)}');
+          //   print('ini buser kurang: ${int.parse(buserKurang.text)}');
+          //   print('ini toolset kurang: ${int.parse(toolsetKurang.text)}');
+          // },
+          onPressed: () => widget.controller.editDooring(
+            idDooring,
+            namaKapal,
+            wilayah,
+            etd,
+            tglBongkar,
+            int.parse(unit.text),
+            int.parse(helm1.text),
+            int.parse(accu1.text),
+            int.parse(spion1.text),
+            int.parse(buser1.text),
+            int.parse(toolset1.text),
+            int.parse(helmKurang.text),
+            int.parse(accuKurang.text),
+            int.parse(spionKurang.text),
+            int.parse(buserKurang.text),
+            int.parse(toolsetKurang.text),
+          ),
+          child: const Text('Simpan'),
+        ),
+      ],
     );
   }
 }

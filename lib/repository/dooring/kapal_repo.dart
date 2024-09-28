@@ -37,6 +37,56 @@ class WilayahRepository {
       throw Exception('Gagal untuk mengambil data kapal☠️');
     }
   }
+
+  // edit master wilayah
+  Future<void> editWilayah(
+    int idWilayah,
+    String wilayah,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/wilayah.php'),
+        body: {
+          'id_wilayah': idWilayah.toString(),
+          'wilayah': wilayah,
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
+    }
+  }
 }
 
 class TypeMotorRepository {
@@ -51,6 +101,103 @@ class TypeMotorRepository {
       return list.map((model) => TypeMotorModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
+    }
+  }
+
+  // edit master type motor
+  Future<void> editTypeMotor(
+    int idType,
+    String merk,
+    String typeMotor,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/type_motor.php'),
+        body: {
+          'id_type': idType.toString(),
+          'merk': merk,
+          'type_motor': typeMotor,
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
+    }
+  }
+
+  // delete master type motor
+  Future<void> deleteTypeMotor(
+    int id,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DELETE DI REPOSITORY DO Harian...');
+      final response = await http.delete(
+          Uri.parse('${storageUtil.baseURL}/type_motor.php'),
+          body: {'id': id.toString()});
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'Data DO Harian berhasil dihapus',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal menghapus DO Harian, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Harian: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat menghapus DO Harian',
+      );
     }
   }
 
@@ -113,6 +260,96 @@ class TypeMotorRepository {
       return;
     }
   }
+
+  // delete data defect
+  Future<void> deleteDefectTableContent(int idDefect) async {
+    try {
+      print('...PROSES AWALANAN DELETE DI REPOSITORY DO Global...');
+      final response = await http.delete(
+          Uri.parse('${storageUtil.baseURL}/defect.php'),
+          body: {'id_defect': idDefect.toString()});
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'Data DO Global berhasil dihapus',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal menghapus DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat menghapus DO Global',
+      );
+    }
+  }
+
+  // selesai data defect
+  Future<void> selesaiDefect(int idDooring) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/dooring.php?action=Konfirmasi'),
+        body: {
+          'id_dooring': idDooring.toString(),
+          'st_defect': '2',
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
+    }
+  }
 }
 
 class PartMotorRepository {
@@ -127,6 +364,93 @@ class PartMotorRepository {
       return list.map((model) => PartMotorModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
+    }
+  }
+
+  // add part motor
+  Future<void> addPartMotor(
+    String namaPart,
+  ) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${storageUtil.baseURL}/defect.php'), body: {
+        'nm_part': namaPart,
+      });
+
+      if (response.statusCode == 200) {
+        SnackbarLoader.successSnackBar(
+          title: 'Berhasil✨',
+          message: 'Menambahkan data do global baru..',
+        );
+      } else if (response.statusCode != 200) {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message: 'Pastikan telah terkoneksi dengan internet😁',
+        );
+      } else {
+        SnackbarLoader.errorSnackBar(
+          title: 'Error',
+          message: 'Something went wrong, please contact developer🥰',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+        title: 'Error☠️',
+        message: 'Terjadi error: $e',
+      );
+      return;
+    }
+  }
+
+  // edit master part
+  Future<void> editPart(
+    int idPart,
+    String namaPart,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/part_motor.php'),
+        body: {
+          'id_part': idPart.toString(),
+          'nm_part': namaPart,
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
     }
   }
 }

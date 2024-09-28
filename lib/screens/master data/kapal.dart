@@ -6,7 +6,6 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../controllers/dooring/kapal_controller.dart';
 import '../../utils/constant/custom_size.dart';
 import '../../utils/loader/circular_loader.dart';
-import '../../utils/popups/dialogs.dart';
 import '../../utils/source/master data/kapal_source.dart';
 import '../../widgets/dropdown.dart';
 
@@ -42,95 +41,108 @@ class MasterKapal extends GetView<KapalController> {
             onDeleted: (KapalModel model) {
               print('ini hapus master kapal');
             },
-            kapalModel: controller.kapalModel,
+            kapalModel: controller.displayedData,
           );
-          return SfDataGrid(
-              source: dataSource,
-              columnWidthMode: ColumnWidthMode.fill,
-              gridLinesVisibility: GridLinesVisibility.both,
-              headerGridLinesVisibility: GridLinesVisibility.both,
-              columns: [
-                GridColumn(
-                    width: columnWidths['No']!,
-                    columnName: 'No',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'No',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Nama Pelayaran']!,
-                    columnName: 'Nama Pelayaran',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Nama Pelayaran',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Nama Kapal']!,
-                    columnName: 'Nama Kapal',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Nama Kapal',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Edit']!,
-                    columnName: 'Edit',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Edit',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Hapus']!,
-                    columnName: 'Hapus',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Hapus',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-              ]);
+          return Column(
+            children: [
+              Expanded(
+                child: SfDataGrid(
+                    source: dataSource,
+                    columnWidthMode: ColumnWidthMode.fill,
+                    verticalScrollController: controller.scrollController,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    columns: [
+                      GridColumn(
+                          width: columnWidths['No']!,
+                          columnName: 'No',
+                          label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'No',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ))),
+                      GridColumn(
+                          width: columnWidths['Nama Pelayaran']!,
+                          columnName: 'Nama Pelayaran',
+                          label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'Nama Pelayaran',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ))),
+                      GridColumn(
+                          width: columnWidths['Nama Kapal']!,
+                          columnName: 'Nama Kapal',
+                          label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'Nama Kapal',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ))),
+                      GridColumn(
+                          width: columnWidths['Edit']!,
+                          columnName: 'Edit',
+                          label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'Edit',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ))),
+                      GridColumn(
+                          width: columnWidths['Hapus']!,
+                          columnName: 'Hapus',
+                          label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'Hapus',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ))),
+                    ]),
+              ),
+              if (controller
+                  .isLoadingMore.value) // Loader di bawah ketika lazy loading
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          );
         }
       }),
       floatingActionButton: FloatingActionButton.extended(
@@ -138,44 +150,94 @@ class MasterKapal extends GetView<KapalController> {
         foregroundColor: Colors.black,
         onPressed: () {
           print('tambah kapal master...');
-          CustomDialogs.defaultDialog(
-              context: context,
-              titleWidget: const Center(child: Text('Tambah Kapal')),
-              contentWidget: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Obx(
-                    () => DropDownWidget(
-                      value: controller.namaPelayaran.value,
-                      items: controller.namaPelayaranMap,
-                      onChanged: (String? value) {
-                        controller.namaPelayaran.value = value!;
-                      },
+          showGeneralDialog(
+            context: context,
+            barrierLabel: "Barrier",
+            barrierDismissible: true,
+            barrierColor: Colors.black.withOpacity(0.5),
+            transitionDuration: const Duration(milliseconds: 300),
+            pageBuilder: (_, __, ___) {
+              return Center(
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(CustomSize.borderRadiusLg),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                          child: Text('Tambah Kapal',
+                              style:
+                                  Theme.of(context).textTheme.headlineMedium),
+                        ),
+                        const SizedBox(height: CustomSize.spaceBtwItems),
+                        Obx(
+                          () => DropDownWidget(
+                            value: controller.namaPelayaran.value,
+                            items: controller.namaPelayaranMap,
+                            onChanged: (String? value) {
+                              controller.namaPelayaran.value = value!;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: CustomSize.spaceBtwItems),
+                        TextFormField(
+                          controller: controller.namaKapalController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Jumlah Unit harus di isi';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Jumlah Unit',
+                          ),
+                        ),
+                        const SizedBox(height: CustomSize.spaceBtwSections),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            OutlinedButton(
+                                onPressed: () => Get.back(),
+                                style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: CustomSize.lg,
+                                        vertical: CustomSize.md)),
+                                child: const Text('Close')),
+                            ElevatedButton(
+                              onPressed: () {
+                                print('nambah data wilayah');
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: CustomSize.lg,
+                                      vertical: CustomSize.md)),
+                              child: const Text('Tambahkan'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: CustomSize.spaceBtwItems),
-                  TextFormField(
-                    controller: controller.namaKapalController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Jumlah Unit harus di isi';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Jumlah Unit',
-                    ),
-                  ),
-                ],
-              ),
-              onConfirm: () {
-                print('nambah data kapal master');
-              },
-              onCancel: () {
-                Get.back();
-              },
-              cancelText: 'Close',
-              confirmText: 'Tambahkan');
+                ),
+              );
+            },
+            transitionBuilder: (_, anim, __, child) {
+              return ScaleTransition(
+                scale: CurvedAnimation(
+                  parent: anim,
+                  curve: Curves.easeOutBack,
+                ),
+                child: child,
+              );
+            },
+          );
         },
         icon: const Icon(Icons.add),
         label: const Text('Tambah Kapal'),

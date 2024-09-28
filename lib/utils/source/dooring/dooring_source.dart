@@ -1,3 +1,4 @@
+import 'package:dooring/utils/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -68,22 +69,28 @@ class DooringSource extends DataGridSource {
       ],
     ));
 
-    cells.add(Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-            onPressed: () {
-              if (onDefect != null && dooringModel.isNotEmpty) {
-                onDefect!(dooringModel[rowIndex]);
-              } else {
-                return;
-              }
-            },
-            icon: const Icon(
-              Icons.heart_broken_outlined,
-            ))
-      ],
-    ));
+    if (dooringModel[rowIndex].statusDefect == 1) {
+      cells.add(Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+              onPressed: () {
+                if (onDefect != null && dooringModel.isNotEmpty) {
+                  onDefect!(dooringModel[rowIndex]);
+                } else {
+                  return;
+                }
+              },
+              icon: const Icon(
+                Icons.check,
+                color: AppColors.success,
+              ))
+        ],
+      ));
+    } else if (dooringModel[rowIndex].statusDefect == 1) {
+    } else {
+      cells.add(const SizedBox.shrink());
+    }
 
     cells.add(Column(
       mainAxisAlignment: MainAxisAlignment.center,

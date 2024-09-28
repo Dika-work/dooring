@@ -90,4 +90,81 @@ class DooringRepository {
       return;
     }
   }
+
+  Future<void> editDooring(
+    int idDooring,
+    String namaKapal,
+    String wilayah,
+    String etd,
+    String tglBongkar,
+    int unit,
+    int helm1,
+    int accu1,
+    int spion1,
+    int buser1,
+    int toolset1,
+    int helmKurang,
+    int accuKurang,
+    int spionKurang,
+    int buserKurang,
+    int toolsetKurang,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/dooring.php'),
+        body: {
+          'id_dooring': idDooring,
+          'nm_kapal': namaKapal,
+          'wilayah': wilayah,
+          'etd': etd,
+          'tgl_bongkar': tglBongkar,
+          'unit': unit.toString(),
+          'helm_l': helm1.toString(),
+          'accu_l': accu1.toString(),
+          'spion_l': spion1.toString(),
+          'buser_l': buser1.toString(),
+          'toolset_l': toolset1.toString(),
+          'helm_k': helmKurang.toString(),
+          'accu_k': accuKurang.toString(),
+          'spion_k': spionKurang.toString(),
+          'buser_k': buserKurang.toString(),
+          'toolset_k': toolsetKurang.toString(),
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
+    }
+  }
 }

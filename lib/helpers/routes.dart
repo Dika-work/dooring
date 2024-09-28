@@ -5,6 +5,7 @@ import '../controllers/dooring/kapal_controller.dart';
 import '../screens/dooring/dooring.dart';
 import '../screens/login.dart';
 import '../screens/master data/kapal.dart';
+import '../screens/master data/part_motor.dart';
 import '../screens/master data/type_motor.dart';
 import '../screens/master data/wilayah.dart';
 import '../screens/onboarding.dart';
@@ -48,6 +49,12 @@ class AppRoutes {
             page: () => const MasterTypeMotor(),
             binding: BindingsBuilder(() {
               Get.put(TypeMotorController());
+            })),
+        GetPage(
+            name: '/master-part',
+            page: () => const PartMotor(),
+            binding: BindingsBuilder(() {
+              Get.put(PartMotorController());
             })),
       ];
 }

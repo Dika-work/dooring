@@ -16,9 +16,17 @@ import '../../utils/popups/snackbar.dart';
 class KapalController extends GetxController {
   final kapalRepo = Get.put(KapalRepository());
   final isLoading = Rx<bool>(false);
+  final isLoadingMore = Rx<bool>(false);
+
   RxList<KapalModel> kapalModel = <KapalModel>[].obs;
+  RxList<KapalModel> displayedData = <KapalModel>[].obs;
   RxString selectedKapal = ''.obs;
   RxString selectedJenisKapal = ''.obs;
+
+  // lazy loading
+  final ScrollController scrollController = ScrollController();
+  int initialDataCount = 15;
+  int loadMoreCount = 5;
 
   final namaPelayaran = 'CTP'.obs;
   TextEditingController namaKapalController = TextEditingController();
@@ -38,6 +46,7 @@ class KapalController extends GetxController {
   void onInit() {
     super.onInit();
     fetchKapalData();
+    scrollController.addListener(scrollListener);
   }
 
   Future<void> fetchKapalData() async {
@@ -45,10 +54,39 @@ class KapalController extends GetxController {
       isLoading.value = true;
       final dataKapal = await kapalRepo.fetchKapalContent();
       kapalModel.assignAll(dataKapal);
+      displayedData.assignAll(kapalModel.take(initialDataCount).toList());
     } catch (e) {
       kapalModel.assignAll([]);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // lazy loading func
+  void scrollListener() {
+    print(
+        "Scroll Position: ${scrollController.position.pixels}, Max Scroll: ${scrollController.position.maxScrollExtent}");
+    if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent &&
+        !isLoading.value &&
+        !isLoadingMore.value) {
+      // Load more data when reaching the bottom
+      loadMoreData();
+    }
+  }
+
+  void loadMoreData() {
+    // Load additional data if available
+    if (displayedData.length < kapalModel.length && !isLoadingMore.value) {
+      print("Loading more data...");
+      isLoadingMore.value = true;
+      final nextData =
+          kapalModel.skip(displayedData.length).take(loadMoreCount).toList();
+      displayedData.addAll(nextData);
+
+      print(
+          'Additional data loaded: ${displayedData.length} items'); // Cetak jumlah data setelah load more
+      isLoadingMore.value = false;
     }
   }
 
@@ -93,6 +131,8 @@ class KapalController extends GetxController {
 
 class WilayahController extends GetxController {
   final wilayahRepo = Get.put(WilayahRepository());
+  final networkManager = Get.find<NetworkManager>();
+
   final isLoading = Rx<bool>(false);
   RxList<WilayahModel> wilayahModel = <WilayahModel>[].obs;
 
@@ -116,6 +156,31 @@ class WilayahController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> editWilayah(
+    int idWilayah,
+    String wilayah,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await wilayahRepo.editWilayah(
+      idWilayah,
+      wilayah,
+    );
+
+    await fetchWilayahData();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
   }
 
   List<WilayahModel> get filteredWilayahModel {
@@ -158,14 +223,25 @@ class WilayahController extends GetxController {
 
 class TypeMotorController extends GetxController {
   final typeMotorRepo = Get.put(TypeMotorRepository());
+  final partMotorController = Get.put(PartMotorController());
+
   final isLoading = Rx<bool>(false);
+  final isLoadingMore = Rx<bool>(false);
+
   final storageUtil = StorageUtil();
   GlobalKey<FormState> addDefectKey = GlobalKey<FormState>();
   String usernameUser = '';
 
   RxList<TypeMotorModel> typeMotorModel = <TypeMotorModel>[].obs;
+  RxList<TypeMotorModel> displayedData = <TypeMotorModel>[].obs;
+
   RxList<DefectModel> defectModel = <DefectModel>[].obs;
   RxList<DooringModel> dooringModel = <DooringModel>[].obs;
+
+  // lazy loading
+  final ScrollController scrollController = ScrollController();
+  int initialDataCount = 15;
+  int loadMoreCount = 5;
 
   final networkManager = Get.find<NetworkManager>();
   final dooringController = Get.put(DooringController());
@@ -189,7 +265,9 @@ class TypeMotorController extends GetxController {
     if (user != null) {
       usernameUser = user.username;
     }
+
     fetchTypeMotor();
+    scrollController.addListener(scrollListener);
   }
 
   Future<void> fetchTypeMotor() async {
@@ -197,10 +275,85 @@ class TypeMotorController extends GetxController {
       isLoading.value = true;
       final dataMotor = await typeMotorRepo.fetchTypeMotorContent();
       typeMotorModel.assignAll(dataMotor);
+      displayedData.assignAll(typeMotorModel.take(initialDataCount).toList());
     } catch (e) {
       typeMotorModel.assignAll([]);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> editTypeMotor(
+    int idType,
+    String merk,
+    String typeMotor,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await typeMotorRepo.editTypeMotor(
+      idType,
+      merk,
+      typeMotor,
+    );
+
+    await fetchTypeMotor();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> hapusTypeMotor(int id) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+    await typeMotorRepo.deleteTypeMotor(id);
+
+    await fetchTypeMotor();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  // lazy loading func
+  void scrollListener() {
+    print(
+        "Scroll Position: ${scrollController.position.pixels}, Max Scroll: ${scrollController.position.maxScrollExtent}");
+    if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent &&
+        !isLoading.value &&
+        !isLoadingMore.value) {
+      // Load more data when reaching the bottom
+      loadMoreData();
+    }
+  }
+
+  void loadMoreData() {
+    // Load additional data if available
+    if (displayedData.length < typeMotorModel.length && !isLoadingMore.value) {
+      print("Loading more data...");
+      isLoadingMore.value = true;
+      final nextData = typeMotorModel
+          .skip(displayedData.length)
+          .take(loadMoreCount)
+          .toList();
+      displayedData.addAll(nextData);
+
+      print(
+          'Additional data loaded: ${displayedData.length} items'); // Cetak jumlah data setelah load more
+      isLoadingMore.value = false;
     }
   }
 
@@ -262,9 +415,45 @@ class TypeMotorController extends GetxController {
       part,
       jumlah,
     );
-    print('Stopped loading dialog');
-
+    selectedMotor.value = '';
+    partMotorController.selectedWilayah.value = '';
+    jumlahDefectController.clear();
     await dooringController.fetchDooringData();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> deleteDefectTable(int idDooring, int idDefect) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+    await typeMotorRepo.deleteDefectTableContent(idDefect);
+
+    await fetchDefetchTable(idDooring);
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> selesaiDefect(int idDooring) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await typeMotorRepo.selesaiDefect(idDooring);
+    await dooringController.fetchDooringData();
+    CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
 
@@ -309,10 +498,12 @@ class TypeMotorController extends GetxController {
 
 class PartMotorController extends GetxController {
   final partRepo = Get.put(PartMotorRepository());
+  final networkManager = Get.find<NetworkManager>();
   final isLoading = Rx<bool>(false);
+  GlobalKey<FormState> addPartKey = GlobalKey<FormState>();
   RxList<PartMotorModel> partMotorModel = <PartMotorModel>[].obs;
 
-  TextEditingController namaWilayahController = TextEditingController();
+  TextEditingController partMotorController = TextEditingController();
   RxString selectedWilayah = ''.obs;
   RxString selectedJenisWilayah = ''.obs;
 
@@ -332,6 +523,55 @@ class PartMotorController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> addPartMotor(String namaPart) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    if (!addPartKey.currentState!.validate()) {
+      CustomHelperFunctions.stopLoading();
+      return;
+    }
+
+    await partRepo.addPartMotor(namaPart);
+    print('Stopped loading dialog');
+
+    await fetchWilayahData();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> editPart(
+    int idPart,
+    String namaPart,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await partRepo.editPart(
+      idPart,
+      namaPart,
+    );
+
+    await fetchWilayahData();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
   }
 
   List<PartMotorModel> get filteredPartMotorModel {

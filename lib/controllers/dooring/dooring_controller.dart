@@ -140,4 +140,56 @@ class DooringController extends GetxController {
     CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
+
+  Future<void> editDooring(
+    int idDooring,
+    String namaKapal,
+    String wilayah,
+    String etd,
+    String tglBongkar,
+    int unit,
+    int helm1,
+    int accu1,
+    int spion1,
+    int buser1,
+    int toolset1,
+    int helmKurang,
+    int accuKurang,
+    int spionKurang,
+    int buserKurang,
+    int toolsetKurang,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await dooringRepo.editDooring(
+      idDooring,
+      namaKapal,
+      wilayah,
+      etd,
+      tglBongkar,
+      unit,
+      helm1,
+      accu1,
+      spion1,
+      buser1,
+      toolset1,
+      helmKurang,
+      accuKurang,
+      spionKurang,
+      buserKurang,
+      toolsetKurang,
+    );
+
+    await fetchDooringData();
+    CustomHelperFunctions.stopLoading();
+  }
 }

@@ -6,10 +6,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../controllers/dooring/kapal_controller.dart';
 import '../../models/dooring/kapal_model.dart';
 import '../../utils/loader/circular_loader.dart';
-import '../../utils/source/master data/wilayah_source.dart';
+import '../../utils/source/master data/part_motor_source.dart';
 
-class MasterWilayah extends GetView<WilayahController> {
-  const MasterWilayah({super.key});
+class PartMotor extends GetView<PartMotorController> {
+  const PartMotor({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +20,18 @@ class MasterWilayah extends GetView<WilayahController> {
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
         title: Text(
-          'Master Wilayah',
+          'Master Part',
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         centerTitle: true,
       ),
       body: Obx(() {
-        if (controller.isLoading.value && controller.wilayahModel.isEmpty) {
+        if (controller.isLoading.value && controller.partMotorModel.isEmpty) {
           return const CustomCircularLoader();
         } else {
-          final dataSource = WilayahSource(
-            onEdited: (WilayahModel model) {
-              controller.namaWilayahController.text = model.wilayah;
+          final dataSource = PartMotorSource(
+            onEdited: (PartMotorModel model) {
+              controller.partMotorController.text = model.namaPart;
               showGeneralDialog(
                 context: context,
                 barrierLabel: "Barrier",
@@ -54,24 +54,24 @@ class MasterWilayah extends GetView<WilayahController> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Text(
-                              'Edit Type Motor',
+                              'Edit Part motor',
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 20),
                             TextFormField(
-                              controller: controller.namaWilayahController,
+                              controller: controller.partMotorController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Type motor harus di isi';
+                                  return 'Part motor harus di isi';
                                 }
                                 return null;
                               },
                               decoration: const InputDecoration(
-                                labelText: 'Type motor',
+                                labelText: 'Part motor',
                               ),
                               onChanged: (value) {
-                                controller.namaWilayahController.text = value;
+                                controller.partMotorController.text = value;
                               },
                             ),
                             const SizedBox(height: CustomSize.spaceBtwSections),
@@ -87,8 +87,8 @@ class MasterWilayah extends GetView<WilayahController> {
                                     child: const Text('Close')),
                                 ElevatedButton(
                                   onPressed: () {
-                                    controller.editWilayah(model.idWilayah,
-                                        controller.namaWilayahController.text);
+                                    controller.editPart(model.idPart,
+                                        controller.partMotorController.text);
                                   },
                                   style: ElevatedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(
@@ -115,7 +115,7 @@ class MasterWilayah extends GetView<WilayahController> {
                 },
               );
             },
-            wilayahModel: controller.wilayahModel,
+            partMotorModel: controller.partMotorModel,
           );
 
           return SfDataGrid(
@@ -143,7 +143,7 @@ class MasterWilayah extends GetView<WilayahController> {
                 ),
               ),
               GridColumn(
-                columnName: 'Nama Wilayah',
+                columnName: 'Nama Part',
                 label: Container(
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -151,7 +151,7 @@ class MasterWilayah extends GetView<WilayahController> {
                     color: Colors.lightBlue.shade100,
                   ),
                   child: Text(
-                    'Nama Wilayah',
+                    'Nama Part',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -185,7 +185,7 @@ class MasterWilayah extends GetView<WilayahController> {
           showDialogWithAnimation(context);
         },
         icon: const Icon(Icons.add),
-        label: const Text('Tambah Kapal'),
+        label: const Text('Tambah Part'),
       ),
     );
   }
@@ -212,20 +212,20 @@ class MasterWilayah extends GetView<WilayahController> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'Tambah Wilayah',
+                    'Tambah Part',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    controller: controller.namaWilayahController,
+                    controller: controller.partMotorController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Nama wilayah harus di isi';
+                        return 'Nama part harus di isi';
                       }
                       return null;
                     },
                     decoration: const InputDecoration(
-                      labelText: 'Nama wilayah',
+                      labelText: 'Nama part motor',
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -240,9 +240,8 @@ class MasterWilayah extends GetView<WilayahController> {
                                   vertical: CustomSize.md)),
                           child: const Text('Close')),
                       ElevatedButton(
-                        onPressed: () {
-                          print('nambah data wilayah');
-                        },
+                        onPressed: () => controller
+                            .addPartMotor(controller.partMotorController.text),
                         style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: CustomSize.lg,

@@ -141,7 +141,7 @@ class CustomDrawer extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () => Get.toNamed('/master-part'),
                           leading: const Icon(
                             Iconsax.record,
                             color: AppColors.darkExpandableContent,
