@@ -2,37 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-import '../../../models/dooring/defect_model.dart';
+import '../../../models/dooring/detail_defect_model.dart';
 import '../../constant/custom_size.dart';
 
-class DefectSource extends DataGridSource {
-  final void Function(DefectModel)? onLihat;
-  final void Function(DefectModel)? onEdited;
-  final void Function(DefectModel)? onAdded;
-  final void Function(DefectModel)? onDeleted;
-  final List<DefectModel> defectModel;
+class DetailDefectSource extends DataGridSource {
+  final void Function(DetailDefectModel)? onEdited;
+  final void Function(DetailDefectModel)? onDeleted;
+  final List<DetailDefectModel> detailDefectModel;
   int startIndex = 0;
 
-  DefectSource({
-    required this.onLihat,
+  DetailDefectSource({
     required this.onEdited,
-    required this.onAdded,
     required this.onDeleted,
-    required this.defectModel,
+    required this.detailDefectModel,
     int startIndex = 0,
   }) {
-    _updateDataPager(defectModel, startIndex);
+    _updateDataPager(detailDefectModel, startIndex);
   }
 
-  List<DataGridRow> dooringData = [];
+  List<DataGridRow> detailDefectData = [];
   int index = 0;
 
   @override
-  List<DataGridRow> get rows => dooringData;
+  List<DataGridRow> get rows => detailDefectData;
 
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {
-    int rowIndex = dooringData.indexOf(row);
+    int rowIndex = detailDefectData.indexOf(row);
     bool isEvenRow = rowIndex % 2 == 0;
 
     List<Widget> cells = [
@@ -51,7 +47,7 @@ class DefectSource extends DataGridSource {
       })
     ];
 
-    final bool hasData = defectModel.isNotEmpty;
+    final bool hasData = detailDefectModel.first.jumlahInput > 0;
 
     if (hasData) {
       cells.add(Column(
@@ -59,36 +55,8 @@ class DefectSource extends DataGridSource {
         children: [
           IconButton(
               onPressed: () {
-                if (onLihat != null) {
-                  onLihat!(defectModel[rowIndex]);
-                }
-              },
-              icon: const Icon(
-                Iconsax.eye,
-              ))
-        ],
-      ));
-      cells.add(Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-              onPressed: () {
-                if (onAdded != null) {
-                  onAdded!(defectModel[rowIndex]);
-                }
-              },
-              icon: const Icon(
-                Iconsax.add,
-              ))
-        ],
-      ));
-      cells.add(Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-              onPressed: () {
                 if (onEdited != null) {
-                  onEdited!(defectModel[rowIndex]);
+                  onEdited!(detailDefectModel[rowIndex]);
                 }
               },
               icon: const Icon(
@@ -96,13 +64,14 @@ class DefectSource extends DataGridSource {
               ))
         ],
       ));
+
       cells.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
               onPressed: () {
                 if (onDeleted != null) {
-                  onDeleted!(defectModel[rowIndex]);
+                  onDeleted!(detailDefectModel[rowIndex]);
                 }
               },
               icon: const Icon(
@@ -122,37 +91,38 @@ class DefectSource extends DataGridSource {
     return List.generate(count, (index) {
       return const DataGridRow(cells: [
         DataGridCell<String>(columnName: 'No', value: '-'),
-        DataGridCell<String>(columnName: 'Type Motor', value: '-'),
-        DataGridCell<String>(columnName: 'Part Motor', value: '-'),
-        DataGridCell<String>(columnName: 'Jml', value: '-'),
+        DataGridCell<String>(columnName: 'No Mesin', value: '-'),
+        DataGridCell<String>(columnName: 'No Rangka', value: '-'),
       ]);
     });
   }
 
-  void _updateDataPager(List<DefectModel> defectModel, int startIndex) {
-    if (defectModel.isEmpty) {
+  void _updateDataPager(
+      List<DetailDefectModel> detailDefectModel, int startIndex) {
+    if (detailDefectModel.first.jumlahInput == 0) {
       print('Model is empty, generating empty rows');
-      dooringData = _generateEmptyRows(1);
+      detailDefectData = _generateEmptyRows(1);
     } else {
       print('Model has data, generating rows based on model');
-      dooringData = defectModel.skip(startIndex).take(5).map<DataGridRow>(
+      index = 0; // Reset index untuk memastikan data baru diambil dengan benar
+      detailDefectData =
+          detailDefectModel.skip(startIndex).take(5).map<DataGridRow>(
         (e) {
           index++;
           return DataGridRow(cells: [
             DataGridCell<int>(columnName: 'No', value: index),
-            DataGridCell<String>(columnName: 'Type Motor', value: e.typeMotor),
-            DataGridCell<String>(columnName: 'Part Motor', value: e.part),
-            DataGridCell<int>(columnName: 'Jml', value: e.jumlah),
+            DataGridCell<String>(columnName: 'No Mesin', value: e.noMesin),
+            DataGridCell<String>(columnName: 'No Rangka', value: e.noRangka),
           ]);
         },
       ).toList();
     }
-    notifyListeners();
+    notifyListeners(); // Memberi tahu perubahan data
   }
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    _updateDataPager(defectModel, newPageIndex);
+    _updateDataPager(detailDefectModel, newPageIndex);
     notifyListeners();
     return true;
   }

@@ -1,3 +1,4 @@
+import 'package:dooring/utils/popups/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -34,104 +35,74 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
             onEdited: (TypeMotorModel model) {
               controller.merk.value = model.merk.toUpperCase();
               controller.namaTypeMotorController.text = model.typeMotor;
-              showGeneralDialog(
+              CustomDialogs.defaultDialog(
                 context: context,
-                barrierLabel: "Barrier",
-                barrierDismissible: true,
-                barrierColor: Colors.black.withOpacity(0.5),
-                transitionDuration: const Duration(milliseconds: 300),
-                pageBuilder: (_, __, ___) {
-                  return Center(
-                    child: Material(
-                      type: MaterialType.transparency,
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(CustomSize.borderRadiusLg),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Edit Type Motor',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 20),
-                            Obx(() {
-                              return DropDownWidget(
-                                value: controller.merk.value,
-                                items: controller.merkList,
-                                onChanged: (String? value) {
-                                  if (value != null) {
-                                    controller.merk.value = value;
-                                    print(
-                                        'Ini type motor yang dipilih: ${controller.merk.value}');
-                                  }
-                                },
-                              );
-                            }),
-                            const SizedBox(height: CustomSize.spaceBtwItems),
-                            TextFormField(
-                              controller: controller.namaTypeMotorController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Type motor harus di isi';
-                                }
-                                return null;
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'Type motor',
-                              ),
-                              onChanged: (value) {
-                                controller.namaTypeMotorController.text = value;
-                              },
-                            ),
-                            const SizedBox(height: CustomSize.spaceBtwSections),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                OutlinedButton(
-                                    onPressed: () => Get.back(),
-                                    style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: CustomSize.lg,
-                                            vertical: CustomSize.md)),
-                                    child: const Text('Close')),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    controller.editTypeMotor(
-                                        model.idType,
-                                        controller.merk.value,
-                                        controller
-                                            .namaTypeMotorController.text);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: CustomSize.lg,
-                                          vertical: CustomSize.md)),
-                                  child: const Text('Tambahkan'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                contentWidget: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Edit Type Motor',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                      return DropDownWidget(
+                        value: controller.merk.value,
+                        items: controller.merkList,
+                        onChanged: (String? value) {
+                          if (value != null) {
+                            controller.merk.value = value;
+                            print(
+                                'Ini type motor yang dipilih: ${controller.merk.value}');
+                          }
+                        },
+                      );
+                    }),
+                    const SizedBox(height: CustomSize.spaceBtwItems),
+                    TextFormField(
+                      controller: controller.namaTypeMotorController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Type motor harus di isi';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Type motor',
                       ),
+                      onChanged: (value) {
+                        controller.namaTypeMotorController.text = value;
+                      },
                     ),
-                  );
-                },
-                transitionBuilder: (_, anim, __, child) {
-                  return ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: anim,
-                      curve: Curves.easeOutBack,
+                    const SizedBox(height: CustomSize.spaceBtwSections),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlinedButton(
+                            onPressed: () => Get.back(),
+                            style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: CustomSize.lg,
+                                    vertical: CustomSize.md)),
+                            child: const Text('Close')),
+                        ElevatedButton(
+                          onPressed: () {
+                            controller.editTypeMotor(
+                                model.idType,
+                                controller.merk.value,
+                                controller.namaTypeMotorController.text);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: CustomSize.lg,
+                                  vertical: CustomSize.md)),
+                          child: const Text('Tambahkan'),
+                        ),
+                      ],
                     ),
-                    child: child,
-                  );
-                },
+                  ],
+                ),
               );
             },
             onDeleted: (TypeMotorModel model) =>
@@ -262,93 +233,62 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
   }
 
   void showDialogWithAnimation(BuildContext context) {
-    showGeneralDialog(
+    CustomDialogs.defaultDialog(
       context: context,
-      barrierLabel: "Barrier",
-      barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (_, __, ___) {
-        return Center(
-          child: Material(
-            type: MaterialType.transparency,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              width: MediaQuery.of(context).size.width * 0.8,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(CustomSize.borderRadiusLg),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Tambah Motor',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  Obx(() {
-                    return DropDownWidget(
-                      value: controller.merk.value,
-                      items: controller.merkList,
-                      onChanged: (String? value) {
-                        controller.merk.value = value!;
-                        print(
-                            'ini type motor yg di pilih: ${controller.merk.value}');
-                      },
-                    );
-                  }),
-                  const SizedBox(height: CustomSize.spaceBtwItems),
-                  TextFormField(
-                    controller: controller.namaTypeMotorController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Type motor harus di isi';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Type motor',
-                    ),
-                  ),
-                  const SizedBox(height: CustomSize.spaceBtwSections),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlinedButton(
-                          onPressed: () => Get.back(),
-                          style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: CustomSize.lg,
-                                  vertical: CustomSize.md)),
-                          child: const Text('Close')),
-                      ElevatedButton(
-                        onPressed: () {
-                          print('nambah data wilayah');
-                        },
-                        style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: CustomSize.lg,
-                                vertical: CustomSize.md)),
-                        child: const Text('Tambahkan'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      contentWidget: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Tambah Motor',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Obx(() {
+            return DropDownWidget(
+              value: controller.merk.value,
+              items: controller.merkList,
+              onChanged: (String? value) {
+                controller.merk.value = value!;
+                print('ini type motor yg di pilih: ${controller.merk.value}');
+              },
+            );
+          }),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          TextFormField(
+            controller: controller.namaTypeMotorController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Type motor harus di isi';
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: 'Type motor',
             ),
           ),
-        );
-      },
-      transitionBuilder: (_, anim, __, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: anim,
-            curve: Curves.easeOutBack,
+          const SizedBox(height: CustomSize.spaceBtwSections),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OutlinedButton(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                  child: const Text('Close')),
+              ElevatedButton(
+                onPressed: () {
+                  print('nambah data wilayah');
+                },
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                child: const Text('Tambahkan'),
+              ),
+            ],
           ),
-          child: child,
-        );
-      },
+        ],
+      ),
     );
   }
 }

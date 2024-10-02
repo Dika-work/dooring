@@ -1,0 +1,121 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../helpers/connectivity.dart';
+import '../../helpers/helper_func.dart';
+import '../../models/dooring/detail_defect_model.dart';
+import '../../models/user_model.dart';
+import '../../repository/dooring/detail_defect_repo.dart';
+import '../../utils/constant/storage_util.dart';
+import '../../utils/popups/dialogs.dart';
+import '../../utils/popups/snackbar.dart';
+
+class DetailDefectController extends GetxController {
+  final detailDefectRepo = Get.put(DetailDefectRepository());
+  final storageUtil = StorageUtil();
+  final isLoading = Rx<bool>(false);
+  RxBool isJumlahUnitSama = false.obs;
+
+  RxList<DetailDefectModel> detailModel = <DetailDefectModel>[].obs;
+  final networkManager = Get.find<NetworkManager>();
+  GlobalKey<FormState> detailDefectKey = GlobalKey<FormState>();
+  String tipeUser = '';
+
+  TextEditingController nomorMesinController = TextEditingController();
+  TextEditingController nomorRangkaController = TextEditingController();
+
+  @override
+  void onInit() {
+    super.onInit();
+    UserModel? user = storageUtil.getUserDetails();
+    if (user != null) {
+      tipeUser = user.username;
+    }
+  }
+
+  Future<void> fetchDetailDefect(int idDefect) async {
+    try {
+      isLoading.value = true;
+      final dataMotor =
+          await detailDefectRepo.fectDetailDefectContent(idDefect);
+      detailModel.assignAll(dataMotor);
+      isJumlahUnitSama.value = detailModel.isNotEmpty &&
+          detailModel.first.jumlah == detailModel.first.jumlahInput;
+      print('isJumlahUnitSama seletah fetch: ${isJumlahUnitSama.value}');
+      print('ini jumlah : ${detailModel.first.jumlahInput}');
+      print('ini unit: ${detailModel.first.unit}');
+    } catch (e) {
+      detailModel.assignAll([]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addDetailDefect(
+    int idDefect,
+    int idDooring,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    if (!detailDefectKey.currentState!.validate()) {
+      CustomHelperFunctions.stopLoading();
+      return;
+    }
+
+    bool isDuplicate = detailModel.any((data) =>
+        data.noMesin == nomorMesinController.text &&
+        data.noRangka ==
+            nomorRangkaController.text); //nama kapal, etd, nama wilayah
+
+    if (isDuplicate) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message:
+            'Data nama pelayaran dan ETD sudah ada, mohon di cek kembali🙄',
+      );
+      return;
+    }
+
+    await detailDefectRepo.addDetailDefect(
+      idDefect,
+      idDooring,
+      CustomHelperFunctions.formattedTime,
+      CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()),
+      tipeUser,
+      nomorMesinController.text,
+      nomorRangkaController.text,
+    );
+
+    // Fetch updated data
+    await fetchDetailDefect(idDefect);
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> deleteDetailDefect(int idDetail, int idDefect) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await detailDefectRepo.deleteDetailDefect(idDetail);
+
+    await fetchDetailDefect(idDefect);
+    CustomHelperFunctions.stopLoading();
+  }
+}

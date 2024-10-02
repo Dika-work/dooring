@@ -6,6 +6,7 @@ import '../screens/dooring/dooring.dart';
 import '../screens/login.dart';
 import '../screens/master data/kapal.dart';
 import '../screens/master data/part_motor.dart';
+import '../screens/master data/pelayaran.dart';
 import '../screens/master data/type_motor.dart';
 import '../screens/master data/wilayah.dart';
 import '../screens/onboarding.dart';
@@ -38,6 +39,14 @@ class AppRoutes {
             binding: BindingsBuilder(() {
               Get.put(KapalController());
             })),
+        GetPage(
+          name: '/master-pelayaran',
+          page: () => const MasterPelayaran(),
+          // binding: BindingsBuilder(() {
+          //   Get.put(KapalController());
+          // }
+          // )
+        ),
         GetPage(
             name: '/master-wilayah',
             page: () => const MasterWilayah(),

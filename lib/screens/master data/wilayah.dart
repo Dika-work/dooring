@@ -1,4 +1,5 @@
 import 'package:dooring/utils/constant/custom_size.dart';
+import 'package:dooring/utils/popups/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -32,87 +33,58 @@ class MasterWilayah extends GetView<WilayahController> {
           final dataSource = WilayahSource(
             onEdited: (WilayahModel model) {
               controller.namaWilayahController.text = model.wilayah;
-              showGeneralDialog(
+              CustomDialogs.defaultDialog(
                 context: context,
-                barrierLabel: "Barrier",
-                barrierDismissible: true,
-                barrierColor: Colors.black.withOpacity(0.5),
-                transitionDuration: const Duration(milliseconds: 300),
-                pageBuilder: (_, __, ___) {
-                  return Center(
-                    child: Material(
-                      type: MaterialType.transparency,
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(CustomSize.borderRadiusLg),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Edit Type Motor',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: controller.namaWilayahController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Type motor harus di isi';
-                                }
-                                return null;
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'Type motor',
-                              ),
-                              onChanged: (value) {
-                                controller.namaWilayahController.text = value;
-                              },
-                            ),
-                            const SizedBox(height: CustomSize.spaceBtwSections),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                OutlinedButton(
-                                    onPressed: () => Get.back(),
-                                    style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: CustomSize.lg,
-                                            vertical: CustomSize.md)),
-                                    child: const Text('Close')),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    controller.editWilayah(model.idWilayah,
-                                        controller.namaWilayahController.text);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: CustomSize.lg,
-                                          vertical: CustomSize.md)),
-                                  child: const Text('Tambahkan'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                contentWidget: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Edit Type Motor',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: controller.namaWilayahController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Type motor harus di isi';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Type motor',
                       ),
+                      onChanged: (value) {
+                        controller.namaWilayahController.text = value;
+                      },
                     ),
-                  );
-                },
-                transitionBuilder: (_, anim, __, child) {
-                  return ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: anim,
-                      curve: Curves.easeOutBack,
+                    const SizedBox(height: CustomSize.spaceBtwSections),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlinedButton(
+                            onPressed: () => Get.back(),
+                            style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: CustomSize.lg,
+                                    vertical: CustomSize.md)),
+                            child: const Text('Close')),
+                        ElevatedButton(
+                          onPressed: () {
+                            controller.editWilayah(model.idWilayah,
+                                controller.namaWilayahController.text);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: CustomSize.lg,
+                                  vertical: CustomSize.md)),
+                          child: const Text('Tambahkan'),
+                        ),
+                      ],
                     ),
-                    child: child,
-                  );
-                },
+                  ],
+                ),
               );
             },
             wilayahModel: controller.wilayahModel,
@@ -191,81 +163,51 @@ class MasterWilayah extends GetView<WilayahController> {
   }
 
   void showDialogWithAnimation(BuildContext context) {
-    showGeneralDialog(
+    CustomDialogs.defaultDialog(
       context: context,
-      barrierLabel: "Barrier",
-      barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (_, __, ___) {
-        return Center(
-          child: Material(
-            type: MaterialType.transparency,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              width: MediaQuery.of(context).size.width * 0.8,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Tambah Wilayah',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: controller.namaWilayahController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama wilayah harus di isi';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Nama wilayah',
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlinedButton(
-                          onPressed: () => Get.back(),
-                          style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: CustomSize.lg,
-                                  vertical: CustomSize.md)),
-                          child: const Text('Close')),
-                      ElevatedButton(
-                        onPressed: () {
-                          print('nambah data wilayah');
-                        },
-                        style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: CustomSize.lg,
-                                vertical: CustomSize.md)),
-                        child: const Text('Tambahkan'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      contentWidget: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Tambah Wilayah',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          TextFormField(
+            controller: controller.namaWilayahController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Nama wilayah harus di isi';
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: 'Nama wilayah',
             ),
           ),
-        );
-      },
-      transitionBuilder: (_, anim, __, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: anim,
-            curve: Curves.easeOutBack,
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OutlinedButton(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                  child: const Text('Close')),
+              ElevatedButton(
+                onPressed: () {
+                  print('nambah data wilayah');
+                },
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                child: const Text('Tambahkan'),
+              ),
+            ],
           ),
-          child: child,
-        );
-      },
+        ],
+      ),
     );
   }
 }

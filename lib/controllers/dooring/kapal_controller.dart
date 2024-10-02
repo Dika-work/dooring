@@ -1,4 +1,3 @@
-import 'package:dooring/controllers/dooring/dooring_controller.dart';
 import 'package:dooring/helpers/helper_func.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,7 @@ import '../../repository/dooring/kapal_repo.dart';
 import '../../utils/constant/storage_util.dart';
 import '../../utils/popups/dialogs.dart';
 import '../../utils/popups/snackbar.dart';
+import 'dooring_controller.dart';
 
 class KapalController extends GetxController {
   final kapalRepo = Get.put(KapalRepository());
@@ -32,6 +32,7 @@ class KapalController extends GetxController {
   TextEditingController namaKapalController = TextEditingController();
 
   final List<String> namaPelayaranMap = [
+    //make master pelayaran
     'CTP',
     'MERATUS',
     'TANTO',
@@ -388,11 +389,6 @@ class TypeMotorController extends GetxController {
       return;
     }
 
-    if (!addDefectKey.currentState!.validate()) {
-      CustomHelperFunctions.stopLoading();
-      return;
-    }
-
     bool isDuplicate = defectModel.any((data) =>
         data.typeMotor.toString() == typeMotor && data.part.toString() == part);
 
@@ -418,23 +414,6 @@ class TypeMotorController extends GetxController {
     selectedMotor.value = '';
     partMotorController.selectedWilayah.value = '';
     jumlahDefectController.clear();
-    await dooringController.fetchDooringData();
-    CustomHelperFunctions.stopLoading();
-  }
-
-  Future<void> deleteDefectTable(int idDooring, int idDefect) async {
-    CustomDialogs.loadingIndicator();
-
-    final isConnected = await networkManager.isConnected();
-    if (!isConnected) {
-      CustomHelperFunctions.stopLoading();
-      SnackbarLoader.errorSnackBar(
-          title: 'Tidak ada koneksi internet',
-          message: 'Silahkan coba lagi setelah koneksi tersedia');
-      return;
-    }
-    await typeMotorRepo.deleteDefectTableContent(idDefect);
-
     await fetchDefetchTable(idDooring);
     CustomHelperFunctions.stopLoading();
   }

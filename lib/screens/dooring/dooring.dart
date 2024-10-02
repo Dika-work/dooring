@@ -1,3 +1,5 @@
+import 'package:dooring/utils/popups/snackbar.dart';
+import 'package:dooring/widgets/dropdown.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,9 +14,11 @@ import '../../models/dooring/dooring_model.dart';
 import '../../models/dooring/kapal_model.dart';
 import '../../utils/constant/custom_size.dart';
 import '../../utils/loader/circular_loader.dart';
+import '../../utils/popups/dialogs.dart';
 import '../../utils/source/dooring/defect_source.dart';
 import '../../utils/source/dooring/dooring_source.dart';
 import '../../utils/theme/app_colors.dart';
+import 'tambah_defect_detail.dart';
 
 class Dooring extends GetView<DooringController> {
   const Dooring({super.key});
@@ -51,52 +55,165 @@ class Dooring extends GetView<DooringController> {
               print('ini lihat dooring');
             },
             onDefect: (DooringModel model) async {
-              await Navigator.of(context).push(PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    TambahDefect(
-                  model: model,
-                  controller: typeMotorController,
-                ),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  const begin = 0.0;
-                  const end = 1.0;
-                  const curve = Curves.easeInOut;
+              if (model.statusDefect == 0) {
+                CustomDialogs.defaultDialog(
+                  contentWidget: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text('Konfirmasi Defect Motor',
+                            style: Theme.of(context).textTheme.headlineMedium),
+                      ),
+                      const SizedBox(height: CustomSize.spaceBtwItems),
+                      Text('Nama Kapal',
+                          style: Theme.of(context).textTheme.labelMedium),
+                      TextFormField(
+                        controller:
+                            TextEditingController(text: model.namaKapal),
+                        readOnly: true,
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Tanggal Bongkar',
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium),
+                              TextFormField(
+                                controller: TextEditingController(
+                                    text: model.tglBongkar),
+                                readOnly: true,
+                              ),
+                            ],
+                          )),
+                          const SizedBox(width: CustomSize.sm),
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('ETD',
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium),
+                              TextFormField(
+                                controller:
+                                    TextEditingController(text: model.etd),
+                                readOnly: true,
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Jumlah Unit',
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium),
+                              TextFormField(
+                                controller: TextEditingController(
+                                    text: model.unit.toString()),
+                                readOnly: true,
+                              ),
+                            ],
+                          )),
+                          const SizedBox(width: CustomSize.sm),
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Wilayah',
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium),
+                              TextFormField(
+                                controller:
+                                    TextEditingController(text: model.wilayah),
+                                readOnly: true,
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
+                      const SizedBox(height: CustomSize.sm),
+                      Text('Status Defect',
+                          style: Theme.of(context).textTheme.labelMedium),
+                      Obx(
+                        () => DropDownWidget(
+                          value: controller.statusDefect.value,
+                          items: controller.listStatusDefect.keys.toList(),
+                          onChanged: (String? value) {
+                            controller.statusDefect.value = value!;
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: CustomSize.spaceBtwSections),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: CustomSize.lg,
+                                      vertical: CustomSize.md)),
+                              child: const Text('Close')),
+                          ElevatedButton(
+                            onPressed: () {
+                              controller.changeStatusDefect(
+                                  model.idDooring, controller.getStatusDefect);
+                            },
+                            style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: CustomSize.lg,
+                                    vertical: CustomSize.md)),
+                            child: const Text('Tambahkan'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  context: context,
+                );
+              } else if (model.statusDefect == 1) {
+                await Navigator.of(context).push(PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      TambahDefect(
+                    model: model,
+                    controller: typeMotorController,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = 0.0;
+                    const end = 1.0;
+                    const curve = Curves.easeInOut;
 
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
+                    var tween = Tween(begin: begin, end: end).chain(
+                      CurveTween(curve: curve),
+                    );
 
-                  return FadeTransition(
-                    opacity: animation.drive(tween),
-                    child: child,
-                  );
-                },
-              ));
+                    return FadeTransition(
+                      opacity: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ));
+              }
             },
             onEdited: (DooringModel model) {
-              showGeneralDialog(
-                context: context,
-                barrierLabel: "Barrier",
-                barrierDismissible: true,
-                barrierColor: Colors.black.withOpacity(0.5),
-                transitionDuration: const Duration(milliseconds: 300),
-                pageBuilder: (_, __, ___) {
-                  return EditDooring(
+              CustomDialogs.defaultDialog(
+                  context: context,
+                  margin: const EdgeInsets.symmetric(vertical: CustomSize.xl),
+                  contentWidget: EditDooring(
                     model: model,
                     controller: controller,
-                  );
-                },
-                transitionBuilder: (_, anim, __, child) {
-                  return ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: anim,
-                      curve: Curves.easeOutBack,
-                    ),
-                    child: child,
-                  );
-                },
-              );
+                  ));
             },
             dooringModel: controller.dooringModel,
           );
@@ -307,7 +424,20 @@ class TambahDooring extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium),
           centerTitle: true,
           leading: IconButton(
-            onPressed: () => Get.back(),
+            onPressed: () {
+              controller.jumlahUnitController.clear();
+              controller.helmController.clear();
+              controller.accuController.clear();
+              controller.spionController.clear();
+              controller.buserController.clear();
+              controller.toolsetController.clear();
+              controller.helmKurangController.clear();
+              controller.accuKurangController.clear();
+              controller.spionKurangController.clear();
+              controller.buserKurangController.clear();
+              controller.toolsetKurangController.clear();
+              Get.back();
+            },
             icon: const Icon(Icons.arrow_back_ios_new),
           ),
         ),
@@ -368,88 +498,98 @@ class TambahDooring extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    flex: 2,
-                    child: Obx(
-                      () => TextFormField(
-                        keyboardType: TextInputType.none,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              DateTime? selectedDate =
-                                  DateTime.tryParse(controller.tglETD.value);
-                              showDatePicker(
-                                context: context,
-                                locale: const Locale("id", "ID"),
-                                initialDate: selectedDate ?? DateTime.now(),
-                                firstDate: DateTime(1850),
-                                lastDate: DateTime(2040),
-                              ).then((newSelectedDate) {
-                                if (newSelectedDate != null) {
-                                  controller.tglETD.value =
-                                      CustomHelperFunctions
-                                          .getFormattedDateDatabase(
-                                              newSelectedDate);
-                                  print(
-                                      'Ini tanggal yang dipilih : ${controller.tglETD.value}');
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.calendar_today),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('ETD'),
+                        Obx(
+                          () => TextFormField(
+                            keyboardType: TextInputType.none,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  DateTime? selectedDate = DateTime.tryParse(
+                                      controller.tglETD.value);
+                                  showDatePicker(
+                                    context: context,
+                                    locale: const Locale("id", "ID"),
+                                    initialDate: selectedDate ?? DateTime.now(),
+                                    firstDate: DateTime(1850),
+                                    lastDate: DateTime(2040),
+                                  ).then((newSelectedDate) {
+                                    if (newSelectedDate != null) {
+                                      controller.tglETD.value =
+                                          CustomHelperFunctions
+                                              .getFormattedDateDatabase(
+                                                  newSelectedDate);
+                                      print(
+                                          'Ini tanggal yang dipilih : ${controller.tglETD.value}');
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.calendar_today),
+                              ),
+                              hintText: controller.tglETD.value.isNotEmpty
+                                  ? DateFormat('d/M/yyyy').format(
+                                      DateTime.tryParse(
+                                              '${controller.tglETD.value} 00:00:00') ??
+                                          DateTime.now(),
+                                    )
+                                  : 'ETD',
+                            ),
                           ),
-                          hintText: controller.tglETD.value.isNotEmpty
-                              ? DateFormat('d/M/yyyy').format(
-                                  DateTime.tryParse(
-                                          '${controller.tglETD.value} 00:00:00') ??
-                                      DateTime.now(),
-                                )
-                              : 'ETD',
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: CustomSize.md),
                   Expanded(
-                    flex: 2,
-                    child: Obx(
-                      () => TextFormField(
-                        keyboardType: TextInputType.none,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              DateTime? selectedDate = DateTime.tryParse(
-                                  controller.tglBongkar.value);
-                              showDatePicker(
-                                context: context,
-                                locale: const Locale("id", "ID"),
-                                initialDate: selectedDate ?? DateTime.now(),
-                                firstDate: DateTime(1850),
-                                lastDate: DateTime(2040),
-                              ).then((newSelectedDate) {
-                                if (newSelectedDate != null) {
-                                  controller.tglBongkar.value =
-                                      CustomHelperFunctions
-                                          .getFormattedDateDatabase(
-                                              newSelectedDate);
-                                  print(
-                                      'Ini tanggal yang dipilih : ${controller.tglBongkar.value}');
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.calendar_today),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Tgl Bongkar'),
+                        Obx(
+                          () => TextFormField(
+                            keyboardType: TextInputType.none,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  DateTime? selectedDate = DateTime.tryParse(
+                                      controller.tglBongkar.value);
+                                  showDatePicker(
+                                    context: context,
+                                    locale: const Locale("id", "ID"),
+                                    initialDate: selectedDate ?? DateTime.now(),
+                                    firstDate: DateTime(1850),
+                                    lastDate: DateTime(2040),
+                                  ).then((newSelectedDate) {
+                                    if (newSelectedDate != null) {
+                                      controller.tglBongkar.value =
+                                          CustomHelperFunctions
+                                              .getFormattedDateDatabase(
+                                                  newSelectedDate);
+                                      print(
+                                          'Ini tanggal yang dipilih : ${controller.tglBongkar.value}');
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.calendar_today),
+                              ),
+                              hintText: controller.tglBongkar.value.isNotEmpty
+                                  ? DateFormat('d/M/yyyy').format(
+                                      DateTime.tryParse(
+                                              '${controller.tglBongkar.value} 00:00:00') ??
+                                          DateTime.now(),
+                                    )
+                                  : 'Tgl Bongkar',
+                            ),
                           ),
-                          hintText: controller.tglBongkar.value.isNotEmpty
-                              ? DateFormat('d/M/yyyy').format(
-                                  DateTime.tryParse(
-                                          '${controller.tglBongkar.value} 00:00:00') ??
-                                      DateTime.now(),
-                                )
-                              : 'Tgl Bongkar',
-                        ),
-                      ),
+                        )
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: CustomSize.spaceBtwItems),
@@ -762,11 +902,11 @@ class TambahDefect extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
-      body: Form(
-          key: controller.addDefectKey,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-                horizontal: CustomSize.md, vertical: CustomSize.sm),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(CustomSize.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Nama Kapal'),
               TextFormField(
@@ -810,9 +950,181 @@ class TambahDefect extends StatelessWidget {
                   return const CustomCircularLoader();
                 } else {
                   final dataSource = DefectSource(
-                    onDeleted: (DefectModel modelDefect) =>
-                        controller.deleteDefectTable(
-                            modelDefect.idDooring, modelDefect.idDefect),
+                    onEdited: (DefectModel modelDefect) {
+                      CustomDialogs.defaultDialog(
+                          context: context,
+                          contentWidget: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Edit Data Defect',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium),
+                              const SizedBox(height: CustomSize.spaceBtwItems),
+                              Obx(() {
+                                return DropdownSearch<TypeMotorModel>(
+                                  items: controller.filteredMotorModel,
+                                  itemAsString: (TypeMotorModel kendaraan) =>
+                                      kendaraan.typeMotor,
+                                  selectedItem: controller
+                                          .selectedMotor.value.isNotEmpty
+                                      ? controller.filteredMotorModel
+                                          .firstWhere(
+                                          (kendaraan) =>
+                                              kendaraan.typeMotor ==
+                                              controller.selectedMotor.value,
+                                          orElse: () => TypeMotorModel(
+                                            idType: 0,
+                                            merk: '',
+                                            typeMotor: '',
+                                          ),
+                                        )
+                                      : null,
+                                  dropdownBuilder:
+                                      (context, TypeMotorModel? selectedItem) {
+                                    return Text(
+                                      selectedItem != null
+                                          ? selectedItem.typeMotor
+                                          : 'Pilih type motor',
+                                      style: TextStyle(
+                                          fontSize: CustomSize.fontSizeSm,
+                                          color: selectedItem == null
+                                              ? Colors.grey
+                                              : Colors.black,
+                                          fontWeight: FontWeight.w600),
+                                    );
+                                  },
+                                  onChanged: (TypeMotorModel? kendaraan) {
+                                    if (kendaraan != null) {
+                                      controller.selectedMotor.value =
+                                          kendaraan.typeMotor;
+                                      print(
+                                          'ini nama kapal : ${controller.selectedMotor.value}');
+                                    } else {
+                                      controller.resetSelectedKendaraan();
+                                    }
+                                  },
+                                  popupProps: const PopupProps.menu(
+                                    showSearchBox: true,
+                                    searchFieldProps: TextFieldProps(
+                                      decoration: InputDecoration(
+                                        hintText: 'Search Type Motor...',
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: CustomSize.sm),
+                              Obx(() {
+                                return DropdownSearch<PartMotorModel>(
+                                  items: partMotorController
+                                      .filteredPartMotorModel,
+                                  itemAsString: (PartMotorModel kendaraan) =>
+                                      kendaraan.namaPart,
+                                  selectedItem: partMotorController
+                                          .selectedWilayah.value.isNotEmpty
+                                      ? partMotorController
+                                          .filteredPartMotorModel
+                                          .firstWhere(
+                                          (kendaraan) =>
+                                              kendaraan.namaPart ==
+                                              partMotorController
+                                                  .selectedWilayah.value,
+                                          orElse: () => PartMotorModel(
+                                            idPart: 0,
+                                            namaPart: '',
+                                          ),
+                                        )
+                                      : null,
+                                  dropdownBuilder:
+                                      (context, PartMotorModel? selectedItem) {
+                                    return Text(
+                                      selectedItem != null
+                                          ? selectedItem.namaPart
+                                          : 'Pilih part motor',
+                                      style: TextStyle(
+                                          fontSize: CustomSize.fontSizeSm,
+                                          color: selectedItem == null
+                                              ? Colors.grey
+                                              : Colors.black,
+                                          fontWeight: FontWeight.w600),
+                                    );
+                                  },
+                                  onChanged: (PartMotorModel? kendaraan) {
+                                    if (kendaraan != null) {
+                                      partMotorController.selectedWilayah
+                                          .value = kendaraan.namaPart;
+                                      print(
+                                          'ini nama kapal : ${partMotorController.selectedWilayah.value}');
+                                    } else {
+                                      partMotorController
+                                          .resetSelectedKendaraan();
+                                    }
+                                  },
+                                  popupProps: const PopupProps.menu(
+                                    showSearchBox: true,
+                                    searchFieldProps: TextFieldProps(
+                                      decoration: InputDecoration(
+                                        hintText: 'Search part motor...',
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller:
+                                    TextEditingController(text: 'ini jumlah'),
+                                decoration: const InputDecoration(
+                                    label: Text('Jumlah')),
+                              ),
+                              const SizedBox(
+                                  height: CustomSize.spaceBtwSections),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  OutlinedButton(
+                                      onPressed: () => Get.back(),
+                                      style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: CustomSize.lg,
+                                              vertical: CustomSize.md)),
+                                      child: const Text('Close')),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      print('nambah data wilayah');
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: CustomSize.lg,
+                                            vertical: CustomSize.md)),
+                                    child: const Text('Tambahkan'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ));
+                    },
+                    onAdded: (DefectModel modelDefect) {
+                      Get.to(() =>
+                          TambahDefectDetail(idDefect: modelDefect.idDefect));
+                    },
+                    onDeleted: (DefectModel modelDefect) {},
+                    onLihat: (DefectModel modelDefect) {
+                      CustomDialogs.defaultDialog(
+                          context: context,
+                          contentWidget: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Detail Rincian Defect',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium),
+                              const SizedBox(height: CustomSize.spaceBtwItems),
+                            ],
+                          ));
+                    },
                     defectModel: controller.defectModel,
                     startIndex: 0 * 5,
                   );
@@ -832,14 +1144,15 @@ class TambahDefect extends StatelessWidget {
                         height: tableHeight,
                         child: SfDataGrid(
                           source: dataSource,
-                          columnWidthMode: ColumnWidthMode.fill,
+                          verticalScrollPhysics:
+                              const NeverScrollableScrollPhysics(),
+                          columnWidthMode: isTableEmpty
+                              ? ColumnWidthMode.fill
+                              : ColumnWidthMode.auto,
                           gridLinesVisibility: GridLinesVisibility.both,
                           headerGridLinesVisibility: GridLinesVisibility.both,
-                          horizontalScrollPhysics:
-                              const NeverScrollableScrollPhysics(),
                           columns: [
                             GridColumn(
-                              width: 50,
                               columnName: 'No',
                               label: Container(
                                 alignment: Alignment.center,
@@ -859,7 +1172,6 @@ class TambahDefect extends StatelessWidget {
                               ),
                             ),
                             GridColumn(
-                              width: 120,
                               columnName: 'Type Motor',
                               label: Container(
                                 alignment: Alignment.center,
@@ -879,7 +1191,6 @@ class TambahDefect extends StatelessWidget {
                               ),
                             ),
                             GridColumn(
-                              width: 100,
                               columnName: 'Part Motor',
                               label: Container(
                                 alignment: Alignment.center,
@@ -919,6 +1230,66 @@ class TambahDefect extends StatelessWidget {
                             ),
                             if (controller.defectModel.isNotEmpty)
                               GridColumn(
+                                columnName: 'Lihat',
+                                label: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.lightBlue.shade100,
+                                  ),
+                                  child: Text(
+                                    'Lihat',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            if (controller.defectModel.isNotEmpty)
+                              GridColumn(
+                                columnName: 'Add',
+                                label: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.lightBlue.shade100,
+                                  ),
+                                  child: Text(
+                                    'Add',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            if (controller.defectModel.isNotEmpty)
+                              GridColumn(
+                                columnName: 'Edit',
+                                label: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.lightBlue.shade100,
+                                  ),
+                                  child: Text(
+                                    'Edit',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            if (controller.defectModel.isNotEmpty)
+                              GridColumn(
                                 columnName: 'Hps',
                                 label: Container(
                                   alignment: Alignment.center,
@@ -940,7 +1311,7 @@ class TambahDefect extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (rowCount > 5)
+                      if (rowCount >= 5)
                         SfDataPager(
                           delegate: dataSource,
                           pageCount: (controller.defectModel.length / 5)
@@ -952,172 +1323,206 @@ class TambahDefect extends StatelessWidget {
                 }
               }),
               const SizedBox(height: CustomSize.spaceBtwItems),
-              Obx(() {
-                return DropdownSearch<TypeMotorModel>(
-                  items: controller.filteredMotorModel,
-                  itemAsString: (TypeMotorModel kendaraan) =>
-                      kendaraan.typeMotor,
-                  selectedItem: controller.selectedMotor.value.isNotEmpty
-                      ? controller.filteredMotorModel.firstWhere(
-                          (kendaraan) =>
-                              kendaraan.typeMotor ==
-                              controller.selectedMotor.value,
-                          orElse: () => TypeMotorModel(
-                            idType: 0,
-                            merk: '',
-                            typeMotor: '',
-                          ),
-                        )
-                      : null,
-                  dropdownBuilder: (context, TypeMotorModel? selectedItem) {
-                    return Text(
-                      selectedItem != null
-                          ? selectedItem.typeMotor
-                          : 'Pilih type motor',
-                      style: TextStyle(
-                          fontSize: CustomSize.fontSizeSm,
-                          color:
-                              selectedItem == null ? Colors.grey : Colors.black,
-                          fontWeight: FontWeight.w600),
-                    );
-                  },
-                  onChanged: (TypeMotorModel? kendaraan) {
-                    if (kendaraan != null) {
-                      controller.selectedMotor.value = kendaraan.typeMotor;
-                      print(
-                          'ini nama kapal : ${controller.selectedMotor.value}');
-                    } else {
-                      controller.resetSelectedKendaraan();
-                    }
-                  },
-                  popupProps: const PopupProps.menu(
-                    showSearchBox: true,
-                    searchFieldProps: TextFieldProps(
-                      decoration: InputDecoration(
-                        hintText: 'Search Type Motor...',
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              const SizedBox(height: CustomSize.sm),
-              Obx(() {
-                return DropdownSearch<PartMotorModel>(
-                  items: partMotorController.filteredPartMotorModel,
-                  itemAsString: (PartMotorModel kendaraan) =>
-                      kendaraan.namaPart,
-                  selectedItem: partMotorController
-                          .selectedWilayah.value.isNotEmpty
-                      ? partMotorController.filteredPartMotorModel.firstWhere(
-                          (kendaraan) =>
-                              kendaraan.namaPart ==
-                              partMotorController.selectedWilayah.value,
-                          orElse: () => PartMotorModel(
-                            idPart: 0,
-                            namaPart: '',
-                          ),
-                        )
-                      : null,
-                  dropdownBuilder: (context, PartMotorModel? selectedItem) {
-                    return Text(
-                      selectedItem != null
-                          ? selectedItem.namaPart
-                          : 'Pilih part motor',
-                      style: TextStyle(
-                          fontSize: CustomSize.fontSizeSm,
-                          color:
-                              selectedItem == null ? Colors.grey : Colors.black,
-                          fontWeight: FontWeight.w600),
-                    );
-                  },
-                  onChanged: (PartMotorModel? kendaraan) {
-                    if (kendaraan != null) {
-                      partMotorController.selectedWilayah.value =
-                          kendaraan.namaPart;
-                      print(
-                          'ini nama kapal : ${partMotorController.selectedWilayah.value}');
-                    } else {
-                      partMotorController.resetSelectedKendaraan();
-                    }
-                  },
-                  popupProps: const PopupProps.menu(
-                    showSearchBox: true,
-                    searchFieldProps: TextFieldProps(
-                      decoration: InputDecoration(
-                        hintText: 'Search part motor...',
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              const SizedBox(height: CustomSize.sm),
-              const Text('Jumlah'),
-              TextFormField(
-                controller: controller.jumlahDefectController,
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: CustomSize.spaceBtwSections),
-              SizedBox(
-                width: CustomHelperFunctions.screenWidth(),
-                child: Obx(() {
-                  return Row(
-                    children: [
-                      if (controller
-                          .defectModel.isNotEmpty) // Cek jika data ada
-                        Expanded(
-                          flex: 2, // Tombol selesai flex 2
-                          child: OutlinedButton(
-                            onPressed: () =>
-                                controller.selesaiDefect(model.idDooring),
-                            style: OutlinedButton.styleFrom(
-                                side:
-                                    const BorderSide(color: AppColors.success)),
-                            child: const Text(
-                              'Selesai',
+              Form(
+                key: controller.addDefectKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() {
+                      return DropdownSearch<TypeMotorModel>(
+                        items: controller.filteredMotorModel,
+                        itemAsString: (TypeMotorModel kendaraan) =>
+                            kendaraan.typeMotor,
+                        selectedItem: controller.selectedMotor.value.isNotEmpty
+                            ? controller.filteredMotorModel.firstWhere(
+                                (kendaraan) =>
+                                    kendaraan.typeMotor ==
+                                    controller.selectedMotor.value,
+                                orElse: () => TypeMotorModel(
+                                  idType: 0,
+                                  merk: '',
+                                  typeMotor: '',
+                                ),
+                              )
+                            : null,
+                        dropdownBuilder:
+                            (context, TypeMotorModel? selectedItem) {
+                          return Text(
+                            selectedItem != null
+                                ? selectedItem.typeMotor
+                                : 'Pilih type motor',
+                            style: TextStyle(
+                                fontSize: CustomSize.fontSizeSm,
+                                color: selectedItem == null
+                                    ? Colors.grey
+                                    : Colors.black,
+                                fontWeight: FontWeight.w600),
+                          );
+                        },
+                        onChanged: (TypeMotorModel? kendaraan) {
+                          if (kendaraan != null) {
+                            controller.selectedMotor.value =
+                                kendaraan.typeMotor;
+                            print(
+                                'ini nama kapal : ${controller.selectedMotor.value}');
+                          } else {
+                            controller.resetSelectedKendaraan();
+                          }
+                        },
+                        popupProps: const PopupProps.menu(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              hintText: 'Search Type Motor...',
                             ),
                           ),
                         ),
-                      if (controller.defectModel.isNotEmpty)
-                        const SizedBox(
-                            width: CustomSize.sm), // Jarak antar tombol
-                      Expanded(
-                        flex: controller.defectModel.isNotEmpty
-                            ? 1
-                            : 3, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
-                        child: ElevatedButton(
-                          onPressed: () => controller.addDataDefect(
-                            model.idDooring,
-                            CustomHelperFunctions.formattedTime,
-                            CustomHelperFunctions.getFormattedDateDatabase(
-                                DateTime.now()),
-                            controller.selectedMotor.value,
-                            partMotorController.selectedWilayah.value,
-                            int.parse(controller.jumlahDefectController.text),
-                          ),
-                          // onPressed: () {
-                          //   print('ini id dooring: ${model.idDooring}');
-                          //   print(
-                          //       'ini jam dooring: ${CustomHelperFunctions.formattedTime}');
-                          //   print(
-                          //       'ini tgl dooring: ${CustomHelperFunctions.getFormattedDateDatabase(DateTime.now())}');
-                          //   print(
-                          //       'ini typeMotor dooring: ${controller.selectedMotor.value}');
-                          //   print(
-                          //       'ini part dooring: ${partMotorController.selectedWilayah.value}');
-                          //   print(
-                          //       'ini jumlah dooring: ${int.parse(controller.jumlahDefectController.text)}');
-                          // },
-                          child: const Text(
-                            'Tambah',
+                      );
+                    }),
+                    const SizedBox(height: CustomSize.sm),
+                    Obx(() {
+                      return DropdownSearch<PartMotorModel>(
+                        items: partMotorController.filteredPartMotorModel,
+                        itemAsString: (PartMotorModel kendaraan) =>
+                            kendaraan.namaPart,
+                        selectedItem: partMotorController
+                                .selectedWilayah.value.isNotEmpty
+                            ? partMotorController.filteredPartMotorModel
+                                .firstWhere(
+                                (kendaraan) =>
+                                    kendaraan.namaPart ==
+                                    partMotorController.selectedWilayah.value,
+                                orElse: () => PartMotorModel(
+                                  idPart: 0,
+                                  namaPart: '',
+                                ),
+                              )
+                            : null,
+                        dropdownBuilder:
+                            (context, PartMotorModel? selectedItem) {
+                          return Text(
+                            selectedItem != null
+                                ? selectedItem.namaPart
+                                : 'Pilih part motor',
+                            style: TextStyle(
+                                fontSize: CustomSize.fontSizeSm,
+                                color: selectedItem == null
+                                    ? Colors.grey
+                                    : Colors.black,
+                                fontWeight: FontWeight.w600),
+                          );
+                        },
+                        onChanged: (PartMotorModel? kendaraan) {
+                          if (kendaraan != null) {
+                            partMotorController.selectedWilayah.value =
+                                kendaraan.namaPart;
+                            print(
+                                'ini nama kapal : ${partMotorController.selectedWilayah.value}');
+                          } else {
+                            partMotorController.resetSelectedKendaraan();
+                          }
+                        },
+                        popupProps: const PopupProps.menu(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              hintText: 'Search part motor...',
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }),
-              ),
+                      );
+                    }),
+                    const SizedBox(height: CustomSize.sm),
+                    const Text('Jumlah'),
+                    TextFormField(
+                      controller: controller.jumlahDefectController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Data tidak boleh kosong!';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.spaceBtwItems),
+                    Obx(() {
+                      return Row(
+                        children: [
+                          if (controller
+                              .defectModel.isNotEmpty) // Cek jika data ada
+                            Expanded(
+                              flex: 2, // Tombol selesai flex 2
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    controller.selesaiDefect(model.idDooring),
+                                style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                        color: AppColors.success)),
+                                child: const Text(
+                                  'Selesai',
+                                ),
+                              ),
+                            ),
+                          if (controller.defectModel.isNotEmpty)
+                            const SizedBox(
+                                width: CustomSize.sm), // Jarak antar tombol
+                          Expanded(
+                            flex: controller.defectModel.isNotEmpty
+                                ? 1
+                                : 3, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (!controller.addDefectKey.currentState!
+                                        .validate() ||
+                                    controller.selectedMotor.value.isEmpty ||
+                                    partMotorController
+                                        .selectedWilayah.value.isEmpty) {
+                                  SnackbarLoader.warningSnackBar(
+                                      title: 'Oops 🤣',
+                                      message:
+                                          'Harap mengisi seluruh form yang ada');
+                                  return;
+                                }
+                                controller.addDataDefect(
+                                  model.idDooring,
+                                  CustomHelperFunctions.formattedTime,
+                                  CustomHelperFunctions
+                                      .getFormattedDateDatabase(DateTime.now()),
+                                  controller.selectedMotor.value,
+                                  partMotorController.selectedWilayah.value,
+                                  int.parse(controller
+                                      .jumlahDefectController.text
+                                      .trim()),
+                                );
+                              },
+                              // onPressed: () {
+                              //   print('ini id dooring: ${model.idDooring}');
+                              //   print(
+                              //       'ini jam dooring: ${CustomHelperFunctions.formattedTime}');
+                              //   print(
+                              //       'ini tgl dooring: ${CustomHelperFunctions.getFormattedDateDatabase(DateTime.now())}');
+                              //   print(
+                              //       'ini typeMotor dooring: ${controller.selectedMotor.value}');
+                              //   print(
+                              //       'ini part dooring: ${partMotorController.selectedWilayah.value}');
+                              //   print(
+                              //       'ini jumlah dooring: ${int.parse(controller.jumlahDefectController.text)}');
+                              // },
+                              child: const Text(
+                                'Tambah',
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              )
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -1179,6 +1584,16 @@ class _EditDooringState extends State<EditDooring> {
   @override
   void dispose() {
     unit.dispose();
+    helm1.dispose();
+    accu1.dispose();
+    spion1.dispose();
+    buser1.dispose();
+    toolset1.dispose();
+    helmKurang.dispose();
+    accuKurang.dispose();
+    spionKurang.dispose();
+    buserKurang.dispose();
+    toolsetKurang.dispose();
     super.dispose();
   }
 
@@ -1186,374 +1601,379 @@ class _EditDooringState extends State<EditDooring> {
   Widget build(BuildContext context) {
     final kapalController = Get.put(KapalController());
     final wilayahController = Get.put(WilayahController());
-    return AlertDialog(
-      title: Text(
-        'Edit data DO Global',
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Nama Kapal'),
-            Obx(() {
-              return DropdownSearch<KapalModel>(
-                items: kapalController.filteredKapalModel,
-                itemAsString: (KapalModel kendaraan) => kendaraan.namaKapal,
-                selectedItem: kapalController.filteredKapalModel.firstWhere(
-                  (kendaraan) => kendaraan.namaKapal == namaKapal,
-                  orElse: () => KapalModel(
-                    idPelayaran: 0,
-                    namaKapal: '',
-                    namaPelayaran: '',
-                  ),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Nama Kapal'),
+          Obx(() {
+            return DropdownSearch<KapalModel>(
+              items: kapalController.filteredKapalModel,
+              itemAsString: (KapalModel kendaraan) => kendaraan.namaKapal,
+              selectedItem: kapalController.filteredKapalModel.firstWhere(
+                (kendaraan) => kendaraan.namaKapal == namaKapal,
+                orElse: () => KapalModel(
+                  idPelayaran: 0,
+                  namaKapal: '',
+                  namaPelayaran: '',
                 ),
-                dropdownBuilder: (context, KapalModel? selectedItem) {
-                  return Text(
-                    selectedItem != null
-                        ? selectedItem.namaKapal
-                        : 'Pilih nama kapal',
-                    style: TextStyle(
-                      fontSize: CustomSize.fontSizeSm,
-                      color: selectedItem == null ? Colors.grey : Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  );
-                },
-                onChanged: (KapalModel? kendaraan) {
-                  setState(() {
-                    if (kendaraan != null) {
-                      namaKapal = kendaraan.namaKapal;
-                      kapalController.selectedKapal.value = kendaraan.namaKapal;
-                    } else {
-                      kapalController.resetSelectedKendaraan();
-                      namaKapal = '';
-                    }
-                  });
-                },
-                popupProps: const PopupProps.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                      hintText: 'Search Kapal...',
-                    ),
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: CustomSize.spaceBtwItems),
-            const Text('ETD'),
-            TextFormField(
-              keyboardType: TextInputType.none,
-              readOnly: true,
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    DateTime? selectedDate = DateTime.tryParse(etd);
-                    showDatePicker(
-                      context: context,
-                      locale: const Locale("id", "ID"),
-                      initialDate: selectedDate ?? DateTime.now(),
-                      firstDate: DateTime(1850),
-                      lastDate: DateTime(2040),
-                    ).then((newSelectedDate) {
-                      if (newSelectedDate != null) {
-                        etd = CustomHelperFunctions.getFormattedDateDatabase(
-                            newSelectedDate);
-                        print('Ini tanggal yang dipilih : $etd');
-                      }
-                    });
-                  },
-                  icon: const Icon(Icons.calendar_today),
-                ),
-                hintText: etd.isNotEmpty
-                    ? DateFormat('d/M/yyyy').format(
-                        DateTime.tryParse('$etd 00:00:00') ?? DateTime.now(),
-                      )
-                    : 'ETD',
               ),
-            ),
-            const SizedBox(height: CustomSize.spaceBtwItems),
-            const Text('Tgl Bongkar'),
-            TextFormField(
-              keyboardType: TextInputType.none,
-              readOnly: true,
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    DateTime? selectedDate = DateTime.tryParse(tglBongkar);
-                    showDatePicker(
-                      context: context,
-                      locale: const Locale("id", "ID"),
-                      initialDate: selectedDate ?? DateTime.now(),
-                      firstDate: DateTime(1850),
-                      lastDate: DateTime(2040),
-                    ).then((newSelectedDate) {
-                      if (newSelectedDate != null) {
-                        tglBongkar =
-                            CustomHelperFunctions.getFormattedDateDatabase(
-                                newSelectedDate);
-                        print('Ini tanggal yang dipilih : $tglBongkar');
-                      }
-                    });
-                  },
-                  icon: const Icon(Icons.calendar_today),
-                ),
-                hintText: tglBongkar.isNotEmpty
-                    ? DateFormat('d/M/yyyy').format(
-                        DateTime.tryParse('$tglBongkar 00:00:00') ??
-                            DateTime.now(),
-                      )
-                    : 'Tanggal Bongkar',
-              ),
-            ),
-            const SizedBox(height: CustomSize.spaceBtwItems),
-            const Text('Jumlah Unit'),
-            TextFormField(
-              controller: unit,
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
+              dropdownBuilder: (context, KapalModel? selectedItem) {
+                return Text(
+                  selectedItem != null
+                      ? selectedItem.namaKapal
+                      : 'Pilih nama kapal',
+                  style: TextStyle(
+                    fontSize: CustomSize.fontSizeSm,
+                    color: selectedItem == null ? Colors.grey : Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              },
+              onChanged: (KapalModel? kendaraan) {
                 setState(() {
-                  unit.text = value;
+                  if (kendaraan != null) {
+                    namaKapal = kendaraan.namaKapal;
+                    kapalController.selectedKapal.value = kendaraan.namaKapal;
+                  } else {
+                    kapalController.resetSelectedKendaraan();
+                    namaKapal = '';
+                  }
                 });
               },
-            ),
-            const SizedBox(height: CustomSize.spaceBtwItems),
-            const Text('Wilayah'),
-            Obx(() {
-              return DropdownSearch<WilayahModel>(
-                items: wilayahController.filteredWilayahModel,
-                itemAsString: (WilayahModel wilayahItem) => wilayahItem.wilayah,
-                selectedItem: wilayah.isNotEmpty
-                    ? wilayahController.filteredWilayahModel.firstWhere(
-                        (wilayahItem) => wilayahItem.wilayah == wilayah,
-                        orElse: () => WilayahModel(
-                          idWilayah: 0,
-                          wilayah: '',
-                        ),
-                      )
-                    : null,
-                dropdownBuilder: (context, WilayahModel? selectedItem) {
-                  return Text(
-                    selectedItem != null ? selectedItem.wilayah : 'Wilayah',
-                    style: TextStyle(
-                      fontSize: CustomSize.fontSizeSm,
-                      color: selectedItem == null ? Colors.grey : Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  );
-                },
-                onChanged: (WilayahModel? wilayahItem) {
-                  setState(() {
-                    if (wilayahItem != null) {
-                      wilayah = wilayahItem.wilayah;
-                      wilayahController.selectedWilayah.value =
-                          wilayahItem.wilayah;
-                    } else {
-                      wilayahController.resetSelectedKendaraan();
-                      wilayah = '';
+              popupProps: const PopupProps.menu(
+                showSearchBox: true,
+                searchFieldProps: TextFieldProps(
+                  decoration: InputDecoration(
+                    hintText: 'Search Kapal...',
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          const Text('ETD'),
+          TextFormField(
+            keyboardType: TextInputType.none,
+            readOnly: true,
+            decoration: InputDecoration(
+              suffixIcon: IconButton(
+                onPressed: () {
+                  DateTime? selectedDate = DateTime.tryParse(etd);
+                  showDatePicker(
+                    context: context,
+                    locale: const Locale("id", "ID"),
+                    initialDate: selectedDate ?? DateTime.now(),
+                    firstDate: DateTime(1850),
+                    lastDate: DateTime(2040),
+                  ).then((newSelectedDate) {
+                    if (newSelectedDate != null) {
+                      etd = CustomHelperFunctions.getFormattedDateDatabase(
+                          newSelectedDate);
+                      print('Ini tanggal yang dipilih : $etd');
                     }
                   });
                 },
-                popupProps: const PopupProps.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                      hintText: 'Cari wilayah...',
-                    ),
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: CustomSize.spaceBtwItems),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text('KSU KELEBIHAN',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.apply(color: AppColors.success)),
-                      const SizedBox(height: CustomSize.md),
-                      TextFormField(
-                        controller: helm1,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Helm')),
-                        onChanged: (value) {
-                          setState(() {
-                            helm1.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: accu1,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Accu')),
-                        onChanged: (value) {
-                          setState(() {
-                            accu1.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: spion1,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Spion')),
-                        onChanged: (value) {
-                          setState(() {
-                            spion1.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: buser1,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Buser')),
-                        onChanged: (value) {
-                          setState(() {
-                            buser1.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: toolset1,
-                        keyboardType: TextInputType.number,
-                        decoration:
-                            const InputDecoration(label: Text('ToolSet')),
-                        onChanged: (value) {
-                          setState(() {
-                            toolset1.text = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: CustomSize.md),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text('KSU KURANG',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.apply(color: AppColors.error)),
-                      const SizedBox(height: CustomSize.md),
-                      TextFormField(
-                        controller: helmKurang,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Helm')),
-                        onChanged: (value) {
-                          setState(() {
-                            helmKurang.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: accuKurang,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Accu')),
-                        onChanged: (value) {
-                          setState(() {
-                            accuKurang.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: spionKurang,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Spion')),
-                        onChanged: (value) {
-                          setState(() {
-                            spionKurang.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: buserKurang,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(label: Text('Buser')),
-                        onChanged: (value) {
-                          setState(() {
-                            buserKurang.text = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      TextFormField(
-                        controller: toolsetKurang,
-                        keyboardType: TextInputType.number,
-                        decoration:
-                            const InputDecoration(label: Text('ToolSet')),
-                        onChanged: (value) {
-                          setState(() {
-                            toolsetKurang.text = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
-        ),
-        TextButton(
-          // onPressed: () {
-          //   print('ini id dooring $idDooring');
-          //   print('ini nama kapal nya :$namaKapal');
-          //   print('ini wilayahnya :$wilayah');
-          //   print('ini etd nya :$etd');
-          //   print('ini tanggal bongkarnya :$tglBongkar');
-          //   print('ini jumlah unitnya :${int.parse(unit.text)}');
-          //   print('ini helm nya: ${int.parse(helm1.text)}');
-          //   print('ini accu nya: ${int.parse(accu1.text)}');
-          //   print('ini spion nya :${int.parse(spion1.text)}');
-          //   print('ini buser nya :${int.parse(buser1.text)}');
-          //   print('ini toolset nya :${int.parse(toolset1.text)}');
-          //   print('ini hlm kurang :${int.parse(helmKurang.text)}');
-          //   print('ini accu kurang :${int.parse(accuKurang.text)}');
-          //   print('ini spion kurang :${int.parse(spionKurang.text)}');
-          //   print('ini buser kurang: ${int.parse(buserKurang.text)}');
-          //   print('ini toolset kurang: ${int.parse(toolsetKurang.text)}');
-          // },
-          onPressed: () => widget.controller.editDooring(
-            idDooring,
-            namaKapal,
-            wilayah,
-            etd,
-            tglBongkar,
-            int.parse(unit.text),
-            int.parse(helm1.text),
-            int.parse(accu1.text),
-            int.parse(spion1.text),
-            int.parse(buser1.text),
-            int.parse(toolset1.text),
-            int.parse(helmKurang.text),
-            int.parse(accuKurang.text),
-            int.parse(spionKurang.text),
-            int.parse(buserKurang.text),
-            int.parse(toolsetKurang.text),
+                icon: const Icon(Icons.calendar_today),
+              ),
+              hintText: etd.isNotEmpty
+                  ? DateFormat('d/M/yyyy').format(
+                      DateTime.tryParse('$etd 00:00:00') ?? DateTime.now(),
+                    )
+                  : 'ETD',
+            ),
           ),
-          child: const Text('Simpan'),
-        ),
-      ],
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          const Text('Tgl Bongkar'),
+          TextFormField(
+            keyboardType: TextInputType.none,
+            readOnly: true,
+            decoration: InputDecoration(
+              suffixIcon: IconButton(
+                onPressed: () {
+                  DateTime? selectedDate = DateTime.tryParse(tglBongkar);
+                  showDatePicker(
+                    context: context,
+                    locale: const Locale("id", "ID"),
+                    initialDate: selectedDate ?? DateTime.now(),
+                    firstDate: DateTime(1850),
+                    lastDate: DateTime(2040),
+                  ).then((newSelectedDate) {
+                    if (newSelectedDate != null) {
+                      tglBongkar =
+                          CustomHelperFunctions.getFormattedDateDatabase(
+                              newSelectedDate);
+                      print('Ini tanggal yang dipilih : $tglBongkar');
+                    }
+                  });
+                },
+                icon: const Icon(Icons.calendar_today),
+              ),
+              hintText: tglBongkar.isNotEmpty
+                  ? DateFormat('d/M/yyyy').format(
+                      DateTime.tryParse('$tglBongkar 00:00:00') ??
+                          DateTime.now(),
+                    )
+                  : 'Tanggal Bongkar',
+            ),
+          ),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          Text('Status Defect', style: Theme.of(context).textTheme.labelMedium),
+          Obx(
+            () => DropDownWidget(
+              value: widget.controller.statusEditDefect.value,
+              items: widget.controller.listStatusEditDefect.keys.toList(),
+              onChanged: (String? value) {
+                widget.controller.statusEditDefect.value = value!;
+                print(
+                    'ini pilihan status defect nya : ${widget.controller.getEditStatusDefect}');
+              },
+            ),
+          ),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          const Text('Jumlah Unit'),
+          TextFormField(
+            controller: unit,
+            keyboardType: TextInputType.number,
+            onChanged: (value) {
+              setState(() {
+                unit.text = value;
+              });
+            },
+          ),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          const Text('Wilayah'),
+          Obx(() {
+            return DropdownSearch<WilayahModel>(
+              items: wilayahController.filteredWilayahModel,
+              itemAsString: (WilayahModel wilayahItem) => wilayahItem.wilayah,
+              selectedItem: wilayah.isNotEmpty
+                  ? wilayahController.filteredWilayahModel.firstWhere(
+                      (wilayahItem) => wilayahItem.wilayah == wilayah,
+                      orElse: () => WilayahModel(
+                        idWilayah: 0,
+                        wilayah: '',
+                      ),
+                    )
+                  : null,
+              dropdownBuilder: (context, WilayahModel? selectedItem) {
+                return Text(
+                  selectedItem != null ? selectedItem.wilayah : 'Wilayah',
+                  style: TextStyle(
+                    fontSize: CustomSize.fontSizeSm,
+                    color: selectedItem == null ? Colors.grey : Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              },
+              onChanged: (WilayahModel? wilayahItem) {
+                setState(() {
+                  if (wilayahItem != null) {
+                    wilayah = wilayahItem.wilayah;
+                    wilayahController.selectedWilayah.value =
+                        wilayahItem.wilayah;
+                  } else {
+                    wilayahController.resetSelectedKendaraan();
+                    wilayah = '';
+                  }
+                });
+              },
+              popupProps: const PopupProps.menu(
+                showSearchBox: true,
+                searchFieldProps: TextFieldProps(
+                  decoration: InputDecoration(
+                    hintText: 'Cari wilayah...',
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('KSU KELEBIHAN',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.apply(color: AppColors.success)),
+                    const SizedBox(height: CustomSize.md),
+                    TextFormField(
+                      controller: helm1,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Helm')),
+                      onChanged: (value) {
+                        setState(() {
+                          helm1.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: accu1,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Accu')),
+                      onChanged: (value) {
+                        setState(() {
+                          accu1.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: spion1,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Spion')),
+                      onChanged: (value) {
+                        setState(() {
+                          spion1.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: buser1,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Buser')),
+                      onChanged: (value) {
+                        setState(() {
+                          buser1.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: toolset1,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('ToolSet')),
+                      onChanged: (value) {
+                        setState(() {
+                          toolset1.text = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: CustomSize.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('KSU KURANG',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.apply(color: AppColors.error)),
+                    const SizedBox(height: CustomSize.md),
+                    TextFormField(
+                      controller: helmKurang,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Helm')),
+                      onChanged: (value) {
+                        setState(() {
+                          helmKurang.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: accuKurang,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Accu')),
+                      onChanged: (value) {
+                        setState(() {
+                          accuKurang.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: spionKurang,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Spion')),
+                      onChanged: (value) {
+                        setState(() {
+                          spionKurang.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: buserKurang,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Buser')),
+                      onChanged: (value) {
+                        setState(() {
+                          buserKurang.text = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: CustomSize.sm),
+                    TextFormField(
+                      controller: toolsetKurang,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('ToolSet')),
+                      onChanged: (value) {
+                        setState(() {
+                          toolsetKurang.text = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: CustomSize.spaceBtwSections),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OutlinedButton(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                  child: const Text('Close')),
+              ElevatedButton(
+                onPressed: () {
+                  // widget.controller.editDooring(
+                  //     idDooring,
+                  //     namaKapal,
+                  //     wilayah,
+                  //     etd,
+                  //     tglBongkar,
+                  //     int.parse(unit.text),
+                  //     int.parse(helm1.text),
+                  //     int.parse(accu1.text),
+                  //     int.parse(spion1.text),
+                  //     int.parse(buser1.text),
+                  //     int.parse(toolset1.text),
+                  //     int.parse(helmKurang.text),
+                  //     int.parse(accuKurang.text),
+                  //     int.parse(spionKurang.text),
+                  //     int.parse(buserKurang.text),
+                  //     int.parse(toolsetKurang.text));
+                  print('ini idDooring nya : $idDooring');
+                  print('ini namaKapal nya : $namaKapal');
+                  print('ini wilayah nya : $wilayah');
+                  print('ini etd nya : $etd');
+                  print('ini tglBongkar nya : $tglBongkar');
+                  print('ini tglBongkar nya : ${int.parse(unit.text)}');
+                },
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                child: const Text('Tambahkan'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

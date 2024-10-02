@@ -69,7 +69,7 @@ class DooringSource extends DataGridSource {
       ],
     ));
 
-    if (dooringModel[rowIndex].statusDefect == 1) {
+    if (dooringModel[rowIndex].statusDefect == 0) {
       cells.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -82,32 +82,57 @@ class DooringSource extends DataGridSource {
                 }
               },
               icon: const Icon(
-                Icons.check,
-                color: AppColors.success,
+                Icons.file_copy,
+                color: AppColors.buttonPrimary,
               ))
         ],
       ));
     } else if (dooringModel[rowIndex].statusDefect == 1) {
+      cells.add(Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+              onPressed: () {
+                if (onDefect != null && dooringModel.isNotEmpty) {
+                  onDefect!(dooringModel[rowIndex]);
+                } else {
+                  return;
+                }
+              },
+              icon: const Icon(
+                Icons.add,
+                color: AppColors.success,
+              ))
+        ],
+      ));
+    } else if (dooringModel[rowIndex].statusDefect == 2) {
+      cells.add(const Center(child: Text('Selesai')));
+    } else if (dooringModel[rowIndex].statusDefect == 3) {
+      cells.add(const Center(child: Text('-')));
     } else {
       cells.add(const SizedBox.shrink());
     }
 
-    cells.add(Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-            onPressed: () {
-              if (onEdited != null && dooringModel.isNotEmpty) {
-                onEdited!(dooringModel[rowIndex]);
-              } else {
-                return;
-              }
-            },
-            icon: const Icon(
-              Iconsax.edit,
-            ))
-      ],
-    ));
+    if (dooringModel[rowIndex].statusDefect == 0) {
+      cells.add(const SizedBox.shrink());
+    } else {
+      cells.add(Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+              onPressed: () {
+                if (onEdited != null && dooringModel.isNotEmpty) {
+                  onEdited!(dooringModel[rowIndex]);
+                } else {
+                  return;
+                }
+              },
+              icon: const Icon(
+                Iconsax.edit,
+              ))
+        ],
+      ));
+    }
 
     return DataGridRowAdapter(
       color: (isEvenRow ? Colors.white : Colors.grey[200]),

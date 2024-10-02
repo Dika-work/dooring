@@ -20,62 +20,60 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Lottie.asset(
-              'assets/animations/welcome.json',
-              width: CustomHelperFunctions.screenWidth() * .7,
-              height: CustomHelperFunctions.screenHeight() * .45,
-            ),
-            Text(
-              'Selamat Datang',
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Lottie.asset(
+            'assets/animations/welcome.json',
+            width: CustomHelperFunctions.screenWidth() * .7,
+            height: CustomHelperFunctions.screenHeight() * .45,
+          ),
+          Text(
+            'Selamat Datang',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: CustomSize.md),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: CustomSize.lg),
+            child: Text(
+              'Aplikasi praktis untuk layanan antar-jemput langsung dari pintu Anda, mudah dan aman dalam genggaman',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: CustomSize.md),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: CustomSize.lg),
-              child: Text(
-                'Aplikasi praktis untuk layanan antar-jemput langsung dari pintu Anda, mudah dan aman dalam genggaman',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+          ),
+          const SizedBox(height: CustomSize.spaceBtwItems),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: CustomSize.xl),
+            child: SwipeableButtonView(
+              onWaitingProcess: () {
+                Future.delayed(
+                    const Duration(seconds: 2),
+                    () => setState(() {
+                          isFinished = true;
+                        }));
+              },
+              isFinished: isFinished,
+              onFinish: () async {
+                await Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                        child: const LoginScreen(),
+                        type: PageTransitionType.fade));
+                setState(() {
+                  isFinished = false;
+                });
+              },
+              activeColor: AppColors.primary,
+              buttonWidget: const Icon(Icons.keyboard_arrow_right_rounded,
+                  color: AppColors.black),
+              buttonText: 'Slide to Next',
+              buttontextstyle: const TextStyle(
+                  fontSize: CustomSize.fontSizeLg, color: AppColors.white),
             ),
-            const SizedBox(height: CustomSize.spaceBtwItems),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: CustomSize.xl),
-              child: SwipeableButtonView(
-                onWaitingProcess: () {
-                  Future.delayed(
-                      const Duration(seconds: 2),
-                      () => setState(() {
-                            isFinished = true;
-                          }));
-                },
-                isFinished: isFinished,
-                onFinish: () async {
-                  await Navigator.push(
-                      context,
-                      PageTransition(
-                          child: const LoginScreen(),
-                          type: PageTransitionType.fade));
-                  setState(() {
-                    isFinished = false;
-                  });
-                },
-                activeColor: AppColors.primary,
-                buttonWidget: const Icon(Icons.keyboard_arrow_right_rounded,
-                    color: AppColors.black),
-                buttonText: 'Slide to Next',
-                buttontextstyle: const TextStyle(
-                    fontSize: CustomSize.fontSizeLg, color: AppColors.white),
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

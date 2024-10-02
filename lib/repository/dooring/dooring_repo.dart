@@ -108,13 +108,14 @@ class DooringRepository {
     int spionKurang,
     int buserKurang,
     int toolsetKurang,
+    int statusDefect,
   ) async {
     try {
       print('...PROSES AWALANAN DI REPOSITORY DO Global...');
       final response = await http.put(
         Uri.parse('${storageUtil.baseURL}/dooring.php'),
         body: {
-          'id_dooring': idDooring,
+          'id_dooring': idDooring.toString(),
           'nm_kapal': namaKapal,
           'wilayah': wilayah,
           'etd': etd,
@@ -130,6 +131,7 @@ class DooringRepository {
           'spion_k': spionKurang.toString(),
           'buser_k': buserKurang.toString(),
           'toolset_k': toolsetKurang.toString(),
+          'st_defect': statusDefect.toString(),
         },
       );
 
@@ -164,6 +166,50 @@ class DooringRepository {
       SnackbarLoader.errorSnackBar(
         title: 'Gagal😪',
         message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
+    }
+  }
+
+  Future<void> statusDefect(int idDooring, int statusDefect) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/dooring.php?action=Konfirmasi'),
+        body: {
+          'id_dooring': idDooring.toString(),
+          'st_defect': statusDefect.toString(),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'Type motor berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+          print('...ADA MASALAH DI EDIT TYPE MOTOR REPO...');
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit Type motor, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error edit di repository Edit Type Motor: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit Type motor',
       );
     }
   }

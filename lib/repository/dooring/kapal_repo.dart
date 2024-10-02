@@ -261,49 +261,6 @@ class TypeMotorRepository {
     }
   }
 
-  // delete data defect
-  Future<void> deleteDefectTableContent(int idDefect) async {
-    try {
-      print('...PROSES AWALANAN DELETE DI REPOSITORY DO Global...');
-      final response = await http.delete(
-          Uri.parse('${storageUtil.baseURL}/defect.php'),
-          body: {'id_defect': idDefect.toString()});
-
-      print('...BERHASIL DI REPOSITORY...');
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (responseData['status'] == 'success') {
-          SnackbarLoader.successSnackBar(
-            title: 'Sukses 😃',
-            message: 'Data DO Global berhasil dihapus',
-          );
-        } else {
-          CustomHelperFunctions.stopLoading();
-          SnackbarLoader.errorSnackBar(
-            title: 'Gagal😪',
-            message: responseData['message'] ?? 'Ada yang salah🤷',
-          );
-        }
-        return responseData;
-      } else {
-        CustomHelperFunctions.stopLoading();
-        SnackbarLoader.errorSnackBar(
-          title: 'Gagal😪',
-          message:
-              'Gagal menghapus DO Global, status code: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      CustomHelperFunctions.stopLoading();
-      print('Error di catch di repository do Global: $e');
-      SnackbarLoader.errorSnackBar(
-        title: 'Gagal😪',
-        message: 'Terjadi kesalahan saat menghapus DO Global',
-      );
-    }
-  }
-
   // selesai data defect
   Future<void> selesaiDefect(int idDooring) async {
     try {

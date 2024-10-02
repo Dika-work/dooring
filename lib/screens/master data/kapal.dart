@@ -1,4 +1,5 @@
 import 'package:dooring/models/dooring/kapal_model.dart';
+import 'package:dooring/utils/popups/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -149,94 +150,63 @@ class MasterKapal extends GetView<KapalController> {
         backgroundColor: const Color(0xff03dac6),
         foregroundColor: Colors.black,
         onPressed: () {
-          print('tambah kapal master...');
-          showGeneralDialog(
+          CustomDialogs.defaultDialog(
             context: context,
-            barrierLabel: "Barrier",
-            barrierDismissible: true,
-            barrierColor: Colors.black.withOpacity(0.5),
-            transitionDuration: const Duration(milliseconds: 300),
-            pageBuilder: (_, __, ___) {
-              return Center(
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(CustomSize.borderRadiusLg),
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Center(
-                          child: Text('Tambah Kapal',
-                              style:
-                                  Theme.of(context).textTheme.headlineMedium),
-                        ),
-                        const SizedBox(height: CustomSize.spaceBtwItems),
-                        Obx(
-                          () => DropDownWidget(
-                            value: controller.namaPelayaran.value,
-                            items: controller.namaPelayaranMap,
-                            onChanged: (String? value) {
-                              controller.namaPelayaran.value = value!;
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: CustomSize.spaceBtwItems),
-                        TextFormField(
-                          controller: controller.namaKapalController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Jumlah Unit harus di isi';
-                            }
-                            return null;
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Jumlah Unit',
-                          ),
-                        ),
-                        const SizedBox(height: CustomSize.spaceBtwSections),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            OutlinedButton(
-                                onPressed: () => Get.back(),
-                                style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: CustomSize.lg,
-                                        vertical: CustomSize.md)),
-                                child: const Text('Close')),
-                            ElevatedButton(
-                              onPressed: () {
-                                print('nambah data wilayah');
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: CustomSize.lg,
-                                      vertical: CustomSize.md)),
-                              child: const Text('Tambahkan'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+            contentWidget: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Text('Tambah Kapal',
+                      style: Theme.of(context).textTheme.headlineMedium),
+                ),
+                const SizedBox(height: CustomSize.spaceBtwItems),
+                Obx(
+                  () => DropDownWidget(
+                    value: controller.namaPelayaran.value,
+                    items: controller.namaPelayaranMap,
+                    onChanged: (String? value) {
+                      controller.namaPelayaran.value = value!;
+                    },
                   ),
                 ),
-              );
-            },
-            transitionBuilder: (_, anim, __, child) {
-              return ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: anim,
-                  curve: Curves.easeOutBack,
+                const SizedBox(height: CustomSize.spaceBtwItems),
+                TextFormField(
+                  controller: controller.namaKapalController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Jumlah Unit harus di isi';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Jumlah Unit',
+                  ),
                 ),
-                child: child,
-              );
-            },
+                const SizedBox(height: CustomSize.spaceBtwSections),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: CustomSize.lg,
+                                vertical: CustomSize.md)),
+                        child: const Text('Close')),
+                    ElevatedButton(
+                      onPressed: () {
+                        print('nambah data wilayah');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: CustomSize.lg,
+                              vertical: CustomSize.md)),
+                      child: const Text('Tambahkan'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           );
         },
         icon: const Icon(Icons.add),

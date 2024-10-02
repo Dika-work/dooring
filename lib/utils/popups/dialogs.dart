@@ -8,30 +8,39 @@ import 'loading_text.dart';
 class CustomDialogs {
   static defaultDialog({
     required BuildContext context,
-    Widget? titleWidget,
     required Widget contentWidget,
-    String cancelText = 'Batal',
-    String? confirmText,
-    Function()? onCancel,
-    Function()? onConfirm,
+    EdgeInsetsGeometry? margin,
   }) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: titleWidget,
-          content: contentWidget,
-          actions: <Widget>[
-            TextButton(
-              onPressed: onCancel ?? () => Navigator.of(context).pop(),
-              child: Text(cancelText),
+      barrierLabel: "Barrier",
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (_, __, ___) {
+        return Center(
+          child: Material(
+            type: MaterialType.transparency,
+            child: Container(
+              margin: margin,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(CustomSize.borderRadiusLg),
+              ),
+              width: MediaQuery.of(context).size.width * 0.8,
+              padding: const EdgeInsets.all(20),
+              child: contentWidget,
             ),
-            TextButton(
-              onPressed: onConfirm,
-              child: Text(confirmText ?? ''),
-            ),
-          ],
+          ),
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: anim,
+            curve: Curves.easeOutBack,
+          ),
+          child: child,
         );
       },
     );

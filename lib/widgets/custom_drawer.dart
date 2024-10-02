@@ -127,7 +127,7 @@ class CustomDrawer extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () => Get.toNamed('/master-pelayaran'),
                           leading: const Icon(
                             Iconsax.record,
                             color: AppColors.darkExpandableContent,
@@ -185,6 +185,24 @@ class CustomDrawer extends StatelessWidget {
                       ],
                     ))
                 : const SizedBox.shrink(),
+            ExpandableContainer(
+              icon: Iconsax.document_cloud,
+              textTitle: 'Semua Data',
+              content: ListTile(
+                onTap: () {},
+                leading: const Icon(
+                  Iconsax.record,
+                  color: AppColors.darkExpandableContent,
+                ),
+                title: Text(
+                  'Tambah Data',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(color: AppColors.light),
+                ),
+              ),
+            ),
             ExpandableContainer(
               icon: Iconsax.add,
               textTitle: 'Dooring',

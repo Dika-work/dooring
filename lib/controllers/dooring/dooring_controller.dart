@@ -32,6 +32,24 @@ class DooringController extends GetxController {
       CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
   TextEditingController jumlahUnitController = TextEditingController();
 
+  final statusDefect = 'Ada'.obs;
+  final Map<String, int> listStatusDefect = {
+    'Ada': 1,
+    'Tidak Ada': 2,
+  };
+
+  int get getStatusDefect => listStatusDefect[statusDefect.value] ?? 0;
+
+  // edit dooring
+  final statusEditDefect = 'Ada'.obs;
+  final Map<String, int> listStatusEditDefect = {
+    'Ada': 1,
+    'Tidak Ada': 3,
+  };
+
+  int get getEditStatusDefect =>
+      listStatusEditDefect[statusEditDefect.value] ?? 0;
+
   // ksu kelebihan
   TextEditingController helmController = TextEditingController();
   TextEditingController accuController = TextEditingController();
@@ -187,9 +205,20 @@ class DooringController extends GetxController {
       spionKurang,
       buserKurang,
       toolsetKurang,
+      getEditStatusDefect,
     );
 
     await fetchDooringData();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> changeStatusDefect(int idDooring, int statusDefect) async {
+    CustomDialogs.loadingIndicator();
+
+    await dooringRepo.statusDefect(idDooring, statusDefect);
+    await fetchDooringData();
+    CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
 }

@@ -30,6 +30,11 @@ class DropDownWidget extends StatelessWidget {
                   child: Text(
                     item,
                     overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: CustomSize.fontSizeSm,
+                      color: AppColors.textPrimary,
+                      fontFamily: 'Urbanist',
+                    ),
                   ),
                 ))
             .toList(),
@@ -40,10 +45,12 @@ class DropDownWidget extends StatelessWidget {
           width: CustomHelperFunctions.screenWidth(),
           padding: const EdgeInsets.symmetric(horizontal: CustomSize.md),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(width: 1, color: AppColors.borderPrimary),
-            color: AppColors.primaryBackground,
-          ),
+              borderRadius: BorderRadius.circular(CustomSize.inputFieldRadius),
+              border: Border.all(
+                width: 1,
+                color: AppColors.borderPrimary,
+              ),
+              color: AppColors.primaryBackground),
           elevation: 2,
         ),
         iconStyleData: const IconStyleData(
@@ -58,8 +65,11 @@ class DropDownWidget extends StatelessWidget {
           maxHeight: 200,
           width: widthDropdownValue,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: AppColors.light,
+            borderRadius: BorderRadius.circular(CustomSize.inputFieldRadius),
+            border: Border.all(
+              width: 1,
+              color: AppColors.borderPrimary,
+            ),
           ),
           offset: const Offset(-20, 0),
           scrollbarTheme: ScrollbarThemeData(

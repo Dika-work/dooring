@@ -7,7 +7,13 @@ class DefectModel {
   String typeMotor;
   String part;
   int jumlah;
-  String status;
+  int status;
+  String namaKapal;
+  String wilayah;
+  String etd;
+  String tglBongkar;
+  int unit;
+  int jumlahInput;
 
   DefectModel({
     required this.idDefect,
@@ -19,6 +25,12 @@ class DefectModel {
     required this.part,
     required this.jumlah,
     required this.status,
+    required this.namaKapal,
+    required this.wilayah,
+    required this.etd,
+    required this.tglBongkar,
+    required this.unit,
+    required this.jumlahInput,
   });
 
   factory DefectModel.fromJson(Map<String, dynamic> json) {
@@ -31,7 +43,13 @@ class DefectModel {
       typeMotor: json['type_motor'] ?? '',
       part: json['part'] ?? '',
       jumlah: json['jumlah'] ?? 0,
-      status: json['status'] ?? '',
+      status: json['st_detail'] ?? 0,
+      namaKapal: json['nm_kapal'] ?? '',
+      wilayah: json['wilayah'] ?? '',
+      etd: json['etd'] ?? '',
+      tglBongkar: json['tgl_bongkar'] ?? '',
+      unit: json['unit'] ?? 0,
+      jumlahInput: json['jumlah_input'] ?? 0,
     );
   }
 }
