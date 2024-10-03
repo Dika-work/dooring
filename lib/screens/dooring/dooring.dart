@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+import '../../controllers/dooring/detail_defect_controller.dart';
 import '../../controllers/dooring/dooring_controller.dart';
 import '../../controllers/dooring/kapal_controller.dart';
 import '../../helpers/helper_func.dart';
@@ -17,6 +18,7 @@ import '../../utils/loader/circular_loader.dart';
 import '../../utils/popups/dialogs.dart';
 import '../../utils/source/dooring/defect_source.dart';
 import '../../utils/source/dooring/dooring_source.dart';
+import '../../utils/source/dooring/lihat_defect_source.dart';
 import '../../utils/theme/app_colors.dart';
 import 'tambah_defect_detail.dart';
 
@@ -891,6 +893,7 @@ class TambahDefect extends StatelessWidget {
     );
 
     final partMotorController = Get.put(PartMotorController());
+    final detailDefectController = Get.put(DetailDefectController());
 
     return Scaffold(
       appBar: AppBar(
@@ -1110,8 +1113,12 @@ class TambahDefect extends StatelessWidget {
                       Get.to(() =>
                           TambahDefectDetail(idDefect: modelDefect.idDefect));
                     },
-                    onDeleted: (DefectModel modelDefect) {},
+                    onDeleted: (DefectModel modelDefect) =>
+                        detailDefectController.deleteDefectTable(
+                            modelDefect.idDefect, modelDefect.idDooring),
                     onLihat: (DefectModel modelDefect) {
+                      detailDefectController
+                          .fetchDetailDefect(modelDefect.idDefect);
                       CustomDialogs.defaultDialog(
                           context: context,
                           contentWidget: Column(
@@ -1122,6 +1129,163 @@ class TambahDefect extends StatelessWidget {
                                       .textTheme
                                       .headlineMedium),
                               const SizedBox(height: CustomSize.spaceBtwItems),
+                              TextFormField(
+                                controller: TextEditingController(
+                                    text: modelDefect.typeMotor),
+                                decoration: const InputDecoration(
+                                    label: Text('Type Motor')),
+                              ),
+                              const SizedBox(height: CustomSize.sm),
+                              TextFormField(
+                                controller: TextEditingController(
+                                    text: modelDefect.part),
+                                decoration: const InputDecoration(
+                                    label: Text('Part Motor')),
+                              ),
+                              const SizedBox(height: CustomSize.sm),
+                              TextFormField(
+                                controller: TextEditingController(
+                                    text: modelDefect.jumlah.toString()),
+                                decoration: const InputDecoration(
+                                    label: Text('Jumlah')),
+                              ),
+                              const SizedBox(height: CustomSize.defaultSpace),
+                              Obx(() {
+                                if (detailDefectController.isLoading.value &&
+                                    detailDefectController
+                                        .detailModel.isEmpty) {
+                                  return const CustomCircularLoader();
+                                } else {
+                                  final dataSource = LihatDefectSource(
+                                      detailDefectModel:
+                                          detailDefectController.detailModel);
+
+                                  final bool isTableEmpty =
+                                      detailDefectController
+                                          .detailModel.isEmpty;
+                                  final rowCount =
+                                      detailDefectController.detailModel.length;
+
+                                  double gridHeight = 50.0 + (55.0 * 5);
+
+                                  final double tableHeight = isTableEmpty
+                                      ? 110
+                                      : 50.0 +
+                                          (55.0 * rowCount)
+                                              .clamp(0, gridHeight - 55.0);
+
+                                  return Column(
+                                    children: [
+                                      SizedBox(
+                                        height: tableHeight,
+                                        child: SfDataGrid(
+                                            source: dataSource,
+                                            columnWidthMode:
+                                                ColumnWidthMode.fill,
+                                            gridLinesVisibility:
+                                                GridLinesVisibility.both,
+                                            headerGridLinesVisibility:
+                                                GridLinesVisibility.both,
+                                            verticalScrollPhysics:
+                                                const NeverScrollableScrollPhysics(),
+                                            columns: [
+                                              GridColumn(
+                                                columnName: 'No',
+                                                label: Container(
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors
+                                                        .lightBlue.shade100,
+                                                  ),
+                                                  child: Text(
+                                                    'No',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GridColumn(
+                                                columnName: 'No Mesin',
+                                                label: Container(
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors
+                                                        .lightBlue.shade100,
+                                                  ),
+                                                  child: Text(
+                                                    'No Mesin',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GridColumn(
+                                                columnName: 'No Rangka',
+                                                label: Container(
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors
+                                                        .lightBlue.shade100,
+                                                  ),
+                                                  child: Text(
+                                                    'No Rangka',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ]),
+                                      ),
+                                      if (rowCount >= 5)
+                                        SfDataPager(
+                                          delegate: dataSource,
+                                          pageCount: (detailDefectController
+                                                      .detailModel.length /
+                                                  5)
+                                              .ceilToDouble(),
+                                          direction: Axis.horizontal,
+                                        ),
+                                    ],
+                                  );
+                                }
+                              }),
+                              const SizedBox(
+                                  height: CustomSize.spaceBtwInputFields),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: OutlinedButton(
+                                  onPressed: () => Get.back(),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: CustomSize.xl,
+                                        vertical: CustomSize.md),
+                                  ),
+                                  child: const Text(
+                                    'Close',
+                                  ),
+                                ),
+                              ),
                             ],
                           ));
                     },

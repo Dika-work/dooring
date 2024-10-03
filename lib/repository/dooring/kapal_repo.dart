@@ -261,6 +261,40 @@ class TypeMotorRepository {
     }
   }
 
+  // delete defect table
+  Future<void> deleteDefect(int idDefect) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('${storageUtil.baseURL}/defect.php'), body: {
+        'id_defect': idDefect.toString(),
+      });
+
+      if (response.statusCode == 200) {
+        SnackbarLoader.successSnackBar(
+          title: 'Delete Defect✅',
+          message: 'Menambahkan data do harian baru..',
+        );
+      } else if (response.statusCode != 200) {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message: 'Pastikan telah terkoneksi dengan internet😁',
+        );
+      } else {
+        SnackbarLoader.errorSnackBar(
+          title: 'Error',
+          message: 'Something went wrong, please contact developer🥰',
+        );
+      }
+    } catch (e) {
+      SnackbarLoader.errorSnackBar(
+        title: 'Error☠️',
+        message: 'Pastikan sudah terhubung dengan internet 😁',
+      );
+      return;
+    }
+  }
+
   // selesai data defect
   Future<void> selesaiDefect(int idDooring) async {
     try {

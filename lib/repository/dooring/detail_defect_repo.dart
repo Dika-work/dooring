@@ -94,4 +94,24 @@ class DetailDefectRepository {
       return;
     }
   }
+
+  Future<void> selesaiDetailDefect(int idDefectint) async {
+    try {
+      final response = await http.put(
+          Uri.parse('${storageUtil.baseURL}/defect.php?action=selesai'),
+          body: {
+            'id_defect': idDefectint.toString(),
+            'st_detail': '1',
+          });
+      if (response.statusCode != 200) {
+        print('Failed to mark as selesai: ${response.body}');
+        throw Exception('Failed to mark as selesai');
+      } else {
+        print('Marked as selesai successfully: ${response.body}');
+      }
+    } catch (e) {
+      print('Error in accSelesai: $e');
+      throw Exception('Something went wrong, please contact developer');
+    }
+  }
 }

@@ -119,13 +119,17 @@ class TambahDefectDetail extends StatelessWidget {
                         filled: true, fillColor: AppColors.buttonDisabled),
                   ),
                   const SizedBox(height: CustomSize.sm),
-                  const Text('Total Unit'),
-                  TextFormField(
-                    controller: TextEditingController(
-                        text: model.jumlahInput.toString()),
-                    readOnly: true,
-                    decoration: const InputDecoration(
-                        filled: true, fillColor: AppColors.buttonDisabled),
+                  const Text('Jumlah Input'),
+                  Obx(
+                    () => TextFormField(
+                      controller: TextEditingController(
+                          text: controller.detailModel.first.jumlahInput
+                              .toString()),
+                      keyboardType: TextInputType.none,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                          filled: true, fillColor: AppColors.buttonDisabled),
+                    ),
                   ),
                   const SizedBox(height: CustomSize.spaceBtwItems),
                   Obx(() {
@@ -353,11 +357,23 @@ class TambahDefectDetail extends StatelessWidget {
                                 const Text('Nomor Mesin'),
                                 TextFormField(
                                   controller: controller.nomorMesinController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Field ini harus di isi';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 const SizedBox(height: CustomSize.sm),
                                 const Text('Nomor Rangka'),
                                 TextFormField(
                                   controller: controller.nomorRangkaController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Field ini harus di isi';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 const SizedBox(
                                     height: CustomSize.spaceBtwSections),
@@ -372,36 +388,42 @@ class TambahDefectDetail extends StatelessWidget {
                             : 0),
                     child: Row(
                       children: [
-                        Visibility(
-                          visible: controller.isJumlahUnitSama.value,
-                          child: Expanded(
-                            flex: 2, // Tombol selesai flex 2
-                            child: OutlinedButton(
-                              onPressed: () {},
-                              // onPressed: () => controller.selesaiDefect(model.idDooring),
-                              style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(
-                                      color: AppColors.success)),
-                              child: const Text(
-                                'Selesai',
-                              ),
+                        Expanded(
+                          flex: controller.isJumlahUnitSama.value
+                              ? 3
+                              : 1, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
+                          child: ElevatedButton(
+                            onPressed: () {
+                              !controller.isJumlahUnitSama.value
+                                  ? controller.addDetailDefect(
+                                      model.idDefect,
+                                      model.idDooring,
+                                    )
+                                  : Get.back();
+                            },
+                            child: Text(
+                              !controller.isJumlahUnitSama.value
+                                  ? 'Tambah'
+                                  : 'Kembali',
                             ),
                           ),
                         ),
                         if (controller.isJumlahUnitSama.value)
                           const SizedBox(
                               width: CustomSize.sm), // Jarak antar tombol
-                        Expanded(
-                          flex: controller.isJumlahUnitSama.value
-                              ? 3
-                              : 1, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
-                          child: ElevatedButton(
-                            onPressed: () => controller.addDetailDefect(
-                              model.idDefect,
-                              model.idDooring,
-                            ),
-                            child: const Text(
-                              'Tambah',
+                        Visibility(
+                          visible: controller.isJumlahUnitSama.value,
+                          child: Expanded(
+                            flex: 2, // Tombol selesai flex 2
+                            child: OutlinedButton(
+                              onPressed: () => controller.selesaiDetailDefect(
+                                  model.idDefect, model.idDooring),
+                              style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                      color: AppColors.success)),
+                              child: const Text(
+                                'Selesai',
+                              ),
                             ),
                           ),
                         ),

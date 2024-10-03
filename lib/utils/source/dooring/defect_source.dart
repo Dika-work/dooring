@@ -51,9 +51,9 @@ class DefectSource extends DataGridSource {
       })
     ];
 
-    final bool hasData = defectModel.isNotEmpty;
+    final bool statusDetail = defectModel[rowIndex].status > 0;
 
-    if (hasData) {
+    if (statusDetail) {
       cells.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -68,6 +68,11 @@ class DefectSource extends DataGridSource {
               ))
         ],
       ));
+    } else {
+      cells.add(const Center(child: Text('-')));
+    }
+
+    if (!statusDetail) {
       cells.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -82,6 +87,11 @@ class DefectSource extends DataGridSource {
               ))
         ],
       ));
+    } else {
+      cells.add(const Center(child: Text('-')));
+    }
+
+    if (!statusDetail) {
       cells.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -96,6 +106,11 @@ class DefectSource extends DataGridSource {
               ))
         ],
       ));
+    } else {
+      cells.add(const Center(child: Text('-')));
+    }
+
+    if (!statusDetail) {
       cells.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -110,6 +125,8 @@ class DefectSource extends DataGridSource {
               ))
         ],
       ));
+    } else {
+      cells.add(const Center(child: Text('-')));
     }
 
     return DataGridRowAdapter(

@@ -6,9 +6,11 @@ import '../../helpers/helper_func.dart';
 import '../../models/dooring/detail_defect_model.dart';
 import '../../models/user_model.dart';
 import '../../repository/dooring/detail_defect_repo.dart';
+import '../../repository/dooring/kapal_repo.dart';
 import '../../utils/constant/storage_util.dart';
 import '../../utils/popups/dialogs.dart';
 import '../../utils/popups/snackbar.dart';
+import 'kapal_controller.dart';
 
 class DetailDefectController extends GetxController {
   final detailDefectRepo = Get.put(DetailDefectRepository());
@@ -23,6 +25,9 @@ class DetailDefectController extends GetxController {
 
   TextEditingController nomorMesinController = TextEditingController();
   TextEditingController nomorRangkaController = TextEditingController();
+
+  final deleteDefectRepo = Get.put(TypeMotorRepository());
+  final defectController = Get.put(TypeMotorController());
 
   @override
   void onInit() {
@@ -98,6 +103,9 @@ class DetailDefectController extends GetxController {
 
     // Fetch updated data
     await fetchDetailDefect(idDefect);
+
+    nomorMesinController.clear();
+    nomorRangkaController.clear();
     CustomHelperFunctions.stopLoading();
   }
 
@@ -116,6 +124,45 @@ class DetailDefectController extends GetxController {
     await detailDefectRepo.deleteDetailDefect(idDetail);
 
     await fetchDetailDefect(idDefect);
+    CustomHelperFunctions.stopLoading();
+  }
+
+  // delete table defect
+  Future<void> deleteDefectTable(int idDefect, int idDooring) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await deleteDefectRepo.deleteDefect(idDefect);
+    await defectController.fetchDefetchTable(idDooring);
+
+    CustomHelperFunctions.stopLoading();
+  }
+
+  // selesai detail defect
+  Future<void> selesaiDetailDefect(int idDefect, int idDooring) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await detailDefectRepo.selesaiDetailDefect(idDefect);
+
+    CustomHelperFunctions.stopLoading();
+    await defectController.fetchDefetchTable(idDooring);
     CustomHelperFunctions.stopLoading();
   }
 }
