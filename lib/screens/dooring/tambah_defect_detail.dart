@@ -27,7 +27,7 @@ class TambahDefectDetail extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('Detail Defect Motor',
+          title: Text('Detail Deffect Motor',
               style: Theme.of(context).textTheme.headlineMedium),
           centerTitle: true,
           leading: IconButton(
@@ -110,7 +110,7 @@ class TambahDefectDetail extends StatelessWidget {
                         filled: true, fillColor: AppColors.buttonDisabled),
                   ),
                   const SizedBox(height: CustomSize.sm),
-                  const Text('Jumlah Defect'),
+                  const Text('Jumlah Deffect'),
                   TextFormField(
                     controller:
                         TextEditingController(text: model.jumlah.toString()),
@@ -120,16 +120,15 @@ class TambahDefectDetail extends StatelessWidget {
                   ),
                   const SizedBox(height: CustomSize.sm),
                   const Text('Jumlah Input'),
-                  Obx(
-                    () => TextFormField(
-                      controller: TextEditingController(
-                          text: controller.detailModel.first.jumlahInput
-                              .toString()),
-                      keyboardType: TextInputType.none,
-                      readOnly: true,
-                      decoration: const InputDecoration(
-                          filled: true, fillColor: AppColors.buttonDisabled),
-                    ),
+                  TextFormField(
+                    controller: TextEditingController(
+                        text: model.jumlahInput == 0
+                            ? model.jumlahInput.toString()
+                            : controller.jumlahInput.value.toString()),
+                    keyboardType: TextInputType.none,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                        filled: true, fillColor: AppColors.buttonDisabled),
                   ),
                   const SizedBox(height: CustomSize.spaceBtwItems),
                   Obx(() {
@@ -144,7 +143,7 @@ class TambahDefectDetail extends StatelessWidget {
                             contentWidget: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('Detail Data Defect',
+                                Text('Detail Data Deffect',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineMedium),
@@ -345,8 +344,10 @@ class TambahDefectDetail extends StatelessWidget {
                       );
                     }
                   }),
-                  Obx(
-                    () => controller.isJumlahUnitSama.value
+                  Obx(() {
+                    bool isJumlahSama =
+                        controller.jumlahInput.value == model.jumlah;
+                    return isJumlahSama
                         ? const SizedBox.shrink()
                         : Form(
                             key: controller.detailDefectKey,
@@ -379,57 +380,60 @@ class TambahDefectDetail extends StatelessWidget {
                                     height: CustomSize.spaceBtwSections),
                               ],
                             ),
-                          ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: controller.isJumlahUnitSama.value
-                            ? CustomSize.md
-                            : 0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: controller.isJumlahUnitSama.value
-                              ? 3
-                              : 1, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
-                          child: ElevatedButton(
-                            onPressed: () {
-                              !controller.isJumlahUnitSama.value
-                                  ? controller.addDetailDefect(
-                                      model.idDefect,
-                                      model.idDooring,
-                                    )
-                                  : Get.back();
-                            },
-                            child: Text(
-                              !controller.isJumlahUnitSama.value
-                                  ? 'Tambah'
-                                  : 'Kembali',
-                            ),
-                          ),
-                        ),
-                        if (controller.isJumlahUnitSama.value)
-                          const SizedBox(
-                              width: CustomSize.sm), // Jarak antar tombol
-                        Visibility(
-                          visible: controller.isJumlahUnitSama.value,
-                          child: Expanded(
-                            flex: 2, // Tombol selesai flex 2
-                            child: OutlinedButton(
-                              onPressed: () => controller.selesaiDetailDefect(
-                                  model.idDefect, model.idDooring),
-                              style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(
-                                      color: AppColors.success)),
-                              child: const Text(
-                                'Selesai',
+                          );
+                  }),
+                  Obx(() {
+                    bool isJumlahSama =
+                        controller.jumlahInput.value == model.jumlah;
+
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        top: isJumlahSama ? CustomSize.md : 0,
+                      ),
+                      child: Row(
+                        children: [
+                          if (!isJumlahSama)
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  controller.addDetailDefect(
+                                    model.idDefect,
+                                    model.idDooring,
+                                  );
+                                },
+                                child: const Text('Tambah'),
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                          if (isJumlahSama) ...[
+                            Expanded(
+                              flex: 3,
+                              child: ElevatedButton(
+                                onPressed: () => Get.back(),
+                                child: const Text('Kembali'),
+                              ),
+                            ),
+                            const SizedBox(
+                                width: CustomSize.sm), // Jarak antar tombol
+                            Expanded(
+                              flex: 2,
+                              child: OutlinedButton(
+                                onPressed: () => controller.selesaiDetailDefect(
+                                  model.idDefect,
+                                  model.idDooring,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                      color: AppColors.success),
+                                ),
+                                child: const Text('Selesai'),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ),
             );

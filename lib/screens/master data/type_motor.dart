@@ -105,8 +105,11 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
                 ),
               );
             },
-            onDeleted: (TypeMotorModel model) =>
-                controller.hapusTypeMotor(model.idType),
+            onDeleted: (TypeMotorModel model) => CustomDialogs.deleteDialog(
+                context: context,
+                onConfirm: () {
+                  controller.hapusTypeMotor(model.idType);
+                }),
             typeMotorModel: controller.displayedData,
           );
 

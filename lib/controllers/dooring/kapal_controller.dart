@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../helpers/connectivity.dart';
 import '../../models/dooring/defect_model.dart';
+import '../../models/dooring/detail_defect_model.dart';
 import '../../models/dooring/dooring_model.dart';
 import '../../models/dooring/kapal_model.dart';
 import '../../models/user_model.dart';
@@ -237,6 +238,7 @@ class TypeMotorController extends GetxController {
   RxList<TypeMotorModel> displayedData = <TypeMotorModel>[].obs;
 
   RxList<DefectModel> defectModel = <DefectModel>[].obs;
+  RxList<DetailDefectModel> detailDefectModel = <DetailDefectModel>[].obs;
   RxList<DooringModel> dooringModel = <DooringModel>[].obs;
 
   // lazy loading
@@ -249,6 +251,7 @@ class TypeMotorController extends GetxController {
 
   TextEditingController namaTypeMotorController = TextEditingController();
   TextEditingController jumlahDefectController = TextEditingController();
+  TextEditingController editJumlahDefectController = TextEditingController();
   RxString selectedMotor = ''.obs;
   RxString selectedJenisMotor = ''.obs;
 
@@ -364,7 +367,19 @@ class TypeMotorController extends GetxController {
       final dataDefect = await typeMotorRepo.fetchDefectTableContent(idDooring);
       defectModel.assignAll(dataDefect);
     } catch (e) {
-      typeMotorModel.assignAll([]);
+      defectModel.assignAll([]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> lihatDooring(int idDooring) async {
+    try {
+      isLoading.value = true;
+      final dataDefect = await typeMotorRepo.lihatDooringTable(idDooring);
+      detailDefectModel.assignAll(dataDefect);
+    } catch (e) {
+      detailDefectModel.assignAll([]);
     } finally {
       isLoading.value = false;
     }
@@ -415,6 +430,36 @@ class TypeMotorController extends GetxController {
     partMotorController.selectedWilayah.value = '';
     jumlahDefectController.clear();
     await fetchDefetchTable(idDooring);
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> editDataDefect(
+    int idDefect,
+    int idDooring,
+    String typeMotor,
+    String part,
+    String jumlah,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await typeMotorRepo.editDefectData(
+      idDefect,
+      idDooring,
+      typeMotor,
+      part,
+      jumlah,
+    );
+    await fetchDefetchTable(idDooring);
+    CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
 

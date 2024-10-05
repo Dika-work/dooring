@@ -9,13 +9,13 @@ import '../../../helpers/helper_func.dart';
 import '../../../models/dooring/dooring_model.dart';
 import '../../constant/custom_size.dart';
 
-class DooringSource extends DataGridSource {
-  final void Function(DooringModel)? onLihat;
-  final void Function(DooringModel)? onDefect;
-  final void Function(DooringModel)? onEdited;
-  final List<DooringModel> dooringModel;
+class SemuaDooringSource extends DataGridSource {
+  final void Function(AllDooringModel)? onLihat;
+  final void Function(AllDooringModel)? onDefect;
+  final void Function(AllDooringModel)? onEdited;
+  final List<AllDooringModel> dooringModel;
 
-  DooringSource({
+  SemuaDooringSource({
     required this.onLihat,
     required this.onDefect,
     required this.onEdited,
@@ -157,7 +157,7 @@ class DooringSource extends DataGridSource {
     });
   }
 
-  void _updateDataPager(List<DooringModel> dooringModel) {
+  void _updateDataPager(List<AllDooringModel> dooringModel) {
     if (dooringModel.isEmpty) {
       print('Model is empty, generating empty rows');
       dooringData = _generateEmptyRows(1);
@@ -189,7 +189,7 @@ class DooringSource extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    _updateDataPager(controller.dooringModel);
+    _updateDataPager(controller.allDooringModel);
     notifyListeners();
     return true;
   }

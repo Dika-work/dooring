@@ -1,5 +1,3 @@
-import 'package:dooring/utils/popups/snackbar.dart';
-import 'package:dooring/widgets/dropdown.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,420 +12,17 @@ import '../../models/dooring/defect_model.dart';
 import '../../models/dooring/dooring_model.dart';
 import '../../models/dooring/kapal_model.dart';
 import '../../utils/constant/custom_size.dart';
-import '../../utils/loader/animation_loader.dart';
 import '../../utils/loader/circular_loader.dart';
 import '../../utils/popups/dialogs.dart';
+import '../../utils/popups/snackbar.dart';
 import '../../utils/source/dooring/defect_source.dart';
-import '../../utils/source/dooring/dooring_source.dart';
 import '../../utils/source/dooring/lihat_defect_source.dart';
 import '../../utils/theme/app_colors.dart';
-import 'lihat_dooring.dart';
-import 'tambah_defect_detail.dart';
+import '../../widgets/dropdown.dart';
+import '../dooring/tambah_defect_detail.dart';
 
-class Dooring extends GetView<DooringController> {
-  const Dooring({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        controller.fetchDooringData();
-      },
-    );
-
-    late Map<String, double> columnWidths = {
-      'No': 50,
-      'Tgl Input': 100,
-      'Nama Pelayaran': 150,
-      'ETD': 100,
-      'Tgl Bongkar': 100,
-      'Total Unit': 80,
-      'Lihat': 80,
-      'Deffect': 80,
-      'Edit': 80,
-    };
-    final typeMotorController = Get.put(TypeMotorController());
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back_ios)),
-        title: Text('Data Dooring',
-            style: Theme.of(context).textTheme.headlineMedium),
-        centerTitle: true,
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value && controller.dooringModel.isEmpty) {
-          return const CustomCircularLoader();
-        } else if (controller.dooringModel.isEmpty) {
-          return CustomAnimationLoaderWidget(
-            text: 'Tidak ada data saat ini',
-            animation: 'assets/animations/404.json',
-            height: CustomHelperFunctions.screenHeight() * 0.4,
-            width: CustomHelperFunctions.screenHeight(),
-          );
-        } else {
-          final dataSource = DooringSource(
-            onLihat: (DooringModel model) {
-              Get.to(() => LihatDooring(model: model));
-            },
-            onDefect: (DooringModel model) async {
-              if (model.statusDefect == 0) {
-                CustomDialogs.defaultDialog(
-                  contentWidget: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text('Konfirmasi Deffect Motor',
-                            style: Theme.of(context).textTheme.headlineMedium),
-                      ),
-                      const SizedBox(height: CustomSize.spaceBtwItems),
-                      Text('Nama Kapal',
-                          style: Theme.of(context).textTheme.labelMedium),
-                      TextFormField(
-                        controller:
-                            TextEditingController(text: model.namaKapal),
-                        readOnly: true,
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Tanggal Bongkar',
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium),
-                              TextFormField(
-                                controller: TextEditingController(
-                                    text: model.tglBongkar),
-                                readOnly: true,
-                              ),
-                            ],
-                          )),
-                          const SizedBox(width: CustomSize.sm),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('ETD',
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium),
-                              TextFormField(
-                                controller:
-                                    TextEditingController(text: model.etd),
-                                readOnly: true,
-                              ),
-                            ],
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Jumlah Unit',
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium),
-                              TextFormField(
-                                controller: TextEditingController(
-                                    text: model.unit.toString()),
-                                readOnly: true,
-                              ),
-                            ],
-                          )),
-                          const SizedBox(width: CustomSize.sm),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Wilayah',
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium),
-                              TextFormField(
-                                controller:
-                                    TextEditingController(text: model.wilayah),
-                                readOnly: true,
-                              ),
-                            ],
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: CustomSize.sm),
-                      Text('Status Deffect',
-                          style: Theme.of(context).textTheme.labelMedium),
-                      Obx(
-                        () => DropDownWidget(
-                          value: controller.statusDefect.value,
-                          items: controller.listStatusDefect.keys.toList(),
-                          onChanged: (String? value) {
-                            controller.statusDefect.value = value!;
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: CustomSize.spaceBtwSections),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          OutlinedButton(
-                              onPressed: () => Get.back(),
-                              style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: CustomSize.lg,
-                                      vertical: CustomSize.md)),
-                              child: const Text('Close')),
-                          ElevatedButton(
-                            onPressed: () {
-                              controller.changeStatusDefect(
-                                  model.idDooring, controller.getStatusDefect);
-                            },
-                            style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: CustomSize.lg,
-                                    vertical: CustomSize.md)),
-                            child: const Text('Tambahkan'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  context: context,
-                );
-              } else if (model.statusDefect == 1) {
-                await Navigator.of(context).push(PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      TambahDefect(
-                    model: model,
-                    controller: typeMotorController,
-                  ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = 0.0;
-                    const end = 1.0;
-                    const curve = Curves.easeInOut;
-
-                    var tween = Tween(begin: begin, end: end).chain(
-                      CurveTween(curve: curve),
-                    );
-
-                    return FadeTransition(
-                      opacity: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ));
-              }
-            },
-            onEdited: (DooringModel model) {
-              CustomDialogs.defaultDialog(
-                  context: context,
-                  margin: const EdgeInsets.symmetric(vertical: CustomSize.xl),
-                  contentWidget: EditDooring(
-                    model: model,
-                    controller: controller,
-                  ));
-            },
-            dooringModel: controller.dooringModel,
-          );
-          return SfDataGrid(
-              source: dataSource,
-              frozenColumnsCount: 2,
-              columnWidthMode: ColumnWidthMode.auto,
-              gridLinesVisibility: GridLinesVisibility.both,
-              headerGridLinesVisibility: GridLinesVisibility.both,
-              columns: [
-                GridColumn(
-                    width: columnWidths['No']!,
-                    columnName: 'No',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'No',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Tgl Input']!,
-                    columnName: 'Tgl Input',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Tgl Input',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Nama Pelayaran']!,
-                    columnName: 'Nama Pelayaran',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Nama Pelayaran',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['ETD']!,
-                    columnName: 'ETD',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'ETD',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Tgl Bongkar']!,
-                    columnName: 'Tgl Bongkar',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Tgl Bongkar',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Total Unit']!,
-                    columnName: 'Total Unit',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Total Unit',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Lihat']!,
-                    columnName: 'Lihat',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Lihat',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Deffect']!,
-                    columnName: 'Deffect',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Deffect',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Edit']!,
-                    columnName: 'Edit',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Edit',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-              ]);
-        }
-      }),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.black,
-        onPressed: () async {
-          await Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const TambahDooring(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = 0.0;
-              const end = 1.0;
-              const curve = Curves.easeInOut;
-
-              var tween = Tween(begin: begin, end: end).chain(
-                CurveTween(curve: curve),
-              );
-
-              return FadeTransition(
-                opacity: animation.drive(tween),
-                child: child,
-              );
-            },
-          ));
-        },
-        icon: const Icon(
-          Icons.add,
-          color: AppColors.white,
-        ),
-        label: Text('Tambah Dooring',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.apply(color: AppColors.white)),
-      ),
-    );
-  }
-}
-
-class TambahDooring extends StatelessWidget {
-  const TambahDooring({super.key});
+class TambahAllDooring extends StatelessWidget {
+  const TambahAllDooring({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -892,11 +487,11 @@ class TambahDooring extends StatelessWidget {
   }
 }
 
-class TambahDefect extends StatelessWidget {
-  const TambahDefect(
+class TambahAllDefect extends StatelessWidget {
+  const TambahAllDefect(
       {super.key, required this.model, required this.controller});
 
-  final DooringModel model;
+  final AllDooringModel model;
   final TypeMotorController controller;
 
   @override
@@ -1752,17 +1347,18 @@ class TambahDefect extends StatelessWidget {
   }
 }
 
-class EditDooring extends StatefulWidget {
-  const EditDooring({super.key, required this.controller, required this.model});
+class EditAllDooring extends StatefulWidget {
+  const EditAllDooring(
+      {super.key, required this.controller, required this.model});
 
   final DooringController controller;
-  final DooringModel model;
+  final AllDooringModel model;
 
   @override
-  State<EditDooring> createState() => _EditDooringState();
+  State<EditAllDooring> createState() => _EditAllDooringState();
 }
 
-class _EditDooringState extends State<EditDooring> {
+class _EditAllDooringState extends State<EditAllDooring> {
   late int idDooring;
   late String namaKapal;
   late String wilayah;

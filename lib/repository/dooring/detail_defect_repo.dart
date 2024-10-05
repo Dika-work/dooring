@@ -15,7 +15,6 @@ class DetailDefectRepository {
         '${storageUtil.baseURL}/defect_detail.php?action=Tabel&id_defect=$idDefect'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
-      print('..INI RESPONSE KENDARAAN.. : ${list.toList()}');
       return list.map((model) => DetailDefectModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');

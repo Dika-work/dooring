@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dooring/helpers/helper_func.dart';
 import 'package:http/http.dart' as http;
 import '../../models/dooring/defect_model.dart';
+import '../../models/dooring/detail_defect_model.dart';
 import '../../models/dooring/kapal_model.dart';
 import '../../utils/constant/storage_util.dart';
 import '../../utils/popups/snackbar.dart';
@@ -15,7 +16,6 @@ class KapalRepository {
         .get(Uri.parse('${storageUtil.baseURL}/kapal.php?action=getData'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
-      print('..INI RESPONSE KENDARAAN.. : ${list.toList()}');
       return list.map((model) => KapalModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
@@ -31,7 +31,6 @@ class WilayahRepository {
         .get(Uri.parse('${storageUtil.baseURL}/wilayah.php?action=getData'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
-      print('..INI RESPONSE KENDARAAN.. : ${list.toList()}');
       return list.map((model) => WilayahModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
@@ -97,7 +96,6 @@ class TypeMotorRepository {
         .get(Uri.parse('${storageUtil.baseURL}/type_motor.php?action=getData'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
-      print('..INI RESPONSE KENDARAAN.. : ${list.toList()}');
       return list.map((model) => TypeMotorModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
@@ -212,6 +210,17 @@ class TypeMotorRepository {
     }
   }
 
+  Future<List<DetailDefectModel>> lihatDooringTable(int idDooring) async {
+    final response = await http.get(Uri.parse(
+        '${storageUtil.baseURL}/dooring.php?action=Lihat&id_dooring=$idDooring'));
+    if (response.statusCode == 200) {
+      Iterable list = json.decode(response.body);
+      return list.map((model) => DetailDefectModel.fromJson(model)).toList();
+    } else {
+      throw Exception('Gagal untuk mengambil data kapal☠️');
+    }
+  }
+
   // add defect
   Future<void> addDefect(
     int idDooring,
@@ -258,6 +267,61 @@ class TypeMotorRepository {
         message: 'Terjadi error: $e',
       );
       return;
+    }
+  }
+
+  Future<void> editDefectData(
+    int idDefect,
+    int idDooring,
+    String typeMotor,
+    String part,
+    String jumlah,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/defect.php'),
+        body: {
+          'id_defect': idDefect.toString(),
+          'id_dooring': idDooring.toString(),
+          'type_motor': typeMotor,
+          'part': part,
+          'jumlah': jumlah,
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
     }
   }
 
@@ -351,7 +415,6 @@ class PartMotorRepository {
         .get(Uri.parse('${storageUtil.baseURL}/part_motor.php?action=getData'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
-      print('..INI RESPONSE KENDARAAN.. : ${list.toList()}');
       return list.map((model) => PartMotorModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');

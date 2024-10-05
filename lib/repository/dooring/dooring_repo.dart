@@ -14,8 +14,18 @@ class DooringRepository {
         .get(Uri.parse('${storageUtil.baseURL}/dooring.php?action=getData'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
-      print('..INI RESPONSE KENDARAAN.. : ${list.toList()}');
       return list.map((model) => DooringModel.fromJson(model)).toList();
+    } else {
+      throw Exception('Gagal untuk mengambil data kapal☠️');
+    }
+  }
+
+  Future<List<AllDooringModel>> fetchAllDooringContent() async {
+    final response = await http
+        .get(Uri.parse('${storageUtil.baseURL}/dooring.php?action=getDataAll'));
+    if (response.statusCode == 200) {
+      Iterable list = json.decode(response.body);
+      return list.map((model) => AllDooringModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
     }

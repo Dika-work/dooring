@@ -46,6 +46,38 @@ class CustomDialogs {
     );
   }
 
+  static konfirmasiDialog({
+    required BuildContext context,
+    String title = 'Konfirmasi Penyelesaian',
+    String content =
+        'Konfirmasi ini akan menyelesaikan semua data yang terkait. Apakah Anda yakin?',
+    String cancelText = 'Batal',
+    String confirmText = 'Ya',
+    Function()? onCancel,
+    Function()? onConfirm,
+  }) {
+    // Show a confirmation dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              onPressed: onCancel ?? () => Navigator.of(context).pop(),
+              child: Text(cancelText),
+            ),
+            TextButton(
+              onPressed: onConfirm,
+              child: Text(confirmText),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   static deleteDialog({
     required BuildContext context,
     String title = 'Konfirmasi Penghapusan',

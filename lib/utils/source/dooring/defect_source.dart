@@ -36,7 +36,7 @@ class DefectSource extends DataGridSource {
     bool isEvenRow = rowIndex % 2 == 0;
 
     List<Widget> cells = [
-      ...row.getCells().map<Widget>((e) {
+      ...row.getCells().take(4).map<Widget>((e) {
         return Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: CustomSize.md),
@@ -51,82 +51,84 @@ class DefectSource extends DataGridSource {
       })
     ];
 
-    final bool statusDetail = defectModel[rowIndex].status > 0;
+    final bool hasData = defectModel.isNotEmpty;
 
-    if (statusDetail) {
-      cells.add(Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-              onPressed: () {
-                if (onLihat != null) {
-                  onLihat!(defectModel[rowIndex]);
-                }
-              },
-              icon: const Icon(
-                Iconsax.eye,
-              ))
-        ],
-      ));
-    } else {
-      cells.add(const Center(child: Text('-')));
-    }
+    if (hasData) {
+      if (defectModel[rowIndex].status > 0) {
+        cells.add(Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+                onPressed: () {
+                  if (onLihat != null) {
+                    onLihat!(defectModel[rowIndex]);
+                  }
+                },
+                icon: const Icon(
+                  Iconsax.eye,
+                ))
+          ],
+        ));
+      } else {
+        cells.add(const Center(child: Text('-')));
+      }
 
-    if (!statusDetail) {
-      cells.add(Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-              onPressed: () {
-                if (onAdded != null) {
-                  onAdded!(defectModel[rowIndex]);
-                }
-              },
-              icon: const Icon(
-                Iconsax.add,
-              ))
-        ],
-      ));
-    } else {
-      cells.add(const Center(child: Text('-')));
-    }
+      if (defectModel[rowIndex].status == 0) {
+        cells.add(Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+                onPressed: () {
+                  if (onAdded != null) {
+                    onAdded!(defectModel[rowIndex]);
+                  }
+                },
+                icon: const Icon(
+                  Iconsax.add,
+                ))
+          ],
+        ));
+      } else {
+        cells.add(const Center(child: Text('-')));
+      }
 
-    if (!statusDetail) {
-      cells.add(Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-              onPressed: () {
-                if (onEdited != null) {
-                  onEdited!(defectModel[rowIndex]);
-                }
-              },
-              icon: const Icon(
-                Iconsax.edit,
-              ))
-        ],
-      ));
-    } else {
-      cells.add(const Center(child: Text('-')));
-    }
+      if (defectModel[rowIndex].status == 0) {
+        cells.add(Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+                onPressed: () {
+                  if (onEdited != null) {
+                    onEdited!(defectModel[rowIndex]);
+                  }
+                },
+                icon: const Icon(
+                  Iconsax.edit,
+                ))
+          ],
+        ));
+      } else {
+        cells.add(const Center(child: Text('-')));
+      }
 
-    if (!statusDetail) {
-      cells.add(Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-              onPressed: () {
-                if (onDeleted != null) {
-                  onDeleted!(defectModel[rowIndex]);
-                }
-              },
-              icon: const Icon(
-                Iconsax.trash,
-              ))
-        ],
-      ));
-    } else {
-      cells.add(const Center(child: Text('-')));
+      if (defectModel[rowIndex].status == 0) {
+        cells.add(Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+                onPressed: () {
+                  if (onDeleted != null) {
+                    onDeleted!(defectModel[rowIndex]);
+                  }
+                },
+                icon: const Icon(
+                  Iconsax.trash,
+                ))
+          ],
+        ));
+      } else {
+        cells.add(const Center(child: Text('-')));
+      }
     }
 
     return DataGridRowAdapter(
@@ -148,15 +150,15 @@ class DefectSource extends DataGridSource {
 
   void _updateDataPager(List<DefectModel> defectModel, int startIndex) {
     if (defectModel.isEmpty) {
-      print('Model is empty, generating empty rows');
+      print('Model is empty, generating empty rowszzzz');
       dooringData = _generateEmptyRows(1);
     } else {
       print('Model has data, generating rows based on model');
+      index = startIndex + 1;
       dooringData = defectModel.skip(startIndex).take(5).map<DataGridRow>(
         (e) {
-          index++;
           return DataGridRow(cells: [
-            DataGridCell<int>(columnName: 'No', value: index),
+            DataGridCell<int>(columnName: 'No', value: index++),
             DataGridCell<String>(columnName: 'Type Motor', value: e.typeMotor),
             DataGridCell<String>(columnName: 'Part Motor', value: e.part),
             DataGridCell<int>(columnName: 'Jml', value: e.jumlah),
@@ -169,7 +171,8 @@ class DefectSource extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    _updateDataPager(defectModel, newPageIndex);
+    final int startIndex = newPageIndex * 5;
+    _updateDataPager(defectModel, startIndex);
     notifyListeners();
     return true;
   }

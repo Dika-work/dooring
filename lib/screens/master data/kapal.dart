@@ -40,7 +40,9 @@ class MasterKapal extends GetView<KapalController> {
               print('ini edit master kapal');
             },
             onDeleted: (KapalModel model) {
-              print('ini hapus master kapal');
+              CustomDialogs.deleteDialog(
+                  context: context,
+                  onConfirm: () => print('ini hapus master kapal'));
             },
             kapalModel: controller.displayedData,
           );

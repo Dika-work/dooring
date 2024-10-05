@@ -189,13 +189,13 @@ class CustomDrawer extends StatelessWidget {
               icon: Iconsax.document_cloud,
               textTitle: 'Semua Data',
               content: ListTile(
-                onTap: () {},
+                onTap: () => Get.toNamed('/semua-dooring'),
                 leading: const Icon(
                   Iconsax.record,
                   color: AppColors.darkExpandableContent,
                 ),
                 title: Text(
-                  'Tambah Data',
+                  'Semua Dooring',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall

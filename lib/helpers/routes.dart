@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/dooring/dooring_controller.dart';
 import '../controllers/dooring/kapal_controller.dart';
 import '../screens/dooring/dooring.dart';
+import '../screens/semua data/semua_dooring.dart';
 import '../screens/login.dart';
 import '../screens/master data/kapal.dart';
 import '../screens/master data/part_motor.dart';
@@ -64,6 +65,14 @@ class AppRoutes {
             page: () => const PartMotor(),
             binding: BindingsBuilder(() {
               Get.put(PartMotorController());
+            })),
+
+        // Semua Data
+        GetPage(
+            name: '/semua-dooring',
+            page: () => const SemuaDooring(),
+            binding: BindingsBuilder(() {
+              Get.put(DooringController());
             })),
       ];
 }

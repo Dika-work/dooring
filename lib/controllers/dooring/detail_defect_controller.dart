@@ -16,7 +16,6 @@ class DetailDefectController extends GetxController {
   final detailDefectRepo = Get.put(DetailDefectRepository());
   final storageUtil = StorageUtil();
   final isLoading = Rx<bool>(false);
-  RxBool isJumlahUnitSama = false.obs;
 
   RxList<DetailDefectModel> detailModel = <DetailDefectModel>[].obs;
   final networkManager = Get.find<NetworkManager>();
@@ -25,6 +24,7 @@ class DetailDefectController extends GetxController {
 
   TextEditingController nomorMesinController = TextEditingController();
   TextEditingController nomorRangkaController = TextEditingController();
+  RxInt jumlahInput = 0.obs;
 
   final deleteDefectRepo = Get.put(TypeMotorRepository());
   final defectController = Get.put(TypeMotorController());
@@ -44,13 +44,15 @@ class DetailDefectController extends GetxController {
       final dataMotor =
           await detailDefectRepo.fectDetailDefectContent(idDefect);
       detailModel.assignAll(dataMotor);
-      isJumlahUnitSama.value = detailModel.isNotEmpty &&
-          detailModel.first.jumlah == detailModel.first.jumlahInput;
-      print('isJumlahUnitSama seletah fetch: ${isJumlahUnitSama.value}');
-      print('ini jumlah : ${detailModel.first.jumlahInput}');
-      print('ini unit: ${detailModel.first.unit}');
+
+      if (detailModel.isNotEmpty) {
+        jumlahInput.value = detailModel.length;
+      } else {
+        jumlahInput.value = 0; // Atau nilai default lainnya
+      }
     } catch (e) {
       detailModel.assignAll([]);
+      jumlahInput.value = 0; // Atau nilai default lainnya
     } finally {
       isLoading.value = false;
     }
@@ -143,6 +145,7 @@ class DetailDefectController extends GetxController {
     await deleteDefectRepo.deleteDefect(idDefect);
     await defectController.fetchDefetchTable(idDooring);
 
+    CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
 

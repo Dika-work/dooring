@@ -15,6 +15,7 @@ class DooringController extends GetxController {
   final storageUtil = StorageUtil();
   final isLoading = Rx<bool>(false);
   RxList<DooringModel> dooringModel = <DooringModel>[].obs;
+  RxList<AllDooringModel> allDooringModel = <AllDooringModel>[].obs;
   final dooringRepo = Get.put(DooringRepository());
   final kapalController = Get.put(KapalController());
   final wilayahController = Get.put(WilayahController());
@@ -70,7 +71,6 @@ class DooringController extends GetxController {
     if (user != null) {
       tipeUser = user.username;
     }
-    fetchDooringData();
   }
 
   Future<void> fetchDooringData() async {
@@ -80,6 +80,20 @@ class DooringController extends GetxController {
       dooringModel.assignAll(dataDooring);
     } catch (e) {
       dooringModel.assignAll([]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // seluruh dooring
+  Future<void> fetchAllDooringData() async {
+    try {
+      isLoading.value = true;
+      final dataDooring = await dooringRepo.fetchAllDooringContent();
+      allDooringModel.assignAll(dataDooring);
+      print('ini semua response data all doring: ${dataDooring.toList()}');
+    } catch (e) {
+      allDooringModel.assignAll([]);
     } finally {
       isLoading.value = false;
     }
