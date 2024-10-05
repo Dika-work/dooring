@@ -71,3 +71,20 @@ class PartMotorModel {
     );
   }
 }
+
+class PelayaranModel {
+  int idPelayaran;
+  String namaPel;
+
+  PelayaranModel({
+    required this.idPelayaran,
+    required this.namaPel,
+  });
+
+  factory PelayaranModel.fromJson(Map<String, dynamic> json) {
+    return PelayaranModel(
+      idPelayaran: json['id_pel'] ?? 0,
+      namaPel: json['nm_pel'] ?? '',
+    );
+  }
+}

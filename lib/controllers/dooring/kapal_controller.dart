@@ -29,20 +29,7 @@ class KapalController extends GetxController {
   int initialDataCount = 15;
   int loadMoreCount = 5;
 
-  final namaPelayaran = 'CTP'.obs;
   TextEditingController namaKapalController = TextEditingController();
-
-  final List<String> namaPelayaranMap = [
-    //make master pelayaran
-    'CTP',
-    'MERATUS',
-    'TANTO',
-    'SPIL',
-    'KALLA',
-    'DUTA',
-    'TEMAS',
-    'ICON',
-  ];
 
   @override
   void onInit() {
@@ -624,6 +611,142 @@ class PartMotorController extends GetxController {
     );
 
     selectedWilayah.value = kendaraan.namaPart;
+  }
+
+  void setSelectedJenisKendaraan(String jenis) {
+    selectedWilayah.value = jenis;
+    updateSelectedKendaraan(selectedWilayah.value); // Menjaga konsistensi
+  }
+
+  void resetSelectedKendaraan() {
+    selectedWilayah.value = '';
+  }
+}
+
+class PelayaranController extends GetxController {
+  final pelayaranRepo = Get.put(PelayaranRepository());
+  final networkManager = Get.find<NetworkManager>();
+  final isLoading = Rx<bool>(false);
+  GlobalKey<FormState> addPartKey = GlobalKey<FormState>();
+  RxList<PelayaranModel> pelayaranModel = <PelayaranModel>[].obs;
+
+  TextEditingController namaPelayaran = TextEditingController();
+  RxString selectedWilayah = ''.obs;
+  RxString selectedJenisWilayah = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchWilayahData();
+  }
+
+  Future<void> fetchWilayahData() async {
+    try {
+      isLoading.value = true;
+      final dataWilayah = await pelayaranRepo.fetchDataPelayaran();
+      pelayaranModel.assignAll(dataWilayah);
+    } catch (e) {
+      pelayaranModel.assignAll([]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addPartMotor(String namaPart) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    if (!addPartKey.currentState!.validate()) {
+      CustomHelperFunctions.stopLoading();
+      return;
+    }
+
+    await pelayaranRepo.addPartMotor(namaPart);
+    print('Stopped loading dialog');
+
+    await fetchWilayahData();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> editPart(
+    int idPart,
+    String namaPart,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await pelayaranRepo.editPart(
+      idPart,
+      namaPart,
+    );
+
+    await fetchWilayahData();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  Future<void> deletePelayaran(int id) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+    await pelayaranRepo.deletePelayaran(id);
+
+    await fetchWilayahData();
+    namaPelayaran.clear();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+  }
+
+  List<PelayaranModel> get filteredPartMotorModel {
+    if (selectedJenisWilayah.value.isEmpty) {
+      return pelayaranModel;
+    }
+
+    final filtered = pelayaranModel
+        .where(
+          (kapal) => kapal.namaPel
+              .toLowerCase()
+              .contains(selectedJenisWilayah.value.toLowerCase()),
+        )
+        .toList();
+
+    return filtered;
+  }
+
+  void updateSelectedKendaraan(String value) {
+    final kendaraan = filteredPartMotorModel.firstWhere(
+      (kendaraan) => kendaraan.namaPel == value,
+      orElse: () => PelayaranModel(
+        idPelayaran: 0,
+        namaPel: '',
+      ),
+    );
+
+    selectedWilayah.value = kendaraan.namaPel;
   }
 
   void setSelectedJenisKendaraan(String jenis) {

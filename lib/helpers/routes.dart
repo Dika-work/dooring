@@ -41,13 +41,11 @@ class AppRoutes {
               Get.put(KapalController());
             })),
         GetPage(
-          name: '/master-pelayaran',
-          page: () => const MasterPelayaran(),
-          // binding: BindingsBuilder(() {
-          //   Get.put(KapalController());
-          // }
-          // )
-        ),
+            name: '/master-pelayaran',
+            page: () => const MasterPelayaran(),
+            binding: BindingsBuilder(() {
+              Get.put(PelayaranController());
+            })),
         GetPage(
             name: '/master-wilayah',
             page: () => const MasterWilayah(),

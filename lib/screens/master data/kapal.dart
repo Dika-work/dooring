@@ -1,5 +1,6 @@
 import 'package:dooring/models/dooring/kapal_model.dart';
 import 'package:dooring/utils/popups/dialogs.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -8,13 +9,13 @@ import '../../controllers/dooring/kapal_controller.dart';
 import '../../utils/constant/custom_size.dart';
 import '../../utils/loader/circular_loader.dart';
 import '../../utils/source/master data/kapal_source.dart';
-import '../../widgets/dropdown.dart';
 
 class MasterKapal extends GetView<KapalController> {
   const MasterKapal({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final pelayaranController = Get.put(PelayaranController());
     late Map<String, double> columnWidths = {
       'No': 50,
       'Nama Pelayaran': 130,
@@ -162,14 +163,59 @@ class MasterKapal extends GetView<KapalController> {
                       style: Theme.of(context).textTheme.headlineMedium),
                 ),
                 const SizedBox(height: CustomSize.spaceBtwItems),
-                Obx(
-                  () => DropDownWidget(
-                    value: controller.namaPelayaran.value,
-                    items: controller.namaPelayaranMap,
-                    onChanged: (String? value) {
-                      controller.namaPelayaran.value = value!;
-                    },
-                  ),
+                Expanded(
+                  flex: 2,
+                  child: Obx(() {
+                    return DropdownSearch<PelayaranModel>(
+                      items: pelayaranController.filteredPartMotorModel,
+                      itemAsString: (PelayaranModel kendaraan) =>
+                          kendaraan.namaPel,
+                      selectedItem:
+                          pelayaranController.selectedWilayah.value.isNotEmpty
+                              ? pelayaranController.filteredPartMotorModel
+                                  .firstWhere(
+                                  (kendaraan) =>
+                                      kendaraan.namaPel ==
+                                      pelayaranController.selectedWilayah.value,
+                                  orElse: () => PelayaranModel(
+                                    idPelayaran: 0,
+                                    namaPel: '',
+                                  ),
+                                )
+                              : null,
+                      dropdownBuilder: (context, PelayaranModel? selectedItem) {
+                        return Text(
+                          selectedItem != null
+                              ? selectedItem.namaPel
+                              : 'Nama Pelayaran',
+                          style: TextStyle(
+                              fontSize: CustomSize.fontSizeSm,
+                              color: selectedItem == null
+                                  ? Colors.grey
+                                  : Colors.black,
+                              fontWeight: FontWeight.w600),
+                        );
+                      },
+                      onChanged: (PelayaranModel? kendaraan) {
+                        if (kendaraan != null) {
+                          pelayaranController.selectedWilayah.value =
+                              kendaraan.namaPel;
+                          print(
+                              'ini nama kapal : ${pelayaranController.selectedWilayah.value}');
+                        } else {
+                          pelayaranController.resetSelectedKendaraan();
+                        }
+                      },
+                      popupProps: const PopupProps.menu(
+                        showSearchBox: true,
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            hintText: 'Search Kendaraan...',
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                 ),
                 const SizedBox(height: CustomSize.spaceBtwItems),
                 TextFormField(
