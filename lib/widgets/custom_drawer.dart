@@ -106,121 +106,159 @@ class CustomDrawer extends StatelessWidget {
             ),
             ExpandableContainer(
                 icon: Iconsax.book, textTitle: 'Home', onTap: closeDrawer),
-            user.menu1 == 1
-                ? ExpandableContainer(
-                    icon: Iconsax.folder_2,
-                    textTitle: 'Master Data',
-                    content: Column(
-                      children: [
-                        ListTile(
-                          onTap: () => Get.toNamed('/master-kapal'),
-                          leading: const Icon(
-                            Iconsax.record,
-                            color: AppColors.darkExpandableContent,
-                          ),
-                          title: Text(
-                            'Kapal',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: AppColors.light),
-                          ),
+            if (user.menu1 == 1)
+              ExpandableContainer(
+                  icon: Iconsax.folder_2,
+                  textTitle: 'Master Data',
+                  content: Column(
+                    children: [
+                      ListTile(
+                        onTap: () => Get.toNamed('/master-kapal'),
+                        leading: const Icon(
+                          Iconsax.record,
+                          color: AppColors.darkExpandableContent,
                         ),
-                        ListTile(
-                          onTap: () => Get.toNamed('/master-pelayaran'),
-                          leading: const Icon(
-                            Iconsax.record,
-                            color: AppColors.darkExpandableContent,
-                          ),
-                          title: Text(
-                            'Pelayaran',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: AppColors.light),
-                          ),
+                        title: Text(
+                          'Kapal',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: AppColors.light),
                         ),
-                        ListTile(
-                          onTap: () => Get.toNamed('/master-part'),
-                          leading: const Icon(
-                            Iconsax.record,
-                            color: AppColors.darkExpandableContent,
-                          ),
-                          title: Text(
-                            'Part',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: AppColors.light),
-                          ),
+                      ),
+                      ListTile(
+                        onTap: () => Get.toNamed('/master-pelayaran'),
+                        leading: const Icon(
+                          Iconsax.record,
+                          color: AppColors.darkExpandableContent,
                         ),
-                        ListTile(
-                          onTap: () => Get.toNamed('/master-motor'),
-                          leading: const Icon(
-                            Iconsax.record,
-                            color: AppColors.darkExpandableContent,
-                          ),
-                          title: Text(
-                            'Type Motor',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: AppColors.light),
-                          ),
+                        title: Text(
+                          'Pelayaran',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: AppColors.light),
                         ),
-                        ListTile(
-                          onTap: () => Get.toNamed('/master-wilayah'),
-                          leading: const Icon(
-                            Iconsax.record,
-                            color: AppColors.darkExpandableContent,
-                          ),
-                          title: Text(
-                            'Wilayah',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: AppColors.light),
-                          ),
+                      ),
+                      ListTile(
+                        onTap: () => Get.toNamed('/master-part'),
+                        leading: const Icon(
+                          Iconsax.record,
+                          color: AppColors.darkExpandableContent,
                         ),
-                      ],
-                    ))
-                : const SizedBox.shrink(),
-            ExpandableContainer(
-              icon: Iconsax.document_cloud,
-              textTitle: 'Semua Data',
-              content: ListTile(
-                onTap: () => Get.toNamed('/semua-dooring'),
-                leading: const Icon(
-                  Iconsax.record,
-                  color: AppColors.darkExpandableContent,
-                ),
-                title: Text(
-                  'Semua Dooring',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall
-                      ?.copyWith(color: AppColors.light),
-                ),
-              ),
-            ),
-            ExpandableContainer(
-              icon: Iconsax.add,
-              textTitle: 'Dooring',
-              content: ListTile(
-                onTap: () => Get.toNamed('/data-dooring'),
-                leading: const Icon(
-                  Iconsax.record,
-                  color: AppColors.darkExpandableContent,
-                ),
-                title: Text(
-                  'Tambah Data',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall
-                      ?.copyWith(color: AppColors.light),
+                        title: Text(
+                          'Part',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: AppColors.light),
+                        ),
+                      ),
+                      ListTile(
+                        onTap: () => Get.toNamed('/master-motor'),
+                        leading: const Icon(
+                          Iconsax.record,
+                          color: AppColors.darkExpandableContent,
+                        ),
+                        title: Text(
+                          'Type Motor',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: AppColors.light),
+                        ),
+                      ),
+                      ListTile(
+                        onTap: () => Get.toNamed('/master-wilayah'),
+                        leading: const Icon(
+                          Iconsax.record,
+                          color: AppColors.darkExpandableContent,
+                        ),
+                        title: Text(
+                          'Wilayah',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: AppColors.light),
+                        ),
+                      ),
+                    ],
+                  )),
+            if (user.menu2 == 1)
+              ExpandableContainer(
+                icon: Iconsax.document_cloud,
+                textTitle: 'Semua Data',
+                content: ListTile(
+                  onTap: () => Get.toNamed('/semua-dooring'),
+                  leading: const Icon(
+                    Iconsax.record,
+                    color: AppColors.darkExpandableContent,
+                  ),
+                  title: Text(
+                    'Semua Dooring',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(color: AppColors.light),
+                  ),
                 ),
               ),
-            )
+            if (user.menu3 == 1)
+              ExpandableContainer(
+                icon: Iconsax.add,
+                textTitle: 'Dooring',
+                content: ListTile(
+                  onTap: () => Get.toNamed('/data-dooring'),
+                  leading: const Icon(
+                    Iconsax.record,
+                    color: AppColors.darkExpandableContent,
+                  ),
+                  title: Text(
+                    'Tambah Data',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(color: AppColors.light),
+                  ),
+                ),
+              ),
+            if (user.menu9 == 1)
+              ExpandableContainer(
+                icon: Iconsax.archive_book,
+                textTitle: 'Laporan',
+                content: Column(
+                  children: [
+                    ListTile(
+                      onTap: () => Get.toNamed('/laporan-total-unit'),
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Total Unit',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () => Get.toNamed('/laporan-defect'),
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Defect',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

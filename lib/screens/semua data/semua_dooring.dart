@@ -30,14 +30,15 @@ class SemuaDooring extends GetView<DooringController> {
 
     late Map<String, double> columnWidths = {
       'No': 50,
+      if (controller.isAdmin) 'Wilayah': 70,
       'Tgl Input': 100,
       'Nama Pelayaran': 150,
       'ETD': 100,
       'Tgl Bongkar': 100,
       'Total Unit': 80,
-      'Lihat': 80,
-      'Deffect': 80,
-      'Edit': 80,
+      if (controller.lihatRole != 0) 'Lihat': 80,
+      if (controller.tambahRole != 0) 'Deffect': 80,
+      if (controller.editRole != 0) 'Edit': 80,
     };
     return Scaffold(
       appBar: AppBar(
@@ -60,6 +61,7 @@ class SemuaDooring extends GetView<DooringController> {
           );
         } else {
           final dataSource = SemuaDooringSource(
+            isAdmin: controller.isAdmin,
             onLihat: (AllDooringModel model) {
               Get.to(() => LihatSemuaDooring(model: model));
             },
@@ -227,158 +229,183 @@ class SemuaDooring extends GetView<DooringController> {
             dooringModel: controller.allDooringModel,
           );
 
-          return SfDataGrid(
-              source: dataSource,
-              frozenColumnsCount: 2,
-              columnWidthMode: ColumnWidthMode.auto,
-              gridLinesVisibility: GridLinesVisibility.both,
-              headerGridLinesVisibility: GridLinesVisibility.both,
-              columns: [
-                GridColumn(
-                    width: columnWidths['No']!,
-                    columnName: 'No',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'No',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Tgl Input']!,
-                    columnName: 'Tgl Input',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Tgl Input',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Nama Pelayaran']!,
-                    columnName: 'Nama Pelayaran',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Nama Pelayaran',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['ETD']!,
-                    columnName: 'ETD',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'ETD',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Tgl Bongkar']!,
-                    columnName: 'Tgl Bongkar',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Tgl Bongkar',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Total Unit']!,
-                    columnName: 'Total Unit',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Total Unit',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Lihat']!,
-                    columnName: 'Lihat',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Lihat',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Deffect']!,
-                    columnName: 'Deffect',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Deffect',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    width: columnWidths['Edit']!,
-                    columnName: 'Edit',
-                    label: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.lightBlue.shade100,
-                        ),
-                        child: Text(
-                          'Edit',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ))),
-              ]);
+          return RefreshIndicator(
+            onRefresh: () async {
+              await controller.fetchAllDooringData();
+            },
+            child: SfDataGrid(
+                source: dataSource,
+                frozenColumnsCount: 2,
+                columnWidthMode: ColumnWidthMode.auto,
+                gridLinesVisibility: GridLinesVisibility.both,
+                headerGridLinesVisibility: GridLinesVisibility.both,
+                columns: [
+                  GridColumn(
+                      width: columnWidths['No']!,
+                      columnName: 'No',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'No',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  if (controller.isAdmin)
+                    GridColumn(
+                        width: columnWidths['Wilayah']!,
+                        columnName: 'Wilayah',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Wilayah',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
+                  GridColumn(
+                      width: columnWidths['Tgl Input']!,
+                      columnName: 'Tgl Input',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'Tgl Input',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  GridColumn(
+                      width: columnWidths['Nama Pelayaran']!,
+                      columnName: 'Nama Pelayaran',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'Nama Pelayaran',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  GridColumn(
+                      width: columnWidths['ETD']!,
+                      columnName: 'ETD',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'ETD',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  GridColumn(
+                      width: columnWidths['Tgl Bongkar']!,
+                      columnName: 'Tgl Bongkar',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'Tgl Bongkar',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  GridColumn(
+                      width: columnWidths['Total Unit']!,
+                      columnName: 'Total Unit',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'Total Unit',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  if (controller.lihatRole != 0)
+                    GridColumn(
+                        width: columnWidths['Lihat']!,
+                        columnName: 'Lihat',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Lihat',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
+                  if (controller.tambahRole != 0)
+                    GridColumn(
+                        width: columnWidths['Deffect']!,
+                        columnName: 'Deffect',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Deffect',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
+                  if (controller.editRole != 0)
+                    GridColumn(
+                        width: columnWidths['Edit']!,
+                        columnName: 'Edit',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Edit',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
+                ]),
+          );
         }
       }),
     );

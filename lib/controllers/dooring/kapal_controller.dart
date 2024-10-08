@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:dooring/helpers/helper_func.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:excel/excel.dart';
 import 'package:get/get.dart';
 
 import '../../helpers/connectivity.dart';
@@ -369,6 +375,126 @@ class TypeMotorController extends GetxController {
       detailDefectModel.assignAll([]);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> downloadExcelForDooring(int idDooring) async {
+    try {
+      print('Ini awalan download excel');
+      CustomDialogs.loadingIndicator();
+
+      // Cek koneksi internet
+      final isConnected = await networkManager.isConnected();
+      if (!isConnected) {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia',
+        );
+        return;
+      }
+
+      // Fetch data dari lihatDooring
+      await lihatDooring(idDooring);
+      print('Berhasil mengambil data dooring excel..');
+
+      // Cek apakah detailDefectModel berisi data
+      if (detailDefectModel.isEmpty) {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Error',
+          message: 'Data kosong, tidak ada yang bisa diunduh',
+        );
+        return;
+      }
+
+      var excel = Excel.createExcel();
+      Sheet sheetObject = excel['Sheet1'];
+      print('Proses ekstraksi..');
+
+      // Menambahkan header ke dalam Excel
+      sheetObject.appendRow([
+        TextCellValue('No'),
+        TextCellValue('Nama Kapal'),
+        TextCellValue('ETD'),
+        TextCellValue('Tgl Bongkar'),
+        TextCellValue('Total Unit'),
+        TextCellValue('Type Motor'),
+        TextCellValue('Part Motor'),
+        TextCellValue('No Mesin'),
+        TextCellValue('No Rangka'),
+      ]);
+
+      // Variabel untuk menambah nomor urut
+      int index = 1;
+
+      // Loop untuk menambahkan data ke dalam Excel
+      for (var item in detailDefectModel) {
+        sheetObject.appendRow([
+          IntCellValue(index++), // No
+          TextCellValue(item.namaKapal),
+          TextCellValue(item.etd),
+          TextCellValue(item.tglBongkar),
+          IntCellValue(item.unit),
+          TextCellValue(item.typeMotor), // Type Motor
+          TextCellValue(item.part), // Part Motor
+          TextCellValue(item.noMesin), // No Mesin
+          TextCellValue(item.noRangka), // No Rangka
+        ]);
+      }
+
+      // Mendapatkan direktori eksternal (untuk penyimpanan di folder Downloads)
+      Directory? directory = Directory('/storage/emulated/0/Download');
+
+      if (!await directory.exists()) {
+        directory = await getExternalStorageDirectory();
+      }
+
+      // Ambil nama kapal dan etd, gunakan fallback jika null
+      var namaKapal = detailDefectModel.first.namaKapal;
+      var etdString = detailDefectModel.first.etd;
+
+      // Coba simpan file Excel
+      var fileBytes = excel.save();
+
+      // Pastikan fileBytes tidak null sebelum menulis ke file
+      if (fileBytes == null) {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Error',
+          message: 'Gagal menyimpan file Excel, data tidak valid',
+        );
+        return;
+      }
+
+      // Format path penyimpanan menggunakan direktori Downloads
+      String filePath = join(directory!.path, '$namaKapal $etdString.xlsx');
+
+      // Simpan file Excel
+      File(filePath)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes);
+
+      // Tampilkan pesan sukses
+      SnackbarLoader.successSnackBar(
+        title: 'Success',
+        message: 'File berhasil disimpan',
+      );
+
+      print('Berhasil menyimpan file excel pada direktori ${directory.path}');
+
+      // Membuka file secara otomatis setelah disimpan
+      OpenFile.open(filePath);
+
+      CustomHelperFunctions.stopLoading();
+    } catch (e) {
+      // Tangkap semua error dan tampilkan pesan error
+      SnackbarLoader.errorSnackBar(
+        title: 'Error',
+        message: 'Gagal mengunduh file excel: $e',
+      );
+      print('Ini err nya: $e');
+      CustomHelperFunctions.stopLoading();
     }
   }
 

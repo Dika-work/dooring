@@ -1,8 +1,11 @@
+import 'package:dooring/screens/laporan/defect.dart';
 import 'package:get/get.dart';
 
 import '../controllers/dooring/dooring_controller.dart';
 import '../controllers/dooring/kapal_controller.dart';
+import '../screens/laporan/total_unit.dart';
 import '../screens/dooring/dooring.dart';
+import '../screens/profile.dart';
 import '../screens/semua data/semua_dooring.dart';
 import '../screens/login.dart';
 import '../screens/master data/kapal.dart';
@@ -26,6 +29,10 @@ class AppRoutes {
         GetPage(
           name: '/rootpage',
           page: () => const Rootpage(),
+        ),
+        GetPage(
+          name: '/profile',
+          page: () => const Profile(),
         ),
         GetPage(
             name: '/data-dooring',
@@ -72,5 +79,14 @@ class AppRoutes {
             binding: BindingsBuilder(() {
               Get.put(DooringController());
             })),
+        // Laporan
+        GetPage(
+          name: '/laporan-total-unit',
+          page: () => const TotalUnit(),
+        ),
+        GetPage(
+          name: '/laporan-defect',
+          page: () => const LaporanDefect(),
+        ),
       ];
 }

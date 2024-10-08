@@ -24,7 +24,12 @@ class DooringController extends GetxController {
   final isConnected = Rx<bool>(true);
   final networkManager = Get.find<NetworkManager>();
 
-  String tipeUser = '';
+  String roleUser = '';
+  String roleWilayah = '';
+  String nameUser = '';
+  int lihatRole = 0;
+  int tambahRole = 0;
+  int editRole = 0;
   final tglInput =
       CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
   final tglETD =
@@ -32,6 +37,7 @@ class DooringController extends GetxController {
   final tglBongkar =
       CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
   TextEditingController jumlahUnitController = TextEditingController();
+  bool get isAdmin => roleUser == 'admin';
 
   final statusDefect = 'Ada'.obs;
   final Map<String, int> listStatusDefect = {
@@ -69,15 +75,27 @@ class DooringController extends GetxController {
     super.onInit();
     UserModel? user = storageUtil.getUserDetails();
     if (user != null) {
-      tipeUser = user.username;
+      roleWilayah = user.wilayah;
+      roleUser = user.tipe;
+      nameUser = user.username;
+      lihatRole = user.lihat;
+      tambahRole = user.tambah;
+      editRole = user.edit;
     }
   }
 
   Future<void> fetchDooringData() async {
     try {
+      print('ini wilayah user nya: $roleWilayah');
       isLoading.value = true;
       final dataDooring = await dooringRepo.fetchDooringContent();
-      dooringModel.assignAll(dataDooring);
+
+      if (isAdmin) {
+        dooringModel.assignAll(dataDooring);
+      } else {
+        dooringModel.assignAll(
+            dataDooring.where((item) => item.wilayah == roleWilayah).toList());
+      }
     } catch (e) {
       dooringModel.assignAll([]);
     } finally {
@@ -90,8 +108,12 @@ class DooringController extends GetxController {
     try {
       isLoading.value = true;
       final dataDooring = await dooringRepo.fetchAllDooringContent();
-      allDooringModel.assignAll(dataDooring);
-      print('ini semua response data all doring: ${dataDooring.toList()}');
+      if (isAdmin) {
+        allDooringModel.assignAll(dataDooring);
+      } else {
+        allDooringModel.assignAll(
+            dataDooring.where((item) => item.wilayah == roleWilayah).toList());
+      }
     } catch (e) {
       allDooringModel.assignAll([]);
     } finally {
@@ -137,7 +159,7 @@ class DooringController extends GetxController {
       kapalController.selectedKapal.value,
       CustomHelperFunctions.formattedTime,
       tglInput.value,
-      tipeUser,
+      nameUser,
       wilayahController.selectedWilayah.value,
       tglETD.value,
       tglBongkar.value,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../controllers/dooring/kapal_controller.dart';
@@ -190,9 +191,7 @@ class LihatSemuaDooring extends StatelessWidget {
                       source: dataSource,
                       verticalScrollPhysics:
                           const NeverScrollableScrollPhysics(),
-                      columnWidthMode: isTableEmpty
-                          ? ColumnWidthMode.fill
-                          : ColumnWidthMode.auto,
+                      columnWidthMode: ColumnWidthMode.fill,
                       gridLinesVisibility: GridLinesVisibility.both,
                       headerGridLinesVisibility: GridLinesVisibility.both,
                       columns: [
@@ -428,8 +427,23 @@ class LihatSemuaDooring extends StatelessWidget {
             }
           }),
           const SizedBox(height: CustomSize.spaceBtwItems),
-          ElevatedButton(
-              onPressed: () => Get.back(), child: const Text('Kembali'))
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                    onPressed: () => Get.back(), child: const Text('Kembali')),
+              ),
+              const SizedBox(width: CustomSize.md),
+              Expanded(
+                flex: 1,
+                child: ElevatedButton(
+                    onPressed: () =>
+                        controller.downloadExcelForDooring(model.idDooring),
+                    child: const Icon(Iconsax.document_download)),
+              ),
+            ],
+          )
         ],
       ),
     );
