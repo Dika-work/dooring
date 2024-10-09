@@ -55,6 +55,11 @@ class _LaporanDefectState extends State<LaporanDefect> {
   final controller = Get.put(LaporanDefectController());
   final networkConn = Get.find<NetworkManager>();
 
+  int rowsPerPage = 10;
+  int currentPage = 0;
+  double rowHeight = 45.0;
+  double headerHeight = 55.0;
+
   @override
   void initState() {
     super.initState();
@@ -104,6 +109,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
     setState(() {
       typeSource = LaporanDefectTypeSource(
         detailDefectModel: controller.defectTypeModel,
+        startIndex: currentPage * rowsPerPage,
       );
     });
   }
@@ -118,13 +124,17 @@ class _LaporanDefectState extends State<LaporanDefect> {
 
   @override
   Widget build(BuildContext context) {
+    final rowTypeCount = controller.defectTypeModel.length;
+    final double tableTypeCount = headerHeight +
+        (rowHeight * (rowTypeCount < rowsPerPage ? rowTypeCount : rowsPerPage));
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios),
         ),
-        title: Text('Total Unit',
+        title: Text('Laporan Defect',
             style: Theme.of(context).textTheme.headlineMedium),
         centerTitle: true,
       ),
@@ -186,133 +196,152 @@ class _LaporanDefectState extends State<LaporanDefect> {
               ],
             ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
+            Center(
+              child: Text('SELURUH DATA DEFECT TYPE MOTOR',
+                  style: Theme.of(context).textTheme.headlineMedium),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwInputFields),
             typeSource != null
-                ? SfDataGrid(
-                    source: typeSource!,
-                    columnWidthMode: ColumnWidthMode.fill,
-                    gridLinesVisibility: GridLinesVisibility.both,
-                    headerGridLinesVisibility: GridLinesVisibility.both,
-                    verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-                    columns: [
-                      GridColumn(
-                        columnName: 'No',
-                        label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'No',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'Type Motor',
-                        label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Type Motor', // Menampilkan nama bulan (Jan, Feb, dst.)
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                ? Container(
+                    height: tableTypeCount,
+                    color: Colors.red,
+                    child: SfDataGrid(
+                      source: typeSource!,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      verticalScrollPhysics:
+                          const NeverScrollableScrollPhysics(),
+                      columns: [
+                        GridColumn(
+                          columnName: 'No',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'No',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                      ),
-                      GridColumn(
-                        columnName: 'Total Defect',
-                        label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Total Defect',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                        GridColumn(
+                          columnName: 'Type Motor',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Type Motor', // Menampilkan nama bulan (Jan, Feb, dst.)
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        GridColumn(
+                          columnName: 'Total Defect',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Total Defect',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 : const Center(child: CircularProgressIndicator()),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
+            Center(
+              child: Text('SELURUH DATA DEFECT PART MOTOR',
+                  style: Theme.of(context).textTheme.headlineMedium),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwInputFields),
             partSource != null
-                ? SfDataGrid(
-                    source: partSource!,
-                    columnWidthMode: ColumnWidthMode.fill,
-                    gridLinesVisibility: GridLinesVisibility.both,
-                    headerGridLinesVisibility: GridLinesVisibility.both,
-                    verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-                    columns: [
-                      GridColumn(
-                        columnName: 'No',
-                        label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'No',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'Part Motor',
-                        label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Part Motor', // Menampilkan nama bulan (Jan, Feb, dst.)
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                ? Container(
+                    color: Colors.red,
+                    child: SfDataGrid(
+                      source: partSource!,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      verticalScrollPhysics:
+                          const NeverScrollableScrollPhysics(),
+                      columns: [
+                        GridColumn(
+                          columnName: 'No',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'No',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                      ),
-                      GridColumn(
-                        columnName: 'Total Defect',
-                        label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Total Defect',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                        GridColumn(
+                          columnName: 'Part Motor',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Part Motor', // Menampilkan nama bulan (Jan, Feb, dst.)
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        GridColumn(
+                          columnName: 'Total Defect',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Total Defect',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 : const Center(child: CircularProgressIndicator()),
           ],

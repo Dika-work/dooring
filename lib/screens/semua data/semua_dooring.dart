@@ -37,7 +37,7 @@ class SemuaDooring extends GetView<DooringController> {
       'Tgl Bongkar': 100,
       'Total Unit': 80,
       if (controller.lihatRole != 0) 'Lihat': 80,
-      if (controller.tambahRole != 0) 'Deffect': 80,
+      if (controller.tambahRole != 0) 'Defect': 80,
       if (controller.editRole != 0) 'Edit': 80,
     };
     return Scaffold(
@@ -73,7 +73,7 @@ class SemuaDooring extends GetView<DooringController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Text('Konfirmasi Deffect Motor',
+                        child: Text('Konfirmasi Defect Motor',
                             style: Theme.of(context).textTheme.headlineMedium),
                       ),
                       const SizedBox(height: CustomSize.spaceBtwItems),
@@ -153,7 +153,7 @@ class SemuaDooring extends GetView<DooringController> {
                         ],
                       ),
                       const SizedBox(height: CustomSize.sm),
-                      Text('Status Deffect',
+                      Text('Status Defect',
                           style: Theme.of(context).textTheme.labelMedium),
                       Obx(
                         () => DropDownWidget(
@@ -372,8 +372,8 @@ class SemuaDooring extends GetView<DooringController> {
                             ))),
                   if (controller.tambahRole != 0)
                     GridColumn(
-                        width: columnWidths['Deffect']!,
-                        columnName: 'Deffect',
+                        width: columnWidths['Defect']!,
+                        columnName: 'Defect',
                         label: Container(
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
@@ -381,7 +381,7 @@ class SemuaDooring extends GetView<DooringController> {
                               color: Colors.lightBlue.shade100,
                             ),
                             child: Text(
-                              'Deffect',
+                              'Defect',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium

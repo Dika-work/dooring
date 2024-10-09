@@ -43,7 +43,7 @@ class Dooring extends GetView<DooringController> {
       'Tgl Bongkar': 100,
       'Total Unit': 80,
       if (controller.lihatRole != 0) 'Lihat': 80,
-      if (controller.tambahRole != 0) 'Deffect': 80,
+      if (controller.tambahRole != 0) 'Defect': 80,
       if (controller.editRole != 0) 'Edit': 80,
     };
     final typeMotorController = Get.put(TypeMotorController());
@@ -80,7 +80,7 @@ class Dooring extends GetView<DooringController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Text('Konfirmasi Deffect Motor',
+                        child: Text('Konfirmasi Defect Motor',
                             style: Theme.of(context).textTheme.headlineMedium),
                       ),
                       const SizedBox(height: CustomSize.spaceBtwItems),
@@ -160,7 +160,7 @@ class Dooring extends GetView<DooringController> {
                         ],
                       ),
                       const SizedBox(height: CustomSize.sm),
-                      Text('Status Deffect',
+                      Text('Status Defect',
                           style: Theme.of(context).textTheme.labelMedium),
                       Obx(
                         () => DropDownWidget(
@@ -184,13 +184,26 @@ class Dooring extends GetView<DooringController> {
                               child: const Text('Close')),
                           ElevatedButton(
                             onPressed: () {
-                              controller.changeStatusDefect(
-                                  model.idDooring, controller.getStatusDefect);
+                              if (controller.statusDefect.value ==
+                                  'Pilih Kondisi Defect') {
+                                // Tampilkan Snackbar jika nilai masih default
+                                SnackbarLoader.errorSnackBar(
+                                  title: 'Error',
+                                  message:
+                                      'Silakan pilih kondisi defect terlebih dahulu.',
+                                );
+                              } else {
+                                // Lanjutkan jika sudah memilih kondisi defect
+                                controller.changeStatusDefect(model.idDooring,
+                                    controller.getStatusDefect);
+                              }
                             },
                             style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: CustomSize.lg,
-                                    vertical: CustomSize.md)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: CustomSize.lg,
+                                vertical: CustomSize.md,
+                              ),
+                            ),
                             child: const Text('Tambahkan'),
                           ),
                         ],
@@ -361,8 +374,8 @@ class Dooring extends GetView<DooringController> {
                             ))),
                   if (controller.tambahRole != 0)
                     GridColumn(
-                        width: columnWidths['Deffect']!,
-                        columnName: 'Deffect',
+                        width: columnWidths['Defect']!,
+                        columnName: 'Defect',
                         label: Container(
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
@@ -370,7 +383,7 @@ class Dooring extends GetView<DooringController> {
                               color: Colors.lightBlue.shade100,
                             ),
                             child: Text(
-                              'Deffect',
+                              'Defect',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -842,6 +855,7 @@ class TambahDooring extends StatelessWidget {
                     flex: 2,
                     child: TextFormField(
                       controller: controller.spionKurangController,
+                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Spion harus di isi';
@@ -921,7 +935,7 @@ class TambahDefect extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tambah Data Deffect Motor',
+        title: Text('Tambah Data Defect Motor',
             style: Theme.of(context).textTheme.headlineMedium),
         centerTitle: true,
         leading: IconButton(
@@ -985,7 +999,7 @@ class TambahDefect extends StatelessWidget {
                           contentWidget: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('Edit Data Deffect',
+                              Text('Edit Data Defect',
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium),
@@ -1176,7 +1190,7 @@ class TambahDefect extends StatelessWidget {
                           contentWidget: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('Detail Rincian Deffect',
+                              Text('Detail Rincian Defect',
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium),
@@ -1953,8 +1967,7 @@ class _EditDooringState extends State<EditDooring> {
             ),
           ),
           const SizedBox(height: CustomSize.spaceBtwItems),
-          Text('Status Deffect',
-              style: Theme.of(context).textTheme.labelMedium),
+          Text('Status Defect', style: Theme.of(context).textTheme.labelMedium),
           Obx(
             () => DropDownWidget(
               value: widget.controller.statusEditDefect.value,

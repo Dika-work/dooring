@@ -507,7 +507,7 @@ class TambahAllDefect extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tambah Data Deffect Motor',
+        title: Text('Tambah Data Defect Motor',
             style: Theme.of(context).textTheme.headlineMedium),
         centerTitle: true,
         leading: IconButton(
@@ -571,7 +571,7 @@ class TambahAllDefect extends StatelessWidget {
                           contentWidget: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('Edit Data Deffect',
+                              Text('Edit Data Defect',
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium),
@@ -744,8 +744,8 @@ class TambahAllDefect extends StatelessWidget {
                           ));
                     },
                     onAdded: (DefectModel modelDefect) {
-                      Get.to(() =>
-                          TambahDefectDetail(idDefect: modelDefect.idDefect));
+                      // Get.to(() =>
+                      //     TambahDefectDetail(idDefect: modelDefect.idDefect));
                     },
                     onDeleted: (DefectModel modelDefect) =>
                         CustomDialogs.deleteDialog(
@@ -762,7 +762,7 @@ class TambahAllDefect extends StatelessWidget {
                           contentWidget: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('Detail Rincian Deffect',
+                              Text('Detail Rincian Defect',
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium),
@@ -1540,8 +1540,7 @@ class _EditAllDooringState extends State<EditAllDooring> {
             ),
           ),
           const SizedBox(height: CustomSize.spaceBtwItems),
-          Text('Status Deffect',
-              style: Theme.of(context).textTheme.labelMedium),
+          Text('Status Defect', style: Theme.of(context).textTheme.labelMedium),
           Obx(
             () => DropDownWidget(
               value: widget.controller.statusEditDefect.value,

@@ -39,10 +39,11 @@ class DooringController extends GetxController {
   TextEditingController jumlahUnitController = TextEditingController();
   bool get isAdmin => roleUser == 'admin';
 
-  final statusDefect = 'Ada'.obs;
+  final statusDefect = 'Pilih Kondisi Defect'.obs;
   final Map<String, int> listStatusDefect = {
+    'Pilih Kondisi Defect': 0,
     'Ada': 1,
-    'Tidak Ada': 2,
+    'Tidak Ada': 3,
   };
 
   int get getStatusDefect => listStatusDefect[statusDefect.value] ?? 0;

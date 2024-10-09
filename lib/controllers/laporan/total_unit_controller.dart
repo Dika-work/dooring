@@ -13,9 +13,12 @@ class TotalUnitController extends GetxController {
       isLoading.value = true;
       final getLaporanSamarinda =
           await samarindaRepo.fetchTotalUnitContent(tahun);
+      print('Data yang diterima di controller: $getLaporanSamarinda');
       samarindaModel.assignAll(getLaporanSamarinda);
+      print('samarindaModel setelah assignAll: $samarindaModel');
     } catch (e) {
-      throw Exception('Gagal mengambil data laporan samarinda');
+      print('Error saat fetch data: $e');
+      throw Exception('$e');
     } finally {
       isLoading.value = false;
     }

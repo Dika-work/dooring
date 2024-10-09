@@ -10,7 +10,7 @@ class JumlahDefectRepository {
 
   Future<List<JumlahDefectModel>> fetchTotalUnitContent(int tahun) async {
     final response = await http.get(Uri.parse(
-        '${storageUtil.baseURL}/laporan.php?action=total_deffect&tahun=$tahun'));
+        '${storageUtil.baseURL}/laporan.php?action=total_defect&tahun=$tahun'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
       print('ini hasil dari laporan samarinda : ${list.toList()}');

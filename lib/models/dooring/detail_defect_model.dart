@@ -4,6 +4,16 @@ class DetailDefectModel {
   String etd;
   String tglBongkar;
   int unit;
+  String helmL;
+  String accuL;
+  String spionL;
+  String buserL;
+  String toolSetL;
+  String helmK;
+  String accuK;
+  String spionK;
+  String buserK;
+  String toolSetK;
   int idDefect;
   int idDooring;
   String jam;
@@ -24,6 +34,16 @@ class DetailDefectModel {
     required this.etd,
     required this.tglBongkar,
     required this.unit,
+    required this.helmL,
+    required this.accuL,
+    required this.spionL,
+    required this.buserL,
+    required this.toolSetL,
+    required this.helmK,
+    required this.accuK,
+    required this.spionK,
+    required this.buserK,
+    required this.toolSetK,
     required this.idDefect,
     required this.idDooring,
     required this.jam,
@@ -46,6 +66,16 @@ class DetailDefectModel {
       etd: json['etd'] ?? '',
       tglBongkar: json['tgl_bongkar'] ?? '',
       unit: json['unit'] ?? 0,
+      helmL: json['helm_l'] ?? 0,
+      accuL: json['accu_l'] ?? 0,
+      spionL: json['spion_l'] ?? 0,
+      buserL: json['buser_l'] ?? 0,
+      toolSetL: json['toolset_l'] ?? 0,
+      helmK: json['helm_k'] ?? 0,
+      accuK: json['accu_k'] ?? 0,
+      spionK: json['spion_k'] ?? 0,
+      buserK: json['buser_k'] ?? 0,
+      toolSetK: json['toolset_k'] ?? 0,
       idDefect: json['id_defect'] ?? 0,
       idDooring: json['id_dooring'] ?? 0,
       jam: json['jam'] ?? '',

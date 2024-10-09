@@ -6,11 +6,13 @@ import '../../constant/custom_size.dart';
 
 class LaporanDefectTypeSource extends DataGridSource {
   final List<DefectTypeModel> detailDefectModel;
+  int startIndex = 0;
 
   LaporanDefectTypeSource({
     required this.detailDefectModel,
+    int startIndex = 0,
   }) {
-    _updateDataPager(detailDefectModel);
+    _updateDataPager(detailDefectModel, startIndex);
   }
 
   List<DataGridRow> detailDefectData = [];
@@ -56,14 +58,17 @@ class LaporanDefectTypeSource extends DataGridSource {
     });
   }
 
-  void _updateDataPager(List<DefectTypeModel> detailDefectModel) {
+  void _updateDataPager(
+      List<DefectTypeModel> detailDefectModel, int startIndex) {
+    this.startIndex = startIndex;
+    index = startIndex;
     if (detailDefectModel.isEmpty) {
       print('Model is empty, generating empty rows');
       detailDefectData = _generateEmptyRows(1);
     } else {
       print('Model has data, generating rows based on model');
-      index = 0; // Reset index untuk memastikan data baru diambil dengan benar
-      detailDefectData = detailDefectModel.map<DataGridRow>(
+      detailDefectData =
+          detailDefectModel.skip(startIndex).take(10).map<DataGridRow>(
         (e) {
           index++;
           return DataGridRow(cells: [
@@ -79,7 +84,7 @@ class LaporanDefectTypeSource extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    _updateDataPager(detailDefectModel);
+    _updateDataPager(detailDefectModel, startIndex);
     notifyListeners();
     return true;
   }

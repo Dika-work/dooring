@@ -72,9 +72,13 @@ class _TotalUnitState extends State<TotalUnit> {
       );
     }
     try {
+      print('Memulai pengambilan data di _fetchDataAndRefreshSource');
       await controller.fetchTotalUnitData(int.parse(selectedYear));
       await jumlahDefectController.fetchTotalUnitData(int.parse(selectedYear));
+      print('Data berhasil diambil');
     } catch (e) {
+      print('Error saat fetch data di _fetchDataAndRefreshSource: $e');
+
       controller.samarindaModel.assignAll(
           _generateDefaultData()); // Jika gagal ambil data, gunakan data default
       jumlahDefectController.samarindaModel.assignAll(_generateDefaultDefect());
@@ -184,7 +188,7 @@ class _TotalUnitState extends State<TotalUnit> {
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios),
         ),
-        title: Text('Total Unit',
+        title: Text('Laporan Total Unit',
             style: Theme.of(context).textTheme.headlineMedium),
         centerTitle: true,
       ),

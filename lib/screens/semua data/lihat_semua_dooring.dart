@@ -440,6 +440,8 @@ class LihatSemuaDooring extends StatelessWidget {
                 child: ElevatedButton(
                     onPressed: () =>
                         controller.downloadExcelForDooring(model.idDooring),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.success),
                     child: const Icon(Iconsax.document_download)),
               ),
             ],
