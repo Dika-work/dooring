@@ -91,6 +91,7 @@ class DetailDefectSource extends DataGridSource {
     return List.generate(count, (index) {
       return const DataGridRow(cells: [
         DataGridCell<String>(columnName: 'No', value: '-'),
+        DataGridCell<String>(columnName: 'No Container', value: '-'),
         DataGridCell<String>(columnName: 'No Mesin', value: '-'),
         DataGridCell<String>(columnName: 'No Rangka', value: '-'),
       ]);
@@ -111,6 +112,7 @@ class DetailDefectSource extends DataGridSource {
           index++;
           return DataGridRow(cells: [
             DataGridCell<int>(columnName: 'No', value: index),
+            DataGridCell<String>(columnName: 'No Container', value: e.noCT),
             DataGridCell<String>(columnName: 'No Mesin', value: e.noMesin),
             DataGridCell<String>(columnName: 'No Rangka', value: e.noRangka),
           ]);

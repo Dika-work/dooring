@@ -55,7 +55,8 @@ class DooringSource extends DataGridSource {
     ];
 
     if (controller.lihatRole != 0) {
-      if (dooringModel[rowIndex].statusDefect == 2) {
+      if (dooringModel[rowIndex].statusDefect == 2 ||
+          dooringModel[rowIndex].statusDefect == 3) {
         cells.add(Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -152,6 +153,14 @@ class DooringSource extends DataGridSource {
     );
   }
 
+  Map<String, String> regionMapping = {
+    'SAMARINDA': 'SRD',
+    'MAKASSAR': 'MKS',
+    'PONTIANAK': 'PTK',
+    'BANJARMASIN': 'BJM',
+    'JAKARTA': 'JKT'
+  };
+
   void _updateDataPager(List<DooringModel> dooringModel) {
     final filteredData = isAdmin
         ? dooringModel
@@ -162,6 +171,13 @@ class DooringSource extends DataGridSource {
     dooringData = filteredData.map<DataGridRow>(
       (e) {
         index++;
+
+        final regionKey = regionMapping.keys.firstWhere(
+          (region) => e.wilayah.contains(region),
+          orElse: () => e.wilayah,
+        );
+        final regionValue = regionMapping[regionKey] ?? e.wilayah;
+
         final tglInput =
             CustomHelperFunctions.getFormattedDate(DateTime.parse(e.tgl));
         final etd =
@@ -170,12 +186,14 @@ class DooringSource extends DataGridSource {
             DateTime.parse(e.tglBongkar));
         return DataGridRow(cells: [
           DataGridCell<int>(columnName: 'No', value: index),
+          if (controller.isAdmin)
+            DataGridCell<String>(columnName: 'Wilayah', value: regionValue),
           DataGridCell<String>(columnName: 'Tgl Input', value: tglInput),
           DataGridCell<String>(
               columnName: 'Nama Pelayaran', value: e.namaKapal),
           DataGridCell<String>(columnName: 'ETD', value: etd),
           DataGridCell<String>(columnName: 'Tgl Bongkar', value: tglBongkar),
-          DataGridCell<int>(columnName: 'Total Unit', value: e.unit),
+          DataGridCell<int>(columnName: 'Unit Bongkar', value: e.unit),
         ]);
       },
     ).toList();

@@ -15,14 +15,22 @@ class DetailDefectRepository {
         '${storageUtil.baseURL}/defect_detail.php?action=Tabel&id_defect=$idDefect'));
     if (response.statusCode == 200) {
       Iterable list = json.decode(response.body);
+      print('ini response json dari id $idDefect: ${list.toList()}');
       return list.map((model) => DetailDefectModel.fromJson(model)).toList();
     } else {
       throw Exception('Gagal untuk mengambil data kapal☠️');
     }
   }
 
-  Future<void> addDetailDefect(int idDefect, int idDooring, String jam,
-      String tgl, String user, String noMesin, String noRangka) async {
+  Future<void> addDetailDefect(
+      int idDefect,
+      int idDooring,
+      String jam,
+      String tgl,
+      String user,
+      String noMesin,
+      String noRangka,
+      String noContainer) async {
     try {
       final response = await http
           .post(Uri.parse('${storageUtil.baseURL}/defect_detail.php'), body: {
@@ -33,6 +41,7 @@ class DetailDefectRepository {
         'user': user,
         'no_mesin': noMesin,
         'no_rangka': noRangka,
+        'no_ct': noContainer,
       });
 
       if (response.statusCode == 200) {

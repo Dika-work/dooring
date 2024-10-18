@@ -10,7 +10,7 @@ import '../../utils/constant/custom_size.dart';
 import '../../utils/loader/animation_loader.dart';
 import '../../utils/loader/circular_loader.dart';
 import '../../utils/popups/dialogs.dart';
-import '../../utils/source/dooring/semua_dooring_source.dart';
+import '../../utils/source/seluruh data/semua_dooring_source.dart';
 import '../../widgets/dropdown.dart';
 import 'lihat_semua_dooring.dart';
 import 'tambah_semua_dooring.dart';
@@ -35,7 +35,7 @@ class SemuaDooring extends GetView<DooringController> {
       'Nama Pelayaran': 150,
       'ETD': 100,
       'Tgl Bongkar': 100,
-      'Total Unit': 80,
+      'Unit Bongkar': 100,
       if (controller.lihatRole != 0) 'Lihat': 80,
       if (controller.tambahRole != 0) 'Defect': 80,
       if (controller.editRole != 0) 'Edit': 80,
@@ -338,8 +338,8 @@ class SemuaDooring extends GetView<DooringController> {
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ))),
                   GridColumn(
-                      width: columnWidths['Total Unit']!,
-                      columnName: 'Total Unit',
+                      width: columnWidths['Unit Bongkar']!,
+                      columnName: 'Unit Bongkar',
                       label: Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -347,7 +347,7 @@ class SemuaDooring extends GetView<DooringController> {
                             color: Colors.lightBlue.shade100,
                           ),
                           child: Text(
-                            'Total Unit',
+                            'Unit Bongkar',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium

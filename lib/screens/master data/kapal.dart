@@ -163,60 +163,56 @@ class MasterKapal extends GetView<KapalController> {
                       style: Theme.of(context).textTheme.headlineMedium),
                 ),
                 const SizedBox(height: CustomSize.spaceBtwItems),
-                Expanded(
-                  flex: 2,
-                  child: Obx(() {
-                    return DropdownSearch<PelayaranModel>(
-                      items: pelayaranController.filteredPartMotorModel,
-                      itemAsString: (PelayaranModel kendaraan) =>
-                          kendaraan.namaPel,
-                      selectedItem:
-                          pelayaranController.selectedWilayah.value.isNotEmpty
-                              ? pelayaranController.filteredPartMotorModel
-                                  .firstWhere(
-                                  (kendaraan) =>
-                                      kendaraan.namaPel ==
-                                      pelayaranController.selectedWilayah.value,
-                                  orElse: () => PelayaranModel(
-                                    idPelayaran: 0,
-                                    namaPel: '',
-                                  ),
-                                )
-                              : null,
-                      dropdownBuilder: (context, PelayaranModel? selectedItem) {
-                        return Text(
-                          selectedItem != null
-                              ? selectedItem.namaPel
-                              : 'Nama Pelayaran',
-                          style: TextStyle(
-                              fontSize: CustomSize.fontSizeSm,
-                              color: selectedItem == null
-                                  ? Colors.grey
-                                  : Colors.black,
-                              fontWeight: FontWeight.w600),
-                        );
-                      },
-                      onChanged: (PelayaranModel? kendaraan) {
-                        if (kendaraan != null) {
-                          pelayaranController.selectedWilayah.value =
-                              kendaraan.namaPel;
-                          print(
-                              'ini nama kapal : ${pelayaranController.selectedWilayah.value}');
-                        } else {
-                          pelayaranController.resetSelectedKendaraan();
-                        }
-                      },
-                      popupProps: const PopupProps.menu(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                          decoration: InputDecoration(
-                            hintText: 'Search Kendaraan...',
-                          ),
+                Obx(() {
+                  return DropdownSearch<PelayaranModel>(
+                    items: pelayaranController.filteredPartMotorModel,
+                    itemAsString: (PelayaranModel kendaraan) =>
+                        kendaraan.namaPel,
+                    selectedItem: pelayaranController
+                            .selectedWilayah.value.isNotEmpty
+                        ? pelayaranController.filteredPartMotorModel.firstWhere(
+                            (kendaraan) =>
+                                kendaraan.namaPel ==
+                                pelayaranController.selectedWilayah.value,
+                            orElse: () => PelayaranModel(
+                              idPelayaran: 0,
+                              namaPel: '',
+                            ),
+                          )
+                        : null,
+                    dropdownBuilder: (context, PelayaranModel? selectedItem) {
+                      return Text(
+                        selectedItem != null
+                            ? selectedItem.namaPel
+                            : 'Nama Pelayaran',
+                        style: TextStyle(
+                            fontSize: CustomSize.fontSizeSm,
+                            color: selectedItem == null
+                                ? Colors.grey
+                                : Colors.black,
+                            fontWeight: FontWeight.w600),
+                      );
+                    },
+                    onChanged: (PelayaranModel? kendaraan) {
+                      if (kendaraan != null) {
+                        pelayaranController.selectedWilayah.value =
+                            kendaraan.namaPel;
+                        print(
+                            'ini nama kapal : ${pelayaranController.selectedWilayah.value}');
+                      } else {
+                        pelayaranController.resetSelectedKendaraan();
+                      }
+                    },
+                    popupProps: const PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: TextFieldProps(
+                        decoration: InputDecoration(
+                          hintText: 'Search Kendaraan...',
                         ),
                       ),
-                    );
-                  }),
-                ),
+                    ),
+                  );
+                }),
                 const SizedBox(height: CustomSize.spaceBtwItems),
                 TextFormField(
                   controller: controller.namaKapalController,

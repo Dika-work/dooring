@@ -84,6 +84,7 @@ class LaporanDefectTypeSource extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
+    final int startIndex = newPageIndex * 10;
     _updateDataPager(detailDefectModel, startIndex);
     notifyListeners();
     return true;
@@ -97,7 +98,7 @@ class LaporanDefectPartSource extends DataGridSource {
     required this.detailDefectModel,
     int startIndex = 0,
   }) {
-    _updateDataPager(detailDefectModel);
+    _updateDataPager(detailDefectModel, startIndex);
   }
 
   List<DataGridRow> detailDefectData = [];
@@ -143,14 +144,16 @@ class LaporanDefectPartSource extends DataGridSource {
     });
   }
 
-  void _updateDataPager(List<DefectPartModel> detailDefectModel) {
+  void _updateDataPager(
+      List<DefectPartModel> detailDefectModel, int startIndex) {
     if (detailDefectModel.isEmpty) {
       print('Model is empty, generating empty rows');
       detailDefectData = _generateEmptyRows(1);
     } else {
       print('Model has data, generating rows based on model');
       index = 0; // Reset index untuk memastikan data baru diambil dengan benar
-      detailDefectData = detailDefectModel.map<DataGridRow>(
+      detailDefectData =
+          detailDefectModel.skip(startIndex).take(10).map<DataGridRow>(
         (e) {
           index++;
           return DataGridRow(cells: [
@@ -166,7 +169,8 @@ class LaporanDefectPartSource extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    _updateDataPager(detailDefectModel);
+    final int startIndex = newPageIndex * 10;
+    _updateDataPager(detailDefectModel, startIndex);
     notifyListeners();
     return true;
   }

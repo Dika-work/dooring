@@ -30,13 +30,7 @@ class DooringController extends GetxController {
   int lihatRole = 0;
   int tambahRole = 0;
   int editRole = 0;
-  final tglInput =
-      CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
-  final tglETD =
-      CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
-  final tglBongkar =
-      CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
-  TextEditingController jumlahUnitController = TextEditingController();
+
   bool get isAdmin => roleUser == 'admin';
 
   final statusDefect = 'Pilih Kondisi Defect'.obs;
@@ -57,19 +51,6 @@ class DooringController extends GetxController {
 
   int get getEditStatusDefect =>
       listStatusEditDefect[statusEditDefect.value] ?? 0;
-
-  // ksu kelebihan
-  TextEditingController helmController = TextEditingController();
-  TextEditingController accuController = TextEditingController();
-  TextEditingController spionController = TextEditingController();
-  TextEditingController buserController = TextEditingController();
-  TextEditingController toolsetController = TextEditingController();
-  // ksu kekurangan
-  TextEditingController helmKurangController = TextEditingController();
-  TextEditingController accuKurangController = TextEditingController();
-  TextEditingController spionKurangController = TextEditingController();
-  TextEditingController buserKurangController = TextEditingController();
-  TextEditingController toolsetKurangController = TextEditingController();
 
   @override
   void onInit() {
@@ -122,7 +103,22 @@ class DooringController extends GetxController {
     }
   }
 
-  Future<void> addDataDooring() async {
+  Future<void> editDooring(
+    int idDooring,
+    String namaKapal,
+    String wilayah,
+    String etd,
+    String atd,
+    String tglBongkar,
+    int unit,
+    String ct20,
+    String ct40,
+    int helm1,
+    int accu1,
+    int spion1,
+    int buser1,
+    int toolset1,
+  ) async {
     CustomDialogs.loadingIndicator();
 
     final isConnected = await networkManager.isConnected();
@@ -139,109 +135,21 @@ class DooringController extends GetxController {
       return;
     }
 
-    bool isDuplicate = dooringModel.any((data) =>
-        data.namaKapal == kapalController.selectedKapal.toString() &&
-        data.etd == tglETD.toString() &&
-        data.wilayah ==
-            wilayahController
-                .selectedWilayah.value); //nama kapal, etd, nama wilayah
-
-    if (isDuplicate) {
-      CustomHelperFunctions.stopLoading();
-      SnackbarLoader.errorSnackBar(
-        title: 'Gagal😪',
-        message:
-            'Data nama pelayaran dan ETD sudah ada, mohon di cek kembali🙄',
-      );
-      return;
-    }
-
-    await dooringRepo.addDooring(
-      kapalController.selectedKapal.value,
-      CustomHelperFunctions.formattedTime,
-      tglInput.value,
-      nameUser,
-      wilayahController.selectedWilayah.value,
-      tglETD.value,
-      tglBongkar.value,
-      int.parse(jumlahUnitController.text),
-      int.parse(helmController.text),
-      int.parse(accuController.text),
-      int.parse(spionController.text),
-      int.parse(buserController.text),
-      int.parse(toolsetController.text),
-      int.parse(helmKurangController.text),
-      int.parse(accuKurangController.text),
-      int.parse(spionKurangController.text),
-      int.parse(buserKurangController.text),
-      int.parse(toolsetKurangController.text),
-    );
-
-    // Clear input fields
-    jumlahUnitController.clear();
-    helmController.clear();
-    accuController.clear();
-    spionController.clear();
-    buserController.clear();
-    toolsetController.clear();
-    helmKurangController.clear();
-    accuKurangController.clear();
-    spionKurangController.clear();
-    buserKurangController.clear();
-    toolsetKurangController.clear();
-
-    // Fetch updated data
-    await fetchDooringData();
-    CustomHelperFunctions.stopLoading();
-    CustomHelperFunctions.stopLoading();
-  }
-
-  Future<void> editDooring(
-    int idDooring,
-    String namaKapal,
-    String wilayah,
-    String etd,
-    String tglBongkar,
-    int unit,
-    int helm1,
-    int accu1,
-    int spion1,
-    int buser1,
-    int toolset1,
-    int helmKurang,
-    int accuKurang,
-    int spionKurang,
-    int buserKurang,
-    int toolsetKurang,
-  ) async {
-    CustomDialogs.loadingIndicator();
-
-    final isConnected = await networkManager.isConnected();
-    if (!isConnected) {
-      CustomHelperFunctions.stopLoading();
-      SnackbarLoader.errorSnackBar(
-          title: 'Tidak ada koneksi internet',
-          message: 'Silahkan coba lagi setelah koneksi tersedia');
-      return;
-    }
-
     await dooringRepo.editDooring(
       idDooring,
       namaKapal,
       wilayah,
       etd,
+      atd,
       tglBongkar,
       unit,
+      ct20,
+      ct40,
       helm1,
       accu1,
       spion1,
       buser1,
       toolset1,
-      helmKurang,
-      accuKurang,
-      spionKurang,
-      buserKurang,
-      toolsetKurang,
       getEditStatusDefect,
     );
 

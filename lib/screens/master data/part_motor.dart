@@ -99,6 +99,7 @@ class PartMotor extends GetView<PartMotorController> {
             horizontalScrollPhysics: const NeverScrollableScrollPhysics(),
             columns: [
               GridColumn(
+                width: 50,
                 columnName: 'No',
                 label: Container(
                   alignment: Alignment.center,
@@ -131,6 +132,7 @@ class PartMotor extends GetView<PartMotorController> {
                 ),
               ),
               GridColumn(
+                width: 80,
                 columnName: 'Edit',
                 label: Container(
                   alignment: Alignment.center,

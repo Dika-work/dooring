@@ -32,86 +32,86 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
           return const CustomCircularLoader();
         } else {
           final dataSource = TypeMotorSource(
-            onEdited: (TypeMotorModel model) {
-              controller.merk.value = model.merk.toUpperCase();
-              controller.namaTypeMotorController.text = model.typeMotor;
-              CustomDialogs.defaultDialog(
-                context: context,
-                contentWidget: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Edit Type Motor',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-                    Obx(() {
-                      return DropDownWidget(
-                        value: controller.merk.value,
-                        items: controller.merkList,
-                        onChanged: (String? value) {
-                          if (value != null) {
-                            controller.merk.value = value;
-                            print(
-                                'Ini type motor yang dipilih: ${controller.merk.value}');
-                          }
-                        },
-                      );
-                    }),
-                    const SizedBox(height: CustomSize.spaceBtwItems),
-                    TextFormField(
-                      controller: controller.namaTypeMotorController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Type motor harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Type motor',
+              onEdited: (TypeMotorModel model) {
+                controller.merk.value = model.merk.toUpperCase();
+                controller.namaTypeMotorController.text = model.typeMotor;
+                CustomDialogs.defaultDialog(
+                  context: context,
+                  contentWidget: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Edit Type Motor',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      onChanged: (value) {
-                        controller.namaTypeMotorController.text = value;
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.spaceBtwSections),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OutlinedButton(
-                            onPressed: () => Get.back(),
-                            style: OutlinedButton.styleFrom(
+                      const SizedBox(height: 20),
+                      Obx(() {
+                        return DropDownWidget(
+                          value: controller.merk.value,
+                          items: controller.merkList,
+                          onChanged: (String? value) {
+                            if (value != null) {
+                              controller.merk.value = value;
+                              print(
+                                  'Ini type motor yang dipilih: ${controller.merk.value}');
+                            }
+                          },
+                        );
+                      }),
+                      const SizedBox(height: CustomSize.spaceBtwItems),
+                      TextFormField(
+                        controller: controller.namaTypeMotorController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Type motor harus di isi';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Type motor',
+                        ),
+                        onChanged: (value) {
+                          controller.namaTypeMotorController.text = value;
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.spaceBtwSections),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: CustomSize.lg,
+                                      vertical: CustomSize.md)),
+                              child: const Text('Close')),
+                          ElevatedButton(
+                            onPressed: () {
+                              controller.editTypeMotor(
+                                  model.idType,
+                                  controller.merk.value,
+                                  controller.namaTypeMotorController.text);
+                            },
+                            style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: CustomSize.lg,
                                     vertical: CustomSize.md)),
-                            child: const Text('Close')),
-                        ElevatedButton(
-                          onPressed: () {
-                            controller.editTypeMotor(
-                                model.idType,
-                                controller.merk.value,
-                                controller.namaTypeMotorController.text);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: CustomSize.lg,
-                                  vertical: CustomSize.md)),
-                          child: const Text('Tambahkan'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-            onDeleted: (TypeMotorModel model) => CustomDialogs.deleteDialog(
-                context: context,
-                onConfirm: () {
-                  controller.hapusTypeMotor(model.idType);
-                }),
-            typeMotorModel: controller.displayedData,
-          );
+                            child: const Text('Tambahkan'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+              onDeleted: (TypeMotorModel model) => CustomDialogs.deleteDialog(
+                  context: context,
+                  onConfirm: () {
+                    controller.hapusTypeMotor(model.idType);
+                  }),
+              typeMotorModel: controller.displayedData,
+              context: context);
 
           return Column(
             children: [
@@ -125,6 +125,7 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
                   horizontalScrollPhysics: const NeverScrollableScrollPhysics(),
                   columns: [
                     GridColumn(
+                      width: 50,
                       columnName: 'No',
                       label: Container(
                         alignment: Alignment.center,
@@ -177,6 +178,7 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
                       ),
                     ),
                     GridColumn(
+                      width: 60,
                       columnName: 'Edit',
                       label: Container(
                         alignment: Alignment.center,
@@ -194,6 +196,7 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
                       ),
                     ),
                     GridColumn(
+                      width: 60,
                       columnName: 'Hapus',
                       label: Container(
                         alignment: Alignment.center,

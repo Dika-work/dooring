@@ -27,7 +27,7 @@ class TambahDefectDetail extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('Detail Deffect Motor',
+          title: Text('Detail Defect Motor',
               style: Theme.of(context).textTheme.headlineMedium),
           centerTitle: true,
           leading: IconButton(
@@ -253,6 +253,25 @@ class TambahDefectDetail extends StatelessWidget {
                                   ),
                                 ),
                                 GridColumn(
+                                  columnName: 'No Container',
+                                  label: Container(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      color: Colors.lightBlue.shade100,
+                                    ),
+                                    child: Text(
+                                      'No Container',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                GridColumn(
                                   columnName: 'No Mesin',
                                   label: Container(
                                     alignment: Alignment.center,
@@ -355,6 +374,18 @@ class TambahDefectDetail extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: CustomSize.md),
+                                const Text('Nomor Container'),
+                                TextFormField(
+                                  controller:
+                                      controller.nomorContainerController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Field ini harus di isi';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: CustomSize.sm),
                                 const Text('Nomor Mesin'),
                                 TextFormField(
                                   controller: controller.nomorMesinController,

@@ -20,6 +20,8 @@ class LaporanDefect extends StatefulWidget {
 }
 
 class _LaporanDefectState extends State<LaporanDefect> {
+  int totalRows = 0;
+
   List<String> months = [
     'Jan',
     'Feb',
@@ -57,8 +59,8 @@ class _LaporanDefectState extends State<LaporanDefect> {
 
   int rowsPerPage = 10;
   int currentPage = 0;
-  double rowHeight = 45.0;
-  double headerHeight = 55.0;
+  double rowHeight = 50.0;
+  double headerHeight = 65.0;
 
   @override
   void initState() {
@@ -106,6 +108,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
   }
 
   void _updateTypeSource() {
+    totalRows = controller.defectTypeModel.length;
     setState(() {
       typeSource = LaporanDefectTypeSource(
         detailDefectModel: controller.defectTypeModel,
@@ -117,16 +120,14 @@ class _LaporanDefectState extends State<LaporanDefect> {
   void _updatePartDefect() {
     setState(() {
       partSource = LaporanDefectPartSource(
-        detailDefectModel: controller.defectPartModel,
-      );
+          detailDefectModel: controller.defectPartModel,
+          startIndex: currentPage * rowsPerPage);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final rowTypeCount = controller.defectTypeModel.length;
-    final double tableTypeCount = headerHeight +
-        (rowHeight * (rowTypeCount < rowsPerPage ? rowTypeCount : rowsPerPage));
+    double gridHeight = headerHeight + (rowHeight * 10);
 
     return Scaffold(
       appBar: AppBar(
@@ -203,7 +204,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             typeSource != null
                 ? Container(
-                    height: tableTypeCount,
+                    height: gridHeight,
                     color: Colors.red,
                     child: SfDataGrid(
                       source: typeSource!,
@@ -214,6 +215,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
                           const NeverScrollableScrollPhysics(),
                       columns: [
                         GridColumn(
+                          width: 50,
                           columnName: 'No',
                           label: Container(
                             alignment: Alignment.center,
@@ -250,6 +252,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
                           ),
                         ),
                         GridColumn(
+                          width: 100,
                           columnName: 'Total Defect',
                           label: Container(
                             alignment: Alignment.center,
@@ -277,8 +280,8 @@ class _LaporanDefectState extends State<LaporanDefect> {
             ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             partSource != null
-                ? Container(
-                    color: Colors.red,
+                ? SizedBox(
+                    height: gridHeight,
                     child: SfDataGrid(
                       source: partSource!,
                       columnWidthMode: ColumnWidthMode.fill,
@@ -288,6 +291,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
                           const NeverScrollableScrollPhysics(),
                       columns: [
                         GridColumn(
+                          width: 50,
                           columnName: 'No',
                           label: Container(
                             alignment: Alignment.center,
@@ -324,6 +328,7 @@ class _LaporanDefectState extends State<LaporanDefect> {
                           ),
                         ),
                         GridColumn(
+                          width: 100,
                           columnName: 'Total Defect',
                           label: Container(
                             alignment: Alignment.center,

@@ -55,7 +55,8 @@ class SemuaDooringSource extends DataGridSource {
     ];
 
     if (controller.lihatRole != 0) {
-      if (dooringModel[rowIndex].statusDefect == 2) {
+      if (dooringModel[rowIndex].statusDefect == 2 ||
+          dooringModel[rowIndex].statusDefect == 3) {
         cells.add(Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -159,7 +160,8 @@ class SemuaDooringSource extends DataGridSource {
     'SAMARINDA': 'SRD',
     'MAKASSAR': 'MKS',
     'PONTIANAK': 'PTK',
-    'BANJARMASIN': 'BJM'
+    'BANJARMASIN': 'BJM',
+    'JAKARTA': 'JKT'
   };
 
   void _updateDataPager(List<AllDooringModel> dooringModel) {
@@ -198,7 +200,7 @@ class SemuaDooringSource extends DataGridSource {
               columnName: 'Nama Pelayaran', value: e.namaKapal),
           DataGridCell<String>(columnName: 'ETD', value: etd),
           DataGridCell<String>(columnName: 'Tgl Bongkar', value: tglBongkar),
-          DataGridCell<int>(columnName: 'Total Unit', value: e.unit),
+          DataGridCell<int>(columnName: 'Unit Bongkar', value: e.unit),
         ]);
       },
     ).toList();

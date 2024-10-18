@@ -419,47 +419,28 @@ class TypeMotorController extends GetxController {
         TextCellValue('ETD'),
         TextCellValue('Tgl Bongkar'),
         TextCellValue('Total Unit'),
-        TextCellValue('Helm Lebih'),
-        TextCellValue('Accu Lebih'),
-        TextCellValue('Spion Lebih'),
-        TextCellValue('Buser Lebih'),
-        TextCellValue('Toolset Lebih'),
-        TextCellValue('Helm Kurang'),
-        TextCellValue('Accu Kurang'),
-        TextCellValue('Spion Kurang'),
-        TextCellValue('Buser Kurang'),
-        TextCellValue('Toolset Kurang'),
         TextCellValue('Type Motor'),
         TextCellValue('Part Motor'),
         TextCellValue('No Mesin'),
         TextCellValue('No Rangka'),
+        TextCellValue('No CT'),
       ]);
 
-      // Variabel untuk menambah nomor urut
       int index = 1;
 
       // Loop untuk menambahkan data ke dalam Excel
       for (var item in detailDefectModel) {
         sheetObject.appendRow([
-          IntCellValue(index++), // No
+          IntCellValue(index++),
           TextCellValue(item.namaKapal),
           TextCellValue(item.etd),
           TextCellValue(item.tglBongkar),
           IntCellValue(item.unit),
-          TextCellValue(item.helmL),
-          TextCellValue(item.accuL),
-          TextCellValue(item.spionL),
-          TextCellValue(item.buserL),
-          TextCellValue(item.toolSetL),
-          TextCellValue(item.helmK),
-          TextCellValue(item.accuK),
-          TextCellValue(item.spionK),
-          TextCellValue(item.buserK),
-          TextCellValue(item.toolSetK),
-          TextCellValue(item.typeMotor), // Type Motor
-          TextCellValue(item.part), // Part Motor
-          TextCellValue(item.noMesin), // No Mesin
-          TextCellValue(item.noRangka), // No Rangka
+          TextCellValue(item.typeMotor),
+          TextCellValue(item.part),
+          TextCellValue(item.noMesin),
+          TextCellValue(item.noRangka),
+          TextCellValue(item.noCT),
         ]);
       }
 

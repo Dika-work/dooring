@@ -37,11 +37,12 @@ class Dooring extends GetView<DooringController> {
 
     late Map<String, double> columnWidths = {
       'No': 50,
+      if (controller.isAdmin) 'Wilayah': 70,
       'Tgl Input': 100,
       'Nama Pelayaran': 150,
       'ETD': 100,
       'Tgl Bongkar': 100,
-      'Total Unit': 80,
+      'Unit Bongkar': 100,
       if (controller.lihatRole != 0) 'Lihat': 80,
       if (controller.tambahRole != 0) 'Defect': 80,
       if (controller.editRole != 0) 'Edit': 80,
@@ -275,6 +276,23 @@ class Dooring extends GetView<DooringController> {
                                 .bodyMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ))),
+                  if (controller.isAdmin)
+                    GridColumn(
+                        width: columnWidths['Wilayah']!,
+                        columnName: 'Wilayah',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Wilayah',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
                   GridColumn(
                       width: columnWidths['Tgl Input']!,
                       columnName: 'Tgl Input',
@@ -340,8 +358,8 @@ class Dooring extends GetView<DooringController> {
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ))),
                   GridColumn(
-                      width: columnWidths['Total Unit']!,
-                      columnName: 'Total Unit',
+                      width: columnWidths['Unit Bongkar']!,
+                      columnName: 'Unit Bongkar',
                       label: Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -349,7 +367,7 @@ class Dooring extends GetView<DooringController> {
                             color: Colors.lightBlue.shade100,
                           ),
                           child: Text(
-                            'Total Unit',
+                            'Unit Bongkar',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -410,508 +428,41 @@ class Dooring extends GetView<DooringController> {
           );
         }
       }),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.black,
-        onPressed: () async {
-          await Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const TambahDooring(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = 0.0;
-              const end = 1.0;
-              const curve = Curves.easeInOut;
+      // floatingActionButton: FloatingActionButton.extended(
+      //   backgroundColor: AppColors.primary,
+      //   foregroundColor: Colors.black,
+      //   onPressed: () async {
+      //     await Navigator.of(context).push(PageRouteBuilder(
+      //       pageBuilder: (context, animation, secondaryAnimation) =>
+      //           const TambahDooring(),
+      //       transitionsBuilder:
+      //           (context, animation, secondaryAnimation, child) {
+      //         const begin = 0.0;
+      //         const end = 1.0;
+      //         const curve = Curves.easeInOut;
 
-              var tween = Tween(begin: begin, end: end).chain(
-                CurveTween(curve: curve),
-              );
+      //         var tween = Tween(begin: begin, end: end).chain(
+      //           CurveTween(curve: curve),
+      //         );
 
-              return FadeTransition(
-                opacity: animation.drive(tween),
-                child: child,
-              );
-            },
-          ));
-        },
-        icon: const Icon(
-          Icons.add,
-          color: AppColors.white,
-        ),
-        label: Text('Tambah Dooring',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.apply(color: AppColors.white)),
-      ),
+      //         return FadeTransition(
+      //           opacity: animation.drive(tween),
+      //           child: child,
+      //         );
+      //       },
+      //     ));
+      //   },
+      //   icon: const Icon(
+      //     Icons.add,
+      //     color: AppColors.white,
+      //   ),
+      //   label: Text('Tambah Dooring',
+      //       style: Theme.of(context)
+      //           .textTheme
+      //           .titleMedium
+      //           ?.apply(color: AppColors.white)),
+      // ),
     );
-  }
-}
-
-class TambahDooring extends StatelessWidget {
-  const TambahDooring({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final kapalController = Get.put(KapalController());
-    final wilayahController = Get.put(WilayahController());
-    final controller = Get.put(DooringController());
-
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Tambah Data Dooring',
-              style: Theme.of(context).textTheme.headlineMedium),
-          centerTitle: true,
-          leading: IconButton(
-            onPressed: () {
-              controller.jumlahUnitController.clear();
-              controller.helmController.clear();
-              controller.accuController.clear();
-              controller.spionController.clear();
-              controller.buserController.clear();
-              controller.toolsetController.clear();
-              controller.helmKurangController.clear();
-              controller.accuKurangController.clear();
-              controller.spionKurangController.clear();
-              controller.buserKurangController.clear();
-              controller.toolsetKurangController.clear();
-              Get.back();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new),
-          ),
-        ),
-        body: Form(
-          key: controller.dooringKey,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-                horizontal: CustomSize.md, vertical: CustomSize.sm),
-            children: [
-              Obx(() {
-                return DropdownSearch<KapalModel>(
-                  items: kapalController.filteredKapalModel,
-                  itemAsString: (KapalModel kendaraan) => kendaraan.namaKapal,
-                  selectedItem: kapalController.selectedKapal.value.isNotEmpty
-                      ? kapalController.filteredKapalModel.firstWhere(
-                          (kendaraan) =>
-                              kendaraan.namaKapal ==
-                              kapalController.selectedKapal.value,
-                          orElse: () => KapalModel(
-                            idPelayaran: 0,
-                            namaKapal: '',
-                            namaPelayaran: '',
-                          ),
-                        )
-                      : null,
-                  dropdownBuilder: (context, KapalModel? selectedItem) {
-                    return Text(
-                      selectedItem != null
-                          ? selectedItem.namaKapal
-                          : 'Pilih nama kapal',
-                      style: TextStyle(
-                          fontSize: CustomSize.fontSizeSm,
-                          color:
-                              selectedItem == null ? Colors.grey : Colors.black,
-                          fontWeight: FontWeight.w600),
-                    );
-                  },
-                  onChanged: (KapalModel? kendaraan) {
-                    if (kendaraan != null) {
-                      kapalController.selectedKapal.value = kendaraan.namaKapal;
-                      print(
-                          'ini nama kapal : ${kapalController.selectedKapal.value}');
-                    } else {
-                      kapalController.resetSelectedKendaraan();
-                    }
-                  },
-                  popupProps: const PopupProps.menu(
-                    showSearchBox: true,
-                    searchFieldProps: TextFieldProps(
-                      decoration: InputDecoration(
-                        hintText: 'Cari nama kapal...',
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('ETD'),
-                        Obx(
-                          () => TextFormField(
-                            keyboardType: TextInputType.none,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  DateTime? selectedDate = DateTime.tryParse(
-                                      controller.tglETD.value);
-                                  showDatePicker(
-                                    context: context,
-                                    locale: const Locale("id", "ID"),
-                                    initialDate: selectedDate ?? DateTime.now(),
-                                    firstDate: DateTime(1850),
-                                    lastDate: DateTime(2040),
-                                  ).then((newSelectedDate) {
-                                    if (newSelectedDate != null) {
-                                      controller.tglETD.value =
-                                          CustomHelperFunctions
-                                              .getFormattedDateDatabase(
-                                                  newSelectedDate);
-                                      print(
-                                          'Ini tanggal yang dipilih : ${controller.tglETD.value}');
-                                    }
-                                  });
-                                },
-                                icon: const Icon(Icons.calendar_today),
-                              ),
-                              hintText: controller.tglETD.value.isNotEmpty
-                                  ? DateFormat('d/M/yyyy').format(
-                                      DateTime.tryParse(
-                                              '${controller.tglETD.value} 00:00:00') ??
-                                          DateTime.now(),
-                                    )
-                                  : 'ETD',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: CustomSize.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Tgl Bongkar'),
-                        Obx(
-                          () => TextFormField(
-                            keyboardType: TextInputType.none,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  DateTime? selectedDate = DateTime.tryParse(
-                                      controller.tglBongkar.value);
-                                  showDatePicker(
-                                    context: context,
-                                    locale: const Locale("id", "ID"),
-                                    initialDate: selectedDate ?? DateTime.now(),
-                                    firstDate: DateTime(1850),
-                                    lastDate: DateTime(2040),
-                                  ).then((newSelectedDate) {
-                                    if (newSelectedDate != null) {
-                                      controller.tglBongkar.value =
-                                          CustomHelperFunctions
-                                              .getFormattedDateDatabase(
-                                                  newSelectedDate);
-                                      print(
-                                          'Ini tanggal yang dipilih : ${controller.tglBongkar.value}');
-                                    }
-                                  });
-                                },
-                                icon: const Icon(Icons.calendar_today),
-                              ),
-                              hintText: controller.tglBongkar.value.isNotEmpty
-                                  ? DateFormat('d/M/yyyy').format(
-                                      DateTime.tryParse(
-                                              '${controller.tglBongkar.value} 00:00:00') ??
-                                          DateTime.now(),
-                                    )
-                                  : 'Tgl Bongkar',
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.jumlahUnitController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Jumlah Unit harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Jumlah Unit',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: CustomSize.md),
-                  Expanded(
-                    flex: 2,
-                    child: Obx(() {
-                      return DropdownSearch<WilayahModel>(
-                        items: wilayahController.filteredWilayahModel,
-                        itemAsString: (WilayahModel kendaraan) =>
-                            kendaraan.wilayah,
-                        selectedItem: wilayahController
-                                .selectedWilayah.value.isNotEmpty
-                            ? wilayahController.filteredWilayahModel.firstWhere(
-                                (kendaraan) =>
-                                    kendaraan.wilayah ==
-                                    wilayahController.selectedWilayah.value,
-                                orElse: () => WilayahModel(
-                                  idWilayah: 0,
-                                  wilayah: '',
-                                ),
-                              )
-                            : null,
-                        dropdownBuilder: (context, WilayahModel? selectedItem) {
-                          return Text(
-                            selectedItem != null
-                                ? selectedItem.wilayah
-                                : 'Wilayah',
-                            style: TextStyle(
-                                fontSize: CustomSize.fontSizeSm,
-                                color: selectedItem == null
-                                    ? Colors.grey
-                                    : Colors.black,
-                                fontWeight: FontWeight.w600),
-                          );
-                        },
-                        onChanged: (WilayahModel? kendaraan) {
-                          if (kendaraan != null) {
-                            wilayahController.selectedWilayah.value =
-                                kendaraan.wilayah;
-                            print(
-                                'ini nama kapal : ${wilayahController.selectedWilayah.value}');
-                          } else {
-                            wilayahController.resetSelectedKendaraan();
-                          }
-                        },
-                        popupProps: const PopupProps.menu(
-                          showSearchBox: true,
-                          searchFieldProps: TextFieldProps(
-                            decoration: InputDecoration(
-                              hintText: 'Search Kendaraan...',
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  )
-                ],
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Center(
-                child: Text(
-                  'Serah Terima KSU Kelebihan',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.helmController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Helm harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Helm',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: CustomSize.md),
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.accuController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Accu harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Accu',
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.spionController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Spion harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Spion',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: CustomSize.md),
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.buserController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Buser harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Buser',
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              TextFormField(
-                controller: controller.toolsetController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Toolset harus di isi';
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Toolset Kelebihan',
-                ),
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Center(
-                child: Text(
-                  'Serah Terima KSU Kekurangan',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.helmKurangController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Helm harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Helm',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: CustomSize.md),
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.accuKurangController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Accu harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Accu',
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.spionKurangController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Spion harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Spion',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: CustomSize.md),
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: controller.buserKurangController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Buser harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Buser',
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              TextFormField(
-                controller: controller.toolsetKurangController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Toolset harus di isi';
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Toolset Kekurangan',
-                ),
-              ),
-              const SizedBox(height: CustomSize.spaceBtwSections),
-              SizedBox(
-                width: CustomHelperFunctions.screenWidth(),
-                child: ElevatedButton(
-                    onPressed: () => controller.addDataDooring(),
-                    child: const Text(
-                      'Tambah',
-                    )),
-              )
-            ],
-          ),
-        ));
   }
 }
 
@@ -1790,18 +1341,16 @@ class _EditDooringState extends State<EditDooring> {
   late String namaKapal;
   late String wilayah;
   late String etd;
+  late String atd;
   late String tglBongkar;
   late TextEditingController unit;
+  late TextEditingController ct20;
+  late TextEditingController ct40;
   late TextEditingController helm1;
   late TextEditingController accu1;
   late TextEditingController spion1;
   late TextEditingController buser1;
   late TextEditingController toolset1;
-  late TextEditingController helmKurang;
-  late TextEditingController accuKurang;
-  late TextEditingController spionKurang;
-  late TextEditingController buserKurang;
-  late TextEditingController toolsetKurang;
 
   @override
   void initState() {
@@ -1810,6 +1359,10 @@ class _EditDooringState extends State<EditDooring> {
     namaKapal = widget.model.namaKapal;
     wilayah = widget.model.wilayah;
     etd = widget.model.etd;
+    atd = widget.model.atd;
+    tglBongkar = widget.model.tglBongkar;
+    ct20 = TextEditingController(text: widget.model.ct20);
+    ct40 = TextEditingController(text: widget.model.ct40);
     tglBongkar = widget.model.tglBongkar;
     unit = TextEditingController(text: widget.model.unit.toString());
     helm1 = TextEditingController(text: widget.model.helm1.toString());
@@ -1817,16 +1370,6 @@ class _EditDooringState extends State<EditDooring> {
     spion1 = TextEditingController(text: widget.model.spion1.toString());
     buser1 = TextEditingController(text: widget.model.buser1.toString());
     toolset1 = TextEditingController(text: widget.model.toolset1.toString());
-    helmKurang =
-        TextEditingController(text: widget.model.helmKurang.toString());
-    accuKurang =
-        TextEditingController(text: widget.model.accuKurang.toString());
-    spionKurang =
-        TextEditingController(text: widget.model.spionKurang.toString());
-    buserKurang =
-        TextEditingController(text: widget.model.buserKurang.toString());
-    toolsetKurang =
-        TextEditingController(text: widget.model.totalsetKurang.toString());
   }
 
   @override
@@ -1837,390 +1380,297 @@ class _EditDooringState extends State<EditDooring> {
     spion1.dispose();
     buser1.dispose();
     toolset1.dispose();
-    helmKurang.dispose();
-    accuKurang.dispose();
-    spionKurang.dispose();
-    buserKurang.dispose();
-    toolsetKurang.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final kapalController = Get.put(KapalController());
-    final wilayahController = Get.put(WilayahController());
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Nama Kapal'),
-          Obx(() {
-            return DropdownSearch<KapalModel>(
-              items: kapalController.filteredKapalModel,
-              itemAsString: (KapalModel kendaraan) => kendaraan.namaKapal,
-              selectedItem: kapalController.filteredKapalModel.firstWhere(
-                (kendaraan) => kendaraan.namaKapal == namaKapal,
-                orElse: () => KapalModel(
-                  idPelayaran: 0,
-                  namaKapal: '',
-                  namaPelayaran: '',
+    return Form(
+      key: widget.controller.dooringKey,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Edit Data Dooring',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Nama Kapal'),
+            TextFormField(
+              controller: TextEditingController(text: namaKapal),
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('ETD'),
+            TextFormField(
+              keyboardType: TextInputType.none,
+              readOnly: true,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    DateTime? selectedDate = DateTime.tryParse(etd);
+                    showDatePicker(
+                      context: context,
+                      locale: const Locale("id", "ID"),
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1850),
+                      lastDate: DateTime(2040),
+                    ).then((newSelectedDate) {
+                      if (newSelectedDate != null) {
+                        etd = CustomHelperFunctions.getFormattedDateDatabase(
+                            newSelectedDate);
+                        print('Ini tanggal yang dipilih : $etd');
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.calendar_today),
                 ),
+                hintText: etd.isNotEmpty
+                    ? DateFormat('d/M/yyyy').format(
+                        DateTime.tryParse('$etd 00:00:00') ?? DateTime.now(),
+                      )
+                    : 'ETD',
               ),
-              dropdownBuilder: (context, KapalModel? selectedItem) {
-                return Text(
-                  selectedItem != null
-                      ? selectedItem.namaKapal
-                      : 'Pilih nama kapal',
-                  style: TextStyle(
-                    fontSize: CustomSize.fontSizeSm,
-                    color: selectedItem == null ? Colors.grey : Colors.black,
-                    fontWeight: FontWeight.w600,
-                  ),
-                );
-              },
-              onChanged: (KapalModel? kendaraan) {
-                setState(() {
-                  if (kendaraan != null) {
-                    namaKapal = kendaraan.namaKapal;
-                    kapalController.selectedKapal.value = kendaraan.namaKapal;
-                  } else {
-                    kapalController.resetSelectedKendaraan();
-                    namaKapal = '';
-                  }
-                });
-              },
-              popupProps: const PopupProps.menu(
-                showSearchBox: true,
-                searchFieldProps: TextFieldProps(
-                  decoration: InputDecoration(
-                    hintText: 'Search Kapal...',
-                  ),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('ATD'),
+            TextFormField(
+              keyboardType: TextInputType.none,
+              readOnly: true,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    DateTime? selectedDate = DateTime.tryParse(atd);
+                    showDatePicker(
+                      context: context,
+                      locale: const Locale("id", "ID"),
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1850),
+                      lastDate: DateTime(2040),
+                    ).then((newSelectedDate) {
+                      if (newSelectedDate != null) {
+                        atd = CustomHelperFunctions.getFormattedDateDatabase(
+                            newSelectedDate);
+                        print('Ini tanggal yang dipilih : $atd');
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.calendar_today),
                 ),
+                hintText: etd.isNotEmpty
+                    ? DateFormat('d/M/yyyy').format(
+                        DateTime.tryParse('$etd 00:00:00') ?? DateTime.now(),
+                      )
+                    : 'ETD',
               ),
-            );
-          }),
-          const SizedBox(height: CustomSize.spaceBtwItems),
-          const Text('ETD'),
-          TextFormField(
-            keyboardType: TextInputType.none,
-            readOnly: true,
-            decoration: InputDecoration(
-              suffixIcon: IconButton(
-                onPressed: () {
-                  DateTime? selectedDate = DateTime.tryParse(etd);
-                  showDatePicker(
-                    context: context,
-                    locale: const Locale("id", "ID"),
-                    initialDate: selectedDate ?? DateTime.now(),
-                    firstDate: DateTime(1850),
-                    lastDate: DateTime(2040),
-                  ).then((newSelectedDate) {
-                    if (newSelectedDate != null) {
-                      etd = CustomHelperFunctions.getFormattedDateDatabase(
-                          newSelectedDate);
-                      print('Ini tanggal yang dipilih : $etd');
-                    }
-                  });
-                },
-                icon: const Icon(Icons.calendar_today),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Wilayah'),
+            TextFormField(
+              controller: TextEditingController(text: wilayah),
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Tgl Bongkar'),
+            TextFormField(
+              keyboardType: TextInputType.none,
+              readOnly: true,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    DateTime? selectedDate = DateTime.tryParse(tglBongkar);
+                    showDatePicker(
+                      context: context,
+                      locale: const Locale("id", "ID"),
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1850),
+                      lastDate: DateTime(2040),
+                    ).then((newSelectedDate) {
+                      if (newSelectedDate != null) {
+                        tglBongkar =
+                            CustomHelperFunctions.getFormattedDateDatabase(
+                                newSelectedDate);
+                        print('Ini tanggal yang dipilih : $tglBongkar');
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.calendar_today),
+                ),
+                hintText: tglBongkar.isNotEmpty
+                    ? DateFormat('d/M/yyyy').format(
+                        DateTime.tryParse('$tglBongkar 00:00:00') ??
+                            DateTime.now(),
+                      )
+                    : 'Tanggal Bongkar',
               ),
-              hintText: etd.isNotEmpty
-                  ? DateFormat('d/M/yyyy').format(
-                      DateTime.tryParse('$etd 00:00:00') ?? DateTime.now(),
-                    )
-                  : 'ETD',
             ),
-          ),
-          const SizedBox(height: CustomSize.spaceBtwItems),
-          const Text('Tgl Bongkar'),
-          TextFormField(
-            keyboardType: TextInputType.none,
-            readOnly: true,
-            decoration: InputDecoration(
-              suffixIcon: IconButton(
-                onPressed: () {
-                  DateTime? selectedDate = DateTime.tryParse(tglBongkar);
-                  showDatePicker(
-                    context: context,
-                    locale: const Locale("id", "ID"),
-                    initialDate: selectedDate ?? DateTime.now(),
-                    firstDate: DateTime(1850),
-                    lastDate: DateTime(2040),
-                  ).then((newSelectedDate) {
-                    if (newSelectedDate != null) {
-                      tglBongkar =
-                          CustomHelperFunctions.getFormattedDateDatabase(
-                              newSelectedDate);
-                      print('Ini tanggal yang dipilih : $tglBongkar');
-                    }
-                  });
-                },
-                icon: const Icon(Icons.calendar_today),
-              ),
-              hintText: tglBongkar.isNotEmpty
-                  ? DateFormat('d/M/yyyy').format(
-                      DateTime.tryParse('$tglBongkar 00:00:00') ??
-                          DateTime.now(),
-                    )
-                  : 'Tanggal Bongkar',
-            ),
-          ),
-          const SizedBox(height: CustomSize.spaceBtwItems),
-          Text('Status Defect', style: Theme.of(context).textTheme.labelMedium),
-          Obx(
-            () => DropDownWidget(
-              value: widget.controller.statusEditDefect.value,
-              items: widget.controller.listStatusEditDefect.keys.toList(),
-              onChanged: (String? value) {
-                widget.controller.statusEditDefect.value = value!;
-                print(
-                    'ini pilihan status defect nya : ${widget.controller.getEditStatusDefect}');
-              },
-            ),
-          ),
-          const SizedBox(height: CustomSize.spaceBtwItems),
-          const Text('Jumlah Unit'),
-          TextFormField(
-            controller: unit,
-            keyboardType: TextInputType.number,
-            onChanged: (value) {
-              setState(() {
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('Unit Bongkar'),
+            TextFormField(
+              controller: unit,
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                // Pastikan text diubah dengan benar
                 unit.text = value;
-              });
-            },
-          ),
-          const SizedBox(height: CustomSize.spaceBtwItems),
-          const Text('Wilayah'),
-          Obx(() {
-            return DropdownSearch<WilayahModel>(
-              items: wilayahController.filteredWilayahModel,
-              itemAsString: (WilayahModel wilayahItem) => wilayahItem.wilayah,
-              selectedItem: wilayah.isNotEmpty
-                  ? wilayahController.filteredWilayahModel.firstWhere(
-                      (wilayahItem) => wilayahItem.wilayah == wilayah,
-                      orElse: () => WilayahModel(
-                        idWilayah: 0,
-                        wilayah: '',
-                      ),
-                    )
-                  : null,
-              dropdownBuilder: (context, WilayahModel? selectedItem) {
-                return Text(
-                  selectedItem != null ? selectedItem.wilayah : 'Wilayah',
-                  style: TextStyle(
-                    fontSize: CustomSize.fontSizeSm,
-                    color: selectedItem == null ? Colors.grey : Colors.black,
-                    fontWeight: FontWeight.w600,
-                  ),
-                );
               },
-              onChanged: (WilayahModel? wilayahItem) {
-                setState(() {
-                  if (wilayahItem != null) {
-                    wilayah = wilayahItem.wilayah;
-                    wilayahController.selectedWilayah.value =
-                        wilayahItem.wilayah;
-                  } else {
-                    wilayahController.resetSelectedKendaraan();
-                    wilayah = '';
-                  }
-                });
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Total Motor harus diisi';
+                }
+                final inputValue = int.tryParse(value) ?? 0;
+
+                final maxUnit = widget.model.unit;
+
+                if (inputValue > maxUnit) {
+                  return 'Jumlah unit tidak boleh melebihi $maxUnit unit';
+                }
+                return null;
               },
-              popupProps: const PopupProps.menu(
-                showSearchBox: true,
-                searchFieldProps: TextFieldProps(
-                  decoration: InputDecoration(
-                    hintText: 'Cari wilayah...',
-                  ),
-                ),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('CT 20"'),
+            TextFormField(
+              controller: ct20,
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                ct20.text = value;
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'CT 20 harus diisi';
+                }
+
+                final inputValue = int.tryParse(value) ?? 0;
+                final maxCt20 = int.tryParse(widget.model.ct20);
+
+                if (inputValue > maxCt20!) {
+                  return 'CT 20 tidak boleh melebihi $maxCt20';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Text('CT 40"'),
+            TextFormField(
+              controller: ct40,
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                ct40.text = value;
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'CT 40 harus diisi';
+                }
+
+                final inputValue = int.tryParse(value) ?? 0;
+                final maxCt40 = int.tryParse(widget.model.ct40);
+
+                if (inputValue > maxCt40!) {
+                  return 'CT 40 tidak boleh melebihi $maxCt40';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            Text('Status Defect',
+                style: Theme.of(context).textTheme.labelMedium),
+            Obx(
+              () => DropDownWidget(
+                value: widget.controller.statusEditDefect.value,
+                items: widget.controller.listStatusEditDefect.keys.toList(),
+                onChanged: (String? value) {
+                  widget.controller.statusEditDefect.value = value!;
+                  print(
+                      'ini pilihan status defect nya : ${widget.controller.getEditStatusDefect}');
+                },
               ),
-            );
-          }),
-          const SizedBox(height: CustomSize.spaceBtwItems),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text('KSU KELEBIHAN',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.apply(color: AppColors.success)),
-                    const SizedBox(height: CustomSize.md),
-                    TextFormField(
-                      controller: helm1,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Helm')),
-                      onChanged: (value) {
-                        setState(() {
-                          helm1.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: accu1,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Accu')),
-                      onChanged: (value) {
-                        setState(() {
-                          accu1.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: spion1,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Spion')),
-                      onChanged: (value) {
-                        setState(() {
-                          spion1.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: buser1,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Buser')),
-                      onChanged: (value) {
-                        setState(() {
-                          buser1.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: toolset1,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('ToolSet')),
-                      onChanged: (value) {
-                        setState(() {
-                          toolset1.text = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: CustomSize.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text('KSU KURANG',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.apply(color: AppColors.error)),
-                    const SizedBox(height: CustomSize.md),
-                    TextFormField(
-                      controller: helmKurang,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Helm')),
-                      onChanged: (value) {
-                        setState(() {
-                          helmKurang.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: accuKurang,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Accu')),
-                      onChanged: (value) {
-                        setState(() {
-                          accuKurang.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: spionKurang,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Spion')),
-                      onChanged: (value) {
-                        setState(() {
-                          spionKurang.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: buserKurang,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('Buser')),
-                      onChanged: (value) {
-                        setState(() {
-                          buserKurang.text = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: toolsetKurang,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(label: Text('ToolSet')),
-                      onChanged: (value) {
-                        setState(() {
-                          toolsetKurang.text = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: CustomSize.spaceBtwSections),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              OutlinedButton(
-                  onPressed: () => Get.back(),
-                  style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: CustomSize.lg, vertical: CustomSize.md)),
-                  child: const Text('Close')),
-              ElevatedButton(
-                onPressed: () {
-                  widget.controller.editDooring(
+            ),
+            const SizedBox(height: CustomSize.spaceBtwItems),
+            Center(
+              child: Text('ALAT - ALAT MOTOR',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold, color: AppColors.black)),
+            ),
+            const SizedBox(height: CustomSize.md),
+            const Text('Helm'),
+            TextFormField(
+              controller: helm1,
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.sm),
+            const Text('Accu'),
+            TextFormField(
+              controller: accu1,
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.sm),
+            const Text('Spion'),
+            TextFormField(
+              controller: spion1,
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.sm),
+            const Text('Buser'),
+            TextFormField(
+              controller: buser1,
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.sm),
+            const Text('ToolSet'),
+            TextFormField(
+              controller: toolset1,
+              readOnly: true,
+            ),
+            const SizedBox(height: CustomSize.spaceBtwSections),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlinedButton(
+                    onPressed: () => Get.back(),
+                    style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: CustomSize.lg,
+                            vertical: CustomSize.md)),
+                    child: const Text('Close')),
+                ElevatedButton(
+                  onPressed: () {
+                    widget.controller.editDooring(
                       idDooring,
                       namaKapal,
                       wilayah,
                       etd,
+                      atd,
                       tglBongkar,
                       int.parse(unit.text),
+                      ct20.text,
+                      ct40.text,
                       int.parse(helm1.text),
                       int.parse(accu1.text),
                       int.parse(spion1.text),
                       int.parse(buser1.text),
                       int.parse(toolset1.text),
-                      int.parse(helmKurang.text),
-                      int.parse(accuKurang.text),
-                      int.parse(spionKurang.text),
-                      int.parse(buserKurang.text),
-                      int.parse(toolsetKurang.text));
-                  print('ini idDooring nya : $idDooring');
-                  print('ini namaKapal nya : $namaKapal');
-                  print('ini wilayah nya : $wilayah');
-                  print('ini etd nya : $etd');
-                  print('ini tglBongkar nya : $tglBongkar');
-                  print('ini tglBongkar nya : ${int.parse(unit.text)}');
-                },
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: CustomSize.lg, vertical: CustomSize.md)),
-                child: const Text('Tambahkan'),
-              ),
-            ],
-          ),
-        ],
+                    );
+                    print('ini idDooring nya : $idDooring');
+                    print('ini namaKapal nya : $namaKapal');
+                    print('ini wilayah nya : $wilayah');
+                    print('ini etd nya : $etd');
+                    print('ini tglBongkar nya : $tglBongkar');
+                    print('ini tglBongkar nya : ${int.parse(unit.text)}');
+                  },
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: CustomSize.lg, vertical: CustomSize.md)),
+                  child: const Text('Tambahkan'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

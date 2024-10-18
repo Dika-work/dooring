@@ -1,6 +1,5 @@
 import 'package:dooring/screens/login.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
 
@@ -24,13 +23,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Lottie.asset(
-            'assets/animations/welcome.json',
+          const Spacer(),
+          Image.asset(
+            'assets/images/lps.png',
             width: CustomHelperFunctions.screenWidth() * .7,
             height: CustomHelperFunctions.screenHeight() * .45,
           ),
           Text(
-            'Selamat Datang',
+            'PT. LANGGENG PRANAMAS SENTOSA',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
@@ -38,12 +38,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: CustomSize.lg),
             child: Text(
-              'Aplikasi praktis untuk layanan antar-jemput langsung dari pintu Anda, mudah dan aman dalam genggaman',
+              'Perusahaan JASA yang bergerak dalam bidang Angkutan Transportasi penggiriman barang ke luar Pulau, terutama Pulau KALIMANTAN & SULAWESI melalui Kapal Countainer',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
-          const SizedBox(height: CustomSize.spaceBtwItems),
+          const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: CustomSize.xl),
             child: SwipeableButtonView(
@@ -72,7 +72,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               buttontextstyle: const TextStyle(
                   fontSize: CustomSize.fontSizeLg, color: AppColors.white),
             ),
-          )
+          ),
+          const Spacer(),
         ],
       ),
     );

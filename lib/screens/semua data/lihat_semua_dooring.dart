@@ -30,7 +30,7 @@ class LihatSemuaDooring extends StatelessWidget {
         leading: IconButton(
             onPressed: () => Get.back(),
             icon: const Icon(Icons.arrow_back_ios)),
-        title: Text('Lihat Data Dooring',
+        title: Text('Lihat Semua Dooring',
             style: Theme.of(context).textTheme.headlineMedium),
         centerTitle: true,
       ),
@@ -171,8 +171,7 @@ class LihatSemuaDooring extends StatelessWidget {
               return const CustomCircularLoader();
             } else {
               final dataSource = LihatDooringSource(
-                defectModel: controller.defectModel,
-              );
+                  defectModel: controller.defectModel, context: context);
 
               final bool isTableEmpty = controller.defectModel.isEmpty;
               final rowCount = controller.defectModel.length;
@@ -196,6 +195,7 @@ class LihatSemuaDooring extends StatelessWidget {
                       headerGridLinesVisibility: GridLinesVisibility.both,
                       columns: [
                         GridColumn(
+                          width: 50,
                           columnName: 'No',
                           label: Container(
                             alignment: Alignment.center,
@@ -253,6 +253,7 @@ class LihatSemuaDooring extends StatelessWidget {
                           ),
                         ),
                         GridColumn(
+                          width: 50,
                           columnName: 'Jml',
                           label: Container(
                             alignment: Alignment.center,

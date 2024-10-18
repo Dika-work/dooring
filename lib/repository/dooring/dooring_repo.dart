@@ -31,93 +31,21 @@ class DooringRepository {
     }
   }
 
-  Future<void> addDooring(
-    String namaKapal,
-    String jam,
-    String tgl,
-    String user,
-    String wilayah,
-    String etd,
-    String tglBongkar,
-    int unit,
-    int helm1,
-    int accu1,
-    int spion1,
-    int buser1,
-    int toolset1,
-    int helmKurang,
-    int accuKurang,
-    int spionKurang,
-    int buserKurang,
-    int toolsetKurang,
-  ) async {
-    try {
-      final response = await http
-          .post(Uri.parse('${storageUtil.baseURL}/dooring.php'), body: {
-        'nm_kapal': namaKapal,
-        'jam': jam,
-        'tgl': tgl,
-        'user': user,
-        'wilayah': wilayah,
-        'etd': etd,
-        'tgl_bongkar': tglBongkar,
-        'unit': unit.toString(),
-        'helm_l': helm1.toString(),
-        'accu_l': accu1.toString(),
-        'spion_l': spion1.toString(),
-        'buser_l': buser1.toString(),
-        'toolset_l': toolset1.toString(),
-        'helm_k': helmKurang.toString(),
-        'accu_k': accuKurang.toString(),
-        'spion_k': spionKurang.toString(),
-        'buser_k': buserKurang.toString(),
-        'toolset_k': toolsetKurang.toString(),
-        'st_input': '1',
-      });
-
-      if (response.statusCode == 200) {
-        SnackbarLoader.successSnackBar(
-          title: 'Berhasil✨',
-          message: 'Menambahkan data do harian baru..',
-        );
-      } else if (response.statusCode != 200) {
-        CustomHelperFunctions.stopLoading();
-        SnackbarLoader.errorSnackBar(
-          title: 'Gagal😪',
-          message: 'Pastikan telah terkoneksi dengan internet😁',
-        );
-      } else {
-        SnackbarLoader.errorSnackBar(
-          title: 'Error',
-          message: 'Something went wrong, please contact developer🥰',
-        );
-      }
-    } catch (e) {
-      SnackbarLoader.errorSnackBar(
-        title: 'Error☠️',
-        message: 'Pastikan sudah terhubung dengan internet 😁',
-      );
-      return;
-    }
-  }
-
   Future<void> editDooring(
     int idDooring,
     String namaKapal,
     String wilayah,
     String etd,
+    String atd,
     String tglBongkar,
     int unit,
+    String ct20,
+    String ct40,
     int helm1,
     int accu1,
     int spion1,
     int buser1,
     int toolset1,
-    int helmKurang,
-    int accuKurang,
-    int spionKurang,
-    int buserKurang,
-    int toolsetKurang,
     int statusDefect,
   ) async {
     try {
@@ -129,18 +57,16 @@ class DooringRepository {
           'nm_kapal': namaKapal,
           'wilayah': wilayah,
           'etd': etd,
+          'atd': atd,
           'tgl_bongkar': tglBongkar,
           'unit': unit.toString(),
+          'ct_20': ct20,
+          'ct_40': ct40,
           'helm_l': helm1.toString(),
           'accu_l': accu1.toString(),
           'spion_l': spion1.toString(),
           'buser_l': buser1.toString(),
           'toolset_l': toolset1.toString(),
-          'helm_k': helmKurang.toString(),
-          'accu_k': accuKurang.toString(),
-          'spion_k': spionKurang.toString(),
-          'buser_k': buserKurang.toString(),
-          'toolset_k': toolsetKurang.toString(),
           'st_defect': statusDefect.toString(),
         },
       );

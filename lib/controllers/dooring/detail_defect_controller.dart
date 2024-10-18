@@ -22,6 +22,7 @@ class DetailDefectController extends GetxController {
   GlobalKey<FormState> detailDefectKey = GlobalKey<FormState>();
   String tipeUser = '';
 
+  TextEditingController nomorContainerController = TextEditingController();
   TextEditingController nomorMesinController = TextEditingController();
   TextEditingController nomorRangkaController = TextEditingController();
   RxInt jumlahInput = 0.obs;
@@ -101,6 +102,7 @@ class DetailDefectController extends GetxController {
       tipeUser,
       nomorMesinController.text,
       nomorRangkaController.text,
+      nomorContainerController.text,
     );
 
     // Fetch updated data

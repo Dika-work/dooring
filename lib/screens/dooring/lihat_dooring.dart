@@ -1,3 +1,4 @@
+import 'package:dooring/helpers/helper_func.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -46,22 +47,82 @@ class LihatDooring extends StatelessWidget {
           const SizedBox(height: CustomSize.sm),
           const Text('ETD'),
           TextFormField(
-            controller: TextEditingController(text: model.etd),
+            controller: TextEditingController(
+                text: CustomHelperFunctions.getFormattedDate(
+                    DateTime.parse(model.etd))),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('ATD'),
+          TextFormField(
+            controller: TextEditingController(
+                text: CustomHelperFunctions.getFormattedDate(
+                    DateTime.parse(model.atd))),
             readOnly: true,
           ),
           const SizedBox(height: CustomSize.sm),
           const Text('Tgl Bongkar'),
           TextFormField(
-            controller: TextEditingController(text: model.tglBongkar),
+            controller: TextEditingController(
+                text: CustomHelperFunctions.getFormattedDate(
+                    DateTime.parse(model.tglBongkar))),
             readOnly: true,
           ),
           const SizedBox(height: CustomSize.sm),
-          const Text('Total Unit'),
+          const Text('Unit Bongkar'),
           TextFormField(
             controller: TextEditingController(text: model.unit.toString()),
             readOnly: true,
           ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('CT 20"'),
+          TextFormField(
+            controller: TextEditingController(text: model.ct20),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('CT 40"'),
+          TextFormField(
+            controller: TextEditingController(text: model.ct40),
+            readOnly: true,
+          ),
           const SizedBox(height: CustomSize.spaceBtwItems),
+          Center(
+            child: Text('ALAT - ALAT MOTOR',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold, color: AppColors.black)),
+          ),
+          const SizedBox(height: CustomSize.md),
+          const Text('Helm'),
+          TextFormField(
+            controller: TextEditingController(text: model.helm1.toString()),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('Accu'),
+          TextFormField(
+            controller: TextEditingController(text: model.accu1.toString()),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('Spion'),
+          TextFormField(
+            controller: TextEditingController(text: model.spion1.toString()),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('Buser'),
+          TextFormField(
+            controller: TextEditingController(text: model.buser1.toString()),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('ToolSet'),
+          TextFormField(
+            controller: TextEditingController(text: model.toolset1.toString()),
+            readOnly: true,
+          ),
+          const SizedBox(height: CustomSize.md),
           Row(
             children: [
               Expanded(
@@ -78,36 +139,46 @@ class LihatDooring extends StatelessWidget {
                     const SizedBox(height: CustomSize.md),
                     const Text('Helm'),
                     TextFormField(
-                      controller:
-                          TextEditingController(text: model.helm1.toString()),
+                      controller: TextEditingController(
+                          text: (model.unit - model.helm1 < 0)
+                              ? (model.unit - model.helm1).abs().toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('Accu'),
                     TextFormField(
-                      controller:
-                          TextEditingController(text: model.accu1.toString()),
+                      controller: TextEditingController(
+                          text: (model.unit - model.accu1 < 0)
+                              ? (model.unit - model.accu1).abs().toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('Spion'),
                     TextFormField(
-                      controller:
-                          TextEditingController(text: model.spion1.toString()),
+                      controller: TextEditingController(
+                          text: (model.unit - model.spion1 < 0)
+                              ? (model.unit - model.spion1).abs().toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('Buser'),
                     TextFormField(
-                      controller:
-                          TextEditingController(text: model.buser1.toString()),
+                      controller: TextEditingController(
+                          text: (model.unit - model.buser1 < 0)
+                              ? (model.unit - model.buser1).abs().toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
-                    const Text('ToolSeet'),
+                    const Text('ToolSet'),
                     TextFormField(
                       controller: TextEditingController(
-                          text: model.toolset1.toString()),
+                          text: (model.unit - model.toolset1 < 0)
+                              ? (model.unit - model.toolset1).abs().toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                   ],
@@ -129,35 +200,45 @@ class LihatDooring extends StatelessWidget {
                     const Text('Helm Kurang'),
                     TextFormField(
                       controller: TextEditingController(
-                          text: model.helmKurang.toString()),
+                          text: (model.unit - model.helm1 >= 0)
+                              ? (model.unit - model.helm1).toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('Accu Kurang'),
                     TextFormField(
                       controller: TextEditingController(
-                          text: model.accuKurang.toString()),
+                          text: (model.unit - model.accu1 >= 0)
+                              ? (model.unit - model.accu1).toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('Spion Kurang'),
                     TextFormField(
                       controller: TextEditingController(
-                          text: model.spionKurang.toString()),
+                          text: (model.unit - model.spion1 >= 0)
+                              ? (model.unit - model.spion1).toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('Buser Kurang'),
                     TextFormField(
                       controller: TextEditingController(
-                          text: model.buserKurang.toString()),
+                          text: (model.unit - model.buser1 >= 0)
+                              ? (model.unit - model.buser1).toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                     const SizedBox(height: CustomSize.sm),
                     const Text('ToolSet Kurang'),
                     TextFormField(
                       controller: TextEditingController(
-                          text: model.totalsetKurang.toString()),
+                          text: (model.unit - model.toolset1 >= 0)
+                              ? (model.unit - model.toolset1).toString()
+                              : 0.toString()),
                       readOnly: true,
                     ),
                   ],
@@ -171,13 +252,12 @@ class LihatDooring extends StatelessWidget {
               return const CustomCircularLoader();
             } else {
               final dataSource = LihatDooringSource(
-                defectModel: controller.defectModel,
-              );
+                  defectModel: controller.defectModel, context: context);
 
               final bool isTableEmpty = controller.defectModel.isEmpty;
               final rowCount = controller.defectModel.length;
 
-              double gridHeight = 50.0 + (55.0 * 5);
+              double gridHeight = 35.0 + (55.0 * 5);
 
               final double tableHeight = isTableEmpty
                   ? 110
@@ -191,13 +271,12 @@ class LihatDooring extends StatelessWidget {
                       source: dataSource,
                       verticalScrollPhysics:
                           const NeverScrollableScrollPhysics(),
-                      columnWidthMode: isTableEmpty
-                          ? ColumnWidthMode.fill
-                          : ColumnWidthMode.auto,
+                      columnWidthMode: ColumnWidthMode.fill,
                       gridLinesVisibility: GridLinesVisibility.both,
                       headerGridLinesVisibility: GridLinesVisibility.both,
                       columns: [
                         GridColumn(
+                          width: 50,
                           columnName: 'No',
                           label: Container(
                             alignment: Alignment.center,
@@ -255,6 +334,7 @@ class LihatDooring extends StatelessWidget {
                           ),
                         ),
                         GridColumn(
+                          width: 50,
                           columnName: 'Jml',
                           label: Container(
                             alignment: Alignment.center,
@@ -276,6 +356,7 @@ class LihatDooring extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (rowCount > 5) const Divider(),
                   if (rowCount > 5)
                     SfDataPager(
                       delegate: dataSource,
@@ -283,11 +364,20 @@ class LihatDooring extends StatelessWidget {
                           (controller.defectModel.length / 5).ceilToDouble(),
                       direction: Axis.horizontal,
                     ),
+                  if (rowCount > 5) const Divider(),
                 ],
               );
             }
           }),
-          const SizedBox(height: CustomSize.spaceBtwItems),
+          Obx(() {
+            if (controller.defectModel.length <= 5) {
+              return const SizedBox(
+                height: CustomSize.defaultSpace,
+              );
+            } else {
+              return const SizedBox.shrink(); // Mengembalikan widget kosong
+            }
+          }),
           Obx(() {
             if (controller.isLoading.value && controller.defectModel.isEmpty) {
               return const CustomCircularLoader();
@@ -299,12 +389,13 @@ class LihatDooring extends StatelessWidget {
               final bool isTableEmpty = controller.detailDefectModel.isEmpty;
               final rowCount = controller.detailDefectModel.length;
 
-              double gridHeight = 50.0 + (55.0 * 5);
+              double gridHeight = 35.0 + (55.0 * 5);
 
               final double tableHeight = isTableEmpty
                   ? 110
                   : 50.0 + (55.0 * rowCount).clamp(0, gridHeight - 55.0);
-
+              print(
+                  'ini hasil dari tinggi tableHeight :${50.0 + (55.0 * rowCount).clamp(0, gridHeight - 55.0)}');
               return Column(
                 children: [
                   SizedBox(
@@ -348,6 +439,7 @@ class LihatDooring extends StatelessWidget {
                             ),
                             child: Text(
                               'Type Motor',
+                              textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -367,6 +459,7 @@ class LihatDooring extends StatelessWidget {
                             ),
                             child: Text(
                               'Part Motor',
+                              textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -386,6 +479,7 @@ class LihatDooring extends StatelessWidget {
                             ),
                             child: Text(
                               'No Mesin',
+                              textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -405,6 +499,7 @@ class LihatDooring extends StatelessWidget {
                             ),
                             child: Text(
                               'No Rangka',
+                              textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -417,6 +512,7 @@ class LihatDooring extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (rowCount > 5) const Divider(),
                   if (rowCount > 5)
                     SfDataPager(
                       delegate: dataSource,
@@ -424,6 +520,7 @@ class LihatDooring extends StatelessWidget {
                           .ceilToDouble(),
                       direction: Axis.horizontal,
                     ),
+                  if (rowCount > 5) const Divider(),
                 ],
               );
             }

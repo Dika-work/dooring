@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-import '../../../models/dooring/defect_model.dart';
-import '../../../models/dooring/detail_defect_model.dart';
+import '../../../models/dooring/jadwal_kapal_model.dart';
 import '../../constant/custom_size.dart';
 
-class LihatDooringSource extends DataGridSource {
-  final List<DefectModel> defectModel;
+// table 1
+class LihatJadwalKapalSource extends DataGridSource {
+  final List<LihatJadwalKapalModel> defectModel;
   final BuildContext context;
 
-  LihatDooringSource({
+  LihatJadwalKapalSource({
     required this.defectModel,
     required this.context,
     int startIndex = 0,
@@ -103,12 +103,20 @@ class LihatDooringSource extends DataGridSource {
     });
   }
 
-  void _updateDataPager(List<DefectModel> defectModel, int startIndex) {
-    if (defectModel.isEmpty) {
+  void _updateDataPager(
+      List<LihatJadwalKapalModel> defectModel, int startIndex) {
+    final filteredDefectModel = defectModel.where((e) {
+      return e.typeMotor != null && e.part != null;
+    }).toList();
+
+    if (filteredDefectModel.isEmpty ||
+        (filteredDefectModel.first.idDetail == 0 &&
+            filteredDefectModel.first.jumlah == 0)) {
       dooringData = _generateEmptyRows(1);
     } else {
       index = startIndex + 1;
-      dooringData = defectModel.skip(startIndex).take(5).map<DataGridRow>((e) {
+      dooringData =
+          filteredDefectModel.skip(startIndex).take(5).map<DataGridRow>((e) {
         return DataGridRow(cells: [
           DataGridCell<int>(columnName: 'No', value: index++),
           DataGridCell<String>(columnName: 'Type Motor', value: e.typeMotor),
@@ -129,12 +137,11 @@ class LihatDooringSource extends DataGridSource {
   }
 }
 
-// table yg dibawah lihat dooring
+// table 2
+class DetailLihatJadwalKapalSource extends DataGridSource {
+  final List<LihatJadwalKapalModel> defectModel;
 
-class DetailLihatSource extends DataGridSource {
-  final List<DetailDefectModel> defectModel;
-
-  DetailLihatSource({
+  DetailLihatJadwalKapalSource({
     required this.defectModel,
     int startIndex = 0,
   }) {
@@ -186,24 +193,28 @@ class DetailLihatSource extends DataGridSource {
     });
   }
 
-  void _updateDataPager(List<DetailDefectModel> defectModel, int startIndex) {
-    if (defectModel.isEmpty) {
-      print('Model is empty, generating empty rowszzzz');
+  void _updateDataPager(
+      List<LihatJadwalKapalModel> defectModel, int startIndex) {
+    final filteredDefectModel = defectModel.where((e) {
+      return e.typeMotor != null && e.part != null;
+    }).toList();
+
+    if (filteredDefectModel.isEmpty ||
+        (filteredDefectModel.first.idDetail == 0 &&
+            filteredDefectModel.first.jumlah == 0)) {
       dooringData = _generateEmptyRows(1);
     } else {
-      print('Model has data, generating rows based on model');
       index = startIndex + 1;
-      dooringData = defectModel.skip(startIndex).take(5).map<DataGridRow>(
-        (e) {
-          return DataGridRow(cells: [
-            DataGridCell<int>(columnName: 'No', value: index++),
-            DataGridCell<String>(columnName: 'Type Motor', value: e.typeMotor),
-            DataGridCell<String>(columnName: 'Part Motor', value: e.part),
-            DataGridCell<String>(columnName: 'No Mesin', value: e.noMesin),
-            DataGridCell<String>(columnName: 'No Rangka', value: e.noRangka),
-          ]);
-        },
-      ).toList();
+      dooringData =
+          filteredDefectModel.skip(startIndex).take(5).map<DataGridRow>((e) {
+        return DataGridRow(cells: [
+          DataGridCell<int>(columnName: 'No', value: index++),
+          DataGridCell<String>(columnName: 'Type Motor', value: e.typeMotor),
+          DataGridCell<String>(columnName: 'Part Motor', value: e.part),
+          DataGridCell<String>(columnName: 'No Mesin', value: e.noMesin),
+          DataGridCell<String>(columnName: 'No Rangka', value: e.noRangka),
+        ]);
+      }).toList();
     }
     notifyListeners();
   }

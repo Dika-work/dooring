@@ -188,38 +188,89 @@ class CustomDrawer extends StatelessWidget {
               ExpandableContainer(
                 icon: Iconsax.document_cloud,
                 textTitle: 'Semua Data',
-                content: ListTile(
-                  onTap: () => Get.toNamed('/semua-dooring'),
-                  leading: const Icon(
-                    Iconsax.record,
-                    color: AppColors.darkExpandableContent,
-                  ),
-                  title: Text(
-                    'Semua Dooring',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(color: AppColors.light),
-                  ),
+                content: Column(
+                  children: [
+                    ListTile(
+                      onTap: () => Get.toNamed('/semua-jadwal-kapal'),
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Jadwal Kapal',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () => Get.toNamed('/semua-dooring'),
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Semua Dooring',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             if (user.menu3 == 1)
               ExpandableContainer(
                 icon: Iconsax.add,
-                textTitle: 'Dooring',
-                content: ListTile(
-                  onTap: () => Get.toNamed('/data-dooring'),
-                  leading: const Icon(
-                    Iconsax.record,
-                    color: AppColors.darkExpandableContent,
-                  ),
-                  title: Text(
-                    'Tambah Data',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(color: AppColors.light),
-                  ),
+                textTitle: 'Input Data',
+                content: Column(
+                  children: [
+                    ListTile(
+                      onTap: () => Get.toNamed('/jadwal-kapal'),
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Jadwal Kapal',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () => Get.toNamed('/data-dooring'),
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Dooring',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                    ListTile(
+                      // onTap: () => Get.toNamed('/jadwal-kapal-acc'),
+                      onTap: () {},
+                      leading: const Icon(
+                        Iconsax.record,
+                        color: AppColors.darkExpandableContent,
+                      ),
+                      title: Text(
+                        'Jadwal Kapal ACC',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(color: AppColors.light),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             if (user.menu9 == 1)
