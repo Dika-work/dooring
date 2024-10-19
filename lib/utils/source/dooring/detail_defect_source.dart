@@ -100,12 +100,14 @@ class DetailDefectSource extends DataGridSource {
 
   void _updateDataPager(
       List<DetailDefectModel> detailDefectModel, int startIndex) {
+    this.startIndex = startIndex;
+    index = startIndex;
+
     if (detailDefectModel.first.jumlahInput == 0) {
       print('Model is empty, generating empty rows');
       detailDefectData = _generateEmptyRows(1);
     } else {
       print('Model has data, generating rows based on model');
-      index = 0; // Reset index untuk memastikan data baru diambil dengan benar
       detailDefectData =
           detailDefectModel.skip(startIndex).take(5).map<DataGridRow>(
         (e) {
@@ -124,7 +126,8 @@ class DetailDefectSource extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    _updateDataPager(detailDefectModel, newPageIndex);
+    int skipPage = newPageIndex * 5;
+    _updateDataPager(detailDefectModel, skipPage);
     notifyListeners();
     return true;
   }

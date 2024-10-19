@@ -46,7 +46,7 @@ class DetailDefectController extends GetxController {
           await detailDefectRepo.fectDetailDefectContent(idDefect);
       detailModel.assignAll(dataMotor);
 
-      if (detailModel.isNotEmpty) {
+      if (detailModel.first.jumlahInput != 0) {
         jumlahInput.value = detailModel.length;
       } else {
         jumlahInput.value = 0; // Atau nilai default lainnya

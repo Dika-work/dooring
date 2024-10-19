@@ -27,7 +27,6 @@ class TambahDefectDetail extends StatelessWidget {
         controller.fetchDetailDefect(idDefect);
       },
     );
-
     return Scaffold(
         appBar: AppBar(
           title: Text('Detail Defect Motor',
@@ -196,16 +195,10 @@ class TambahDefectDetail extends StatelessWidget {
                                         child: const Text('Close')),
                                     ElevatedButton(
                                       onPressed: () {
-                                        print(
-                                            'ini no mesin baru : ${noMesinController.text}');
-                                        print(
-                                            'ini no rangka baru : ${noRangkaController.text}');
-                                        print(
-                                            'ini no container baru : ${noContainerController.text}');
                                         controller.editDefectTable(
-                                            model.idDetail,
-                                            model.idDooring,
-                                            idDefect,
+                                            modelDetailDefect.idDetail,
+                                            modelDetailDefect.idDooring,
+                                            modelDetailDefect.idDefect,
                                             noMesinController.text,
                                             noRangkaController.text,
                                             noContainerController.text);
@@ -230,15 +223,20 @@ class TambahDefectDetail extends StatelessWidget {
                         startIndex: 0 * 5,
                       );
 
-                      final bool isTableEmpty = controller.detailModel.isEmpty;
+                      final bool isTableEmpty =
+                          controller.jumlahInput.value == 0;
                       final rowCount = controller.detailModel.length;
 
-                      double gridHeight = 50.0 + (55.0 * 5);
+                      double rowHeight = 55.0; // Fixed height for each row
+                      int maxRowsPerPage = 5; // Maximum number of rows per page
+                      double headerHeight = 53.0; // Height of the header row
 
-                      final double tableHeight = isTableEmpty
-                          ? 110
-                          : 50.0 +
-                              (55.0 * rowCount).clamp(0, gridHeight - 55.0);
+                      final double tableHeight = (isTableEmpty
+                              ? headerHeight +
+                                  rowHeight // Minimum height if table is empty
+                              : headerHeight + (rowHeight * rowCount))
+                          .clamp(headerHeight,
+                              headerHeight + (rowHeight * maxRowsPerPage));
 
                       final emptyTable =
                           controller.detailModel.first.jumlahInput > 0;
@@ -377,20 +375,24 @@ class TambahDefectDetail extends StatelessWidget {
                               ],
                             ),
                           ),
-                          if (rowCount >= 5)
+                          if (rowCount > 5)
                             SfDataPager(
                               delegate: dataSource,
                               pageCount: (controller.detailModel.length / 5)
                                   .ceilToDouble(),
                               direction: Axis.horizontal,
                             ),
+                          if (rowCount > 5)
+                            const SizedBox(height: CustomSize.md),
                         ],
                       );
                     }
                   }),
+                  const SizedBox(height: CustomSize.sm),
                   Obx(() {
                     bool isJumlahSama =
                         controller.jumlahInput.value == model.jumlah;
+
                     return isJumlahSama
                         ? const SizedBox.shrink()
                         : Form(
@@ -398,7 +400,6 @@ class TambahDefectDetail extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: CustomSize.md),
                                 const Text('Nomor Container'),
                                 TextFormField(
                                   controller:
