@@ -359,6 +359,52 @@ class TypeMotorRepository {
     }
   }
 
+  // edit detail defect table
+  Future<void> editDefect(
+    int idDetail,
+    int idDooring,
+    int idDefect,
+    String noMesin,
+    String noRangka,
+    String noCt,
+  ) async {
+    try {
+      final response = await http
+          .put(Uri.parse('${storageUtil.baseURL}/defect_detail.php'), body: {
+        'id_detail': idDetail.toString(),
+        'id_dooring': idDooring.toString(),
+        'id_defect': idDefect.toString(),
+        'no_mesin': noMesin,
+        'no_rangka': noRangka,
+        'no_ct': noCt,
+      });
+
+      if (response.statusCode == 200) {
+        SnackbarLoader.successSnackBar(
+          title: 'Delete Defect✅',
+          message: 'Menambahkan data do harian baru..',
+        );
+      } else if (response.statusCode != 200) {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message: 'Pastikan telah terkoneksi dengan internet😁',
+        );
+      } else {
+        SnackbarLoader.errorSnackBar(
+          title: 'Error',
+          message: 'Something went wrong, please contact developer🥰',
+        );
+      }
+    } catch (e) {
+      SnackbarLoader.errorSnackBar(
+        title: 'Error☠️',
+        message: 'Pastikan sudah terhubung dengan internet 😁',
+      );
+      return;
+    }
+  }
+
   // selesai data defect
   Future<void> selesaiDefect(int idDooring) async {
     try {

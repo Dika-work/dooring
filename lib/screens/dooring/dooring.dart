@@ -428,40 +428,6 @@ class Dooring extends GetView<DooringController> {
           );
         }
       }),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   backgroundColor: AppColors.primary,
-      //   foregroundColor: Colors.black,
-      //   onPressed: () async {
-      //     await Navigator.of(context).push(PageRouteBuilder(
-      //       pageBuilder: (context, animation, secondaryAnimation) =>
-      //           const TambahDooring(),
-      //       transitionsBuilder:
-      //           (context, animation, secondaryAnimation, child) {
-      //         const begin = 0.0;
-      //         const end = 1.0;
-      //         const curve = Curves.easeInOut;
-
-      //         var tween = Tween(begin: begin, end: end).chain(
-      //           CurveTween(curve: curve),
-      //         );
-
-      //         return FadeTransition(
-      //           opacity: animation.drive(tween),
-      //           child: child,
-      //         );
-      //       },
-      //     ));
-      //   },
-      //   icon: const Icon(
-      //     Icons.add,
-      //     color: AppColors.white,
-      //   ),
-      //   label: Text('Tambah Dooring',
-      //       style: Theme.of(context)
-      //           .textTheme
-      //           .titleMedium
-      //           ?.apply(color: AppColors.white)),
-      // ),
     );
   }
 }
@@ -494,833 +460,819 @@ class TambahDefect extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(CustomSize.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Nama Kapal'),
-              TextFormField(
-                controller: TextEditingController(text: model.namaKapal),
-                readOnly: true,
-                decoration: const InputDecoration(
-                    filled: true, fillColor: AppColors.buttonDisabled),
-              ),
-              const SizedBox(height: CustomSize.sm),
-              const Text('ETD'),
-              TextFormField(
-                controller: TextEditingController(
-                    text: CustomHelperFunctions.getFormattedDate(
-                        DateTime.parse(model.etd))),
-                readOnly: true,
-                decoration: const InputDecoration(
-                    filled: true, fillColor: AppColors.buttonDisabled),
-              ),
-              const SizedBox(height: CustomSize.sm),
-              const Text('Tanggal Bongkar'),
-              TextFormField(
-                controller: TextEditingController(
-                    text: CustomHelperFunctions.getFormattedDate(
-                        DateTime.parse(model.tglBongkar))),
-                readOnly: true,
-                decoration: const InputDecoration(
-                    filled: true, fillColor: AppColors.buttonDisabled),
-              ),
-              const SizedBox(height: CustomSize.sm),
-              const Text('Total Unit'),
-              TextFormField(
-                controller: TextEditingController(text: model.unit.toString()),
-                readOnly: true,
-                decoration: const InputDecoration(
-                    filled: true, fillColor: AppColors.buttonDisabled),
-              ),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Obx(() {
-                if (controller.isLoading.value &&
-                    controller.defectModel.isEmpty) {
-                  return const CustomCircularLoader();
-                } else {
-                  final dataSource = DefectSource(
-                    onEdited: (DefectModel modelDefect) {
-                      controller.editJumlahDefectController.text =
-                          modelDefect.jumlah.toString();
-                      CustomDialogs.defaultDialog(
-                          context: context,
-                          contentWidget: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Edit Data Defect',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium),
-                              const SizedBox(height: CustomSize.spaceBtwItems),
-                              Obx(() {
-                                return DropdownSearch<TypeMotorModel>(
-                                  items: controller.filteredMotorModel,
-                                  itemAsString: (TypeMotorModel kendaraan) =>
-                                      kendaraan.typeMotor,
-                                  selectedItem:
-                                      controller.filteredMotorModel.isNotEmpty
-                                          ? controller.filteredMotorModel
-                                              .firstWhere(
-                                              (kendaraan) =>
-                                                  kendaraan.typeMotor ==
-                                                  modelDefect.typeMotor,
-                                              orElse: () => TypeMotorModel(
-                                                idType: 0,
-                                                merk: '',
-                                                typeMotor: '',
-                                              ),
-                                            )
-                                          : null,
-                                  dropdownBuilder:
-                                      (context, TypeMotorModel? selectedItem) {
-                                    return Text(
-                                      selectedItem != null
-                                          ? selectedItem.typeMotor
-                                          : 'Pilih type motor',
-                                      style: TextStyle(
-                                        fontSize: CustomSize.fontSizeSm,
-                                        color: selectedItem == null
-                                            ? Colors.grey
-                                            : Colors.black,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    );
-                                  },
-                                  onChanged: (TypeMotorModel? kendaraan) {
-                                    if (kendaraan != null) {
-                                      controller.selectedMotor.value =
-                                          kendaraan.typeMotor;
-                                      print(
-                                          'ini nama kapal : ${controller.selectedMotor.value}');
-                                    } else {
-                                      controller.resetSelectedKendaraan();
-                                    }
-                                  },
-                                  popupProps: const PopupProps.menu(
-                                    showSearchBox: true,
-                                    searchFieldProps: TextFieldProps(
-                                      decoration: InputDecoration(
-                                        hintText: 'Search Type Motor...',
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                              const SizedBox(height: CustomSize.sm),
-                              Obx(() {
-                                return DropdownSearch<PartMotorModel>(
-                                  items: partMotorController
-                                      .filteredPartMotorModel,
-                                  itemAsString: (PartMotorModel kendaraan) =>
-                                      kendaraan.namaPart,
-                                  selectedItem: partMotorController
-                                          .filteredPartMotorModel.isNotEmpty
-                                      ? partMotorController
-                                          .filteredPartMotorModel
-                                          .firstWhere(
-                                          (kendaraan) =>
-                                              kendaraan.namaPart ==
-                                              modelDefect.part,
-                                          orElse: () => PartMotorModel(
-                                            idPart: 0,
-                                            namaPart: '',
-                                          ),
-                                        )
-                                      : null,
-                                  dropdownBuilder:
-                                      (context, PartMotorModel? selectedItem) {
-                                    return Text(
-                                      selectedItem != null
-                                          ? selectedItem.namaPart
-                                          : 'Pilih part motor',
-                                      style: TextStyle(
-                                        fontSize: CustomSize.fontSizeSm,
-                                        color: selectedItem == null
-                                            ? Colors.grey
-                                            : Colors.black,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    );
-                                  },
-                                  onChanged: (PartMotorModel? kendaraan) {
-                                    if (kendaraan != null) {
-                                      partMotorController.selectedWilayah
-                                          .value = kendaraan.namaPart;
-                                      print(
-                                          'ini nama kapal : ${partMotorController.selectedWilayah.value}');
-                                    } else {
-                                      partMotorController
-                                          .resetSelectedKendaraan();
-                                    }
-                                  },
-                                  popupProps: const PopupProps.menu(
-                                    showSearchBox: true,
-                                    searchFieldProps: TextFieldProps(
-                                      decoration: InputDecoration(
-                                        hintText: 'Search part motor...',
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                controller:
-                                    controller.editJumlahDefectController,
-                                decoration: const InputDecoration(
-                                    label: Text('Jumlah')),
-                                onChanged: (value) {
-                                  controller.editJumlahDefectController.text =
-                                      value;
-                                },
-                              ),
-                              const SizedBox(
-                                  height: CustomSize.spaceBtwSections),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  OutlinedButton(
-                                      onPressed: () => Get.back(),
-                                      style: OutlinedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: CustomSize.lg,
-                                              vertical: CustomSize.md)),
-                                      child: const Text('Close')),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // print(
-                                      //     'ini id defect: ${modelDefect.idDefect}');
-                                      // print(
-                                      //     'ini id dooring: ${modelDefect.idDooring}');
-                                      // print(
-                                      //     'ini type motor yg di pilih: ${controller.selectedMotor.value}');
-                                      // print(
-                                      //     'ini part yg dipilih: ${partMotorController.selectedWilayah.value}');
-                                      // print(
-                                      //     'ini jumlah yang di masukkan ${controller.editJumlahDefectController.text}');
-                                      controller.editDataDefect(
-                                          modelDefect.idDefect,
-                                          modelDefect.idDooring,
-                                          controller.selectedMotor.value,
-                                          partMotorController
-                                              .selectedWilayah.value,
-                                          controller
-                                              .editJumlahDefectController.text);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: CustomSize.lg,
-                                            vertical: CustomSize.md)),
-                                    child: const Text('Tambahkan'),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ));
-                    },
-                    onAdded: (DefectModel modelDefect) {
-                      Get.to(() =>
-                          TambahDefectDetail(idDefect: modelDefect.idDefect));
-                    },
-                    onDeleted: (DefectModel modelDefect) =>
-                        CustomDialogs.deleteDialog(
-                            context: context,
-                            onConfirm: () =>
-                                detailDefectController.deleteDefectTable(
-                                    modelDefect.idDefect,
-                                    modelDefect.idDooring)),
-                    onLihat: (DefectModel modelDefect) {
-                      detailDefectController
-                          .fetchDetailDefect(modelDefect.idDefect);
-                      CustomDialogs.defaultDialog(
-                          context: context,
-                          contentWidget: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Detail Rincian Defect',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium),
-                              const SizedBox(height: CustomSize.spaceBtwItems),
-                              TextFormField(
-                                controller: TextEditingController(
-                                    text: modelDefect.typeMotor),
-                                decoration: const InputDecoration(
-                                    label: Text('Type Motor')),
-                              ),
-                              const SizedBox(height: CustomSize.sm),
-                              TextFormField(
-                                controller: TextEditingController(
-                                    text: modelDefect.part),
-                                decoration: const InputDecoration(
-                                    label: Text('Part Motor')),
-                              ),
-                              const SizedBox(height: CustomSize.sm),
-                              TextFormField(
-                                controller: TextEditingController(
-                                    text: modelDefect.jumlah.toString()),
-                                decoration: const InputDecoration(
-                                    label: Text('Jumlah')),
-                              ),
-                              const SizedBox(height: CustomSize.defaultSpace),
-                              Obx(() {
-                                if (detailDefectController.isLoading.value &&
-                                    detailDefectController
-                                        .detailModel.isEmpty) {
-                                  return const CustomCircularLoader();
-                                } else {
-                                  final dataSource = LihatDefectSource(
-                                      detailDefectModel:
-                                          detailDefectController.detailModel);
+      body: ListView(
+        padding: const EdgeInsets.all(CustomSize.md),
+        children: [
+          const Text('Nama Kapal'),
+          TextFormField(
+            controller: TextEditingController(text: model.namaKapal),
+            readOnly: true,
+            decoration: const InputDecoration(
+                filled: true, fillColor: AppColors.buttonDisabled),
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('ETD'),
+          TextFormField(
+            controller: TextEditingController(
+                text: CustomHelperFunctions.getFormattedDate(
+                    DateTime.parse(model.etd))),
+            readOnly: true,
+            decoration: const InputDecoration(
+                filled: true, fillColor: AppColors.buttonDisabled),
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('Tanggal Bongkar'),
+          TextFormField(
+            controller: TextEditingController(
+                text: CustomHelperFunctions.getFormattedDate(
+                    DateTime.parse(model.tglBongkar))),
+            readOnly: true,
+            decoration: const InputDecoration(
+                filled: true, fillColor: AppColors.buttonDisabled),
+          ),
+          const SizedBox(height: CustomSize.sm),
+          const Text('Total Unit'),
+          TextFormField(
+            controller: TextEditingController(text: model.unit.toString()),
+            readOnly: true,
+            decoration: const InputDecoration(
+                filled: true, fillColor: AppColors.buttonDisabled),
+          ),
+          const SizedBox(height: CustomSize.sm),
+          Obx(() {
+            if (controller.isLoading.value && controller.defectModel.isEmpty) {
+              return const CustomCircularLoader();
+            } else {
+              final dataSource = DefectSource(
+                // Your edited onEdited code with the validation for jumlahInput
+                onEdited: (DefectModel modelDefect) {
+                  // Set default jumlah from modelDefect
+                  controller.editJumlahDefectController.text =
+                      modelDefect.jumlah.toString();
 
-                                  final bool isTableEmpty =
-                                      detailDefectController
-                                          .detailModel.isEmpty;
-                                  final rowCount =
-                                      detailDefectController.detailModel.length;
+                  // Assuming jumlahInput is already fetched and stored in DetailDefectController
+                  final int jumlahInput =
+                      detailDefectController.jumlahInput.value;
 
-                                  double gridHeight = 50.0 + (55.0 * 5);
-
-                                  final double tableHeight = isTableEmpty
-                                      ? 110
-                                      : 50.0 +
-                                          (55.0 * rowCount)
-                                              .clamp(0, gridHeight - 55.0);
-
-                                  return Column(
-                                    children: [
-                                      SizedBox(
-                                        height: tableHeight,
-                                        child: SfDataGrid(
-                                            source: dataSource,
-                                            columnWidthMode:
-                                                ColumnWidthMode.fill,
-                                            gridLinesVisibility:
-                                                GridLinesVisibility.both,
-                                            headerGridLinesVisibility:
-                                                GridLinesVisibility.both,
-                                            verticalScrollPhysics:
-                                                const NeverScrollableScrollPhysics(),
-                                            columns: [
-                                              GridColumn(
-                                                columnName: 'No',
-                                                label: Container(
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                    color: Colors
-                                                        .lightBlue.shade100,
-                                                  ),
-                                                  child: Text(
-                                                    'No',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                              GridColumn(
-                                                columnName: 'No Mesin',
-                                                label: Container(
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                    color: Colors
-                                                        .lightBlue.shade100,
-                                                  ),
-                                                  child: Text(
-                                                    'No Mesin',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                              GridColumn(
-                                                columnName: 'No Rangka',
-                                                label: Container(
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                    color: Colors
-                                                        .lightBlue.shade100,
-                                                  ),
-                                                  child: Text(
-                                                    'No Rangka',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ]),
-                                      ),
-                                      if (rowCount >= 5)
-                                        SfDataPager(
-                                          delegate: dataSource,
-                                          pageCount: (detailDefectController
-                                                      .detailModel.length /
-                                                  5)
-                                              .ceilToDouble(),
-                                          direction: Axis.horizontal,
-                                        ),
-                                    ],
-                                  );
-                                }
-                              }),
-                              const SizedBox(
-                                  height: CustomSize.spaceBtwInputFields),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: OutlinedButton(
-                                  onPressed: () => Get.back(),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: CustomSize.xl,
-                                        vertical: CustomSize.md),
-                                  ),
-                                  child: const Text(
-                                    'Close',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ));
-                    },
-                    defectModel: controller.defectModel,
-                    startIndex: 0 * 5,
+                  // Variables to store the selected values
+                  TypeMotorModel? selectedMotor =
+                      controller.filteredMotorModel.firstWhere(
+                    (kendaraan) => kendaraan.typeMotor == modelDefect.typeMotor,
+                    orElse: () =>
+                        TypeMotorModel(idType: 0, merk: '', typeMotor: ''),
                   );
 
-                  final bool isTableEmpty = controller.defectModel.isEmpty;
-                  final rowCount = controller.defectModel.length;
+                  PartMotorModel? selectedPart =
+                      partMotorController.filteredPartMotorModel.firstWhere(
+                    (part) => part.namaPart == modelDefect.part,
+                    orElse: () => PartMotorModel(idPart: 0, namaPart: ''),
+                  );
 
-                  double gridHeight = 50.0 + (55.0 * 5);
+                  CustomDialogs.defaultDialog(
+                    context: context,
+                    contentWidget: Form(
+                      key: detailDefectController.detailDefectKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Edit Data Defect',
+                              style:
+                                  Theme.of(context).textTheme.headlineMedium),
+                          const SizedBox(height: CustomSize.spaceBtwItems),
 
-                  final double tableHeight = isTableEmpty
-                      ? 110
-                      : 50.0 + (55.0 * rowCount).clamp(0, gridHeight - 55.0);
+                          // Dropdown for selecting Type Motor
+                          DropdownSearch<TypeMotorModel>(
+                            items: controller.filteredMotorModel,
+                            itemAsString: (TypeMotorModel kendaraan) =>
+                                kendaraan.typeMotor,
+                            selectedItem: selectedMotor,
+                            dropdownBuilder:
+                                (context, TypeMotorModel? selectedItem) {
+                              return Text(
+                                selectedItem != null
+                                    ? selectedItem.typeMotor
+                                    : 'Pilih type motor',
+                                style: TextStyle(
+                                  fontSize: CustomSize.fontSizeSm,
+                                  color: selectedItem == null
+                                      ? Colors.grey
+                                      : Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              );
+                            },
+                            onChanged: (TypeMotorModel? kendaraan) {
+                              selectedMotor = kendaraan;
+                            },
+                            popupProps: const PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                    hintText: 'Search Type Motor...'),
+                              ),
+                            ),
+                          ),
 
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: tableHeight,
-                        child: SfDataGrid(
-                          source: dataSource,
-                          verticalScrollPhysics:
-                              const NeverScrollableScrollPhysics(),
-                          columnWidthMode: isTableEmpty
-                              ? ColumnWidthMode.fill
-                              : ColumnWidthMode.auto,
-                          gridLinesVisibility: GridLinesVisibility.both,
-                          headerGridLinesVisibility: GridLinesVisibility.both,
-                          columns: [
-                            GridColumn(
-                              columnName: 'No',
-                              label: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  color: Colors.lightBlue.shade100,
+                          const SizedBox(height: CustomSize.sm),
+
+                          // Dropdown for selecting Part Motor
+                          DropdownSearch<PartMotorModel>(
+                            items: partMotorController.filteredPartMotorModel,
+                            itemAsString: (PartMotorModel part) =>
+                                part.namaPart,
+                            selectedItem: selectedPart,
+                            dropdownBuilder:
+                                (context, PartMotorModel? selectedItem) {
+                              return Text(
+                                selectedItem != null
+                                    ? selectedItem.namaPart
+                                    : 'Pilih part motor',
+                                style: TextStyle(
+                                  fontSize: CustomSize.fontSizeSm,
+                                  color: selectedItem == null
+                                      ? Colors.grey
+                                      : Colors.black,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                child: Text(
-                                  'No',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
+                              );
+                            },
+                            onChanged: (PartMotorModel? part) {
+                              selectedPart = part;
+                            },
+                            popupProps: const PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                    hintText: 'Search part motor...'),
                               ),
                             ),
-                            GridColumn(
-                              columnName: 'Type Motor',
-                              label: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  color: Colors.lightBlue.shade100,
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Input for jumlah with validation
+                          TextFormField(
+                            controller: controller.editJumlahDefectController,
+                            decoration:
+                                const InputDecoration(label: Text('Jumlah')),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Jumlah tidak boleh kosong';
+                              }
+                              int? inputJumlah = int.tryParse(value);
+                              if (inputJumlah == null) {
+                                return 'Jumlah harus berupa angka';
+                              }
+                              if (inputJumlah < jumlahInput) {
+                                return 'Jumlah tidak boleh kurang dari $jumlahInput';
+                              }
+                              return null; // Valid
+                            },
+                            onChanged: (value) {
+                              controller.editJumlahDefectController.text =
+                                  value;
+                            },
+                          ),
+
+                          const SizedBox(height: CustomSize.spaceBtwSections),
+
+                          // Action buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              OutlinedButton(
+                                onPressed: () => Get.back(),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: CustomSize.lg,
+                                      vertical: CustomSize.md),
                                 ),
-                                child: Text(
-                                  'Type Motor',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                child: const Text('Close'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Validate inputs
+                                  if (selectedMotor != null &&
+                                      selectedPart != null &&
+                                      detailDefectController
+                                          .detailDefectKey.currentState!
+                                          .validate()) {
+                                    controller.editDataDefect(
+                                      modelDefect.idDefect,
+                                      modelDefect.idDooring,
+                                      selectedMotor!.typeMotor,
+                                      selectedPart!.namaPart,
+                                      controller
+                                          .editJumlahDefectController.text,
+                                    );
+                                  } else {
+                                    SnackbarLoader.errorSnackBar(
+                                        title: 'Oops',
+                                        message:
+                                            'Jumlah tidak boleh kurang dari jumpah input sebelumnya');
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: CustomSize.lg,
+                                      vertical: CustomSize.md),
                                 ),
+                                child: const Text('Tambahkan'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+
+                onAdded: (DefectModel modelDefect) {
+                  Get.to(
+                      () => TambahDefectDetail(idDefect: modelDefect.idDefect));
+                },
+                onDeleted: (DefectModel modelDefect) =>
+                    CustomDialogs.deleteDialog(
+                        context: context,
+                        onConfirm: () =>
+                            detailDefectController.deleteDefectTable(
+                                modelDefect.idDefect, modelDefect.idDooring)),
+                onLihat: (DefectModel modelDefect) {
+                  detailDefectController
+                      .fetchDetailDefect(modelDefect.idDefect);
+                  CustomDialogs.defaultDialog(
+                      context: context,
+                      contentWidget: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Detail Rincian Defect',
+                              style:
+                                  Theme.of(context).textTheme.headlineMedium),
+                          const SizedBox(height: CustomSize.spaceBtwItems),
+                          TextFormField(
+                            controller: TextEditingController(
+                                text: modelDefect.typeMotor),
+                            decoration: const InputDecoration(
+                                label: Text('Type Motor')),
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          TextFormField(
+                            controller:
+                                TextEditingController(text: modelDefect.part),
+                            decoration: const InputDecoration(
+                                label: Text('Part Motor')),
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          TextFormField(
+                            controller: TextEditingController(
+                                text: modelDefect.jumlah.toString()),
+                            decoration:
+                                const InputDecoration(label: Text('Jumlah')),
+                          ),
+                          const SizedBox(height: CustomSize.defaultSpace),
+                          Obx(() {
+                            if (detailDefectController.isLoading.value &&
+                                detailDefectController.detailModel.isEmpty) {
+                              return const CustomCircularLoader();
+                            } else {
+                              final dataSource = LihatDefectSource(
+                                  detailDefectModel:
+                                      detailDefectController.detailModel);
+
+                              final bool isTableEmpty =
+                                  detailDefectController.detailModel.isEmpty;
+                              final rowCount =
+                                  detailDefectController.detailModel.length;
+
+                              double gridHeight = 50.0 + (55.0 * 5);
+
+                              final double tableHeight = isTableEmpty
+                                  ? 110
+                                  : 50.0 +
+                                      (55.0 * rowCount)
+                                          .clamp(0, gridHeight - 55.0);
+
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    height: tableHeight,
+                                    child: SfDataGrid(
+                                        source: dataSource,
+                                        columnWidthMode: ColumnWidthMode.fill,
+                                        gridLinesVisibility:
+                                            GridLinesVisibility.both,
+                                        headerGridLinesVisibility:
+                                            GridLinesVisibility.both,
+                                        verticalScrollPhysics:
+                                            const NeverScrollableScrollPhysics(),
+                                        columns: [
+                                          GridColumn(
+                                            columnName: 'No',
+                                            label: Container(
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                                color:
+                                                    Colors.lightBlue.shade100,
+                                              ),
+                                              child: Text(
+                                                'No',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                          GridColumn(
+                                            columnName: 'No Mesin',
+                                            label: Container(
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                                color:
+                                                    Colors.lightBlue.shade100,
+                                              ),
+                                              child: Text(
+                                                'No Mesin',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                          GridColumn(
+                                            columnName: 'No Rangka',
+                                            label: Container(
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                                color:
+                                                    Colors.lightBlue.shade100,
+                                              ),
+                                              child: Text(
+                                                'No Rangka',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                  ),
+                                  if (rowCount >= 5)
+                                    SfDataPager(
+                                      delegate: dataSource,
+                                      pageCount: (detailDefectController
+                                                  .detailModel.length /
+                                              5)
+                                          .ceilToDouble(),
+                                      direction: Axis.horizontal,
+                                    ),
+                                ],
+                              );
+                            }
+                          }),
+                          const SizedBox(
+                              height: CustomSize.spaceBtwInputFields),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: CustomSize.xl,
+                                    vertical: CustomSize.md),
+                              ),
+                              child: const Text(
+                                'Close',
                               ),
                             ),
-                            GridColumn(
-                              columnName: 'Part Motor',
-                              label: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  color: Colors.lightBlue.shade100,
-                                ),
-                                child: Text(
-                                  'Part Motor',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
+                          ),
+                        ],
+                      ));
+                },
+                defectModel: controller.defectModel,
+                startIndex: 0 * 5,
+              );
+
+              final bool isTableEmpty = controller.defectModel.isEmpty;
+              final rowCount = controller.defectModel.length;
+
+              double gridHeight = 50.0 + (55.0 * 5);
+
+              final double tableHeight = isTableEmpty
+                  ? 110
+                  : 50.0 + (55.0 * rowCount).clamp(0, gridHeight - 55.0);
+
+              return Column(
+                children: [
+                  SizedBox(
+                    height: tableHeight,
+                    child: SfDataGrid(
+                      source: dataSource,
+                      verticalScrollPhysics:
+                          const NeverScrollableScrollPhysics(),
+                      columnWidthMode: isTableEmpty
+                          ? ColumnWidthMode.fill
+                          : ColumnWidthMode.auto,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      columns: [
+                        GridColumn(
+                          columnName: 'No',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'No',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          columnName: 'Type Motor',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Type Motor',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          columnName: 'Part Motor',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Part Motor',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          columnName: 'Jml',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Jml',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        if (controller.defectModel.isNotEmpty)
+                          GridColumn(
+                            columnName: 'Lihat',
+                            label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'Lihat',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ),
-                            GridColumn(
-                              columnName: 'Jml',
-                              label: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  color: Colors.lightBlue.shade100,
-                                ),
-                                child: Text(
-                                  'Jml',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
+                          ),
+                        if (controller.defectModel.isNotEmpty)
+                          GridColumn(
+                            columnName: 'Add',
+                            label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
+                              ),
+                              child: Text(
+                                'Add',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ),
-                            if (controller.defectModel.isNotEmpty)
-                              GridColumn(
-                                columnName: 'Lihat',
-                                label: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.lightBlue.shade100,
-                                  ),
-                                  child: Text(
-                                    'Lihat',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ),
+                          ),
+                        if (controller.defectModel.isNotEmpty)
+                          GridColumn(
+                            columnName: 'Edit',
+                            label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
                               ),
-                            if (controller.defectModel.isNotEmpty)
-                              GridColumn(
-                                columnName: 'Add',
-                                label: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.lightBlue.shade100,
-                                  ),
-                                  child: Text(
-                                    'Add',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ),
+                              child: Text(
+                                'Edit',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
-                            if (controller.defectModel.isNotEmpty)
-                              GridColumn(
-                                columnName: 'Edit',
-                                label: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.lightBlue.shade100,
-                                  ),
-                                  child: Text(
-                                    'Edit',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ),
+                            ),
+                          ),
+                        if (controller.defectModel.isNotEmpty)
+                          GridColumn(
+                            columnName: 'Hps',
+                            label: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.lightBlue.shade100,
                               ),
-                            if (controller.defectModel.isNotEmpty)
-                              GridColumn(
-                                columnName: 'Hps',
-                                label: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.lightBlue.shade100,
-                                  ),
-                                  child: Text(
-                                    'Hps',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ),
+                              child: Text(
+                                'Hps',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
-                          ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (rowCount > 5)
+                    SfDataPager(
+                      delegate: dataSource,
+                      pageCount:
+                          (controller.defectModel.length / 5).ceilToDouble(),
+                      direction: Axis.horizontal,
+                    ),
+                ],
+              );
+            }
+          }),
+          const SizedBox(height: CustomSize.sm),
+          Form(
+            key: controller.addDefectKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Obx(() {
+                  return DropdownSearch<TypeMotorModel>(
+                    items: controller.filteredMotorModel,
+                    itemAsString: (TypeMotorModel kendaraan) =>
+                        kendaraan.typeMotor,
+                    selectedItem: controller.selectedMotor.value.isNotEmpty
+                        ? controller.filteredMotorModel.firstWhere(
+                            (kendaraan) =>
+                                kendaraan.typeMotor ==
+                                controller.selectedMotor.value,
+                            orElse: () => TypeMotorModel(
+                              idType: 0,
+                              merk: '',
+                              typeMotor: '',
+                            ),
+                          )
+                        : null,
+                    dropdownBuilder: (context, TypeMotorModel? selectedItem) {
+                      return Text(
+                        selectedItem != null
+                            ? selectedItem.typeMotor
+                            : 'Pilih type motor',
+                        style: TextStyle(
+                            fontSize: CustomSize.fontSizeSm,
+                            color: selectedItem == null
+                                ? Colors.grey
+                                : Colors.black,
+                            fontWeight: FontWeight.w600),
+                      );
+                    },
+                    onChanged: (TypeMotorModel? kendaraan) {
+                      if (kendaraan != null) {
+                        controller.selectedMotor.value = kendaraan.typeMotor;
+                        print(
+                            'ini nama kapal : ${controller.selectedMotor.value}');
+                      } else {
+                        controller.resetSelectedKendaraan();
+                      }
+                    },
+                    popupProps: const PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: TextFieldProps(
+                        decoration: InputDecoration(
+                          hintText: 'Search Type Motor...',
                         ),
                       ),
-                      if (rowCount > 5)
-                        SfDataPager(
-                          delegate: dataSource,
-                          pageCount: (controller.defectModel.length / 5)
-                              .ceilToDouble(),
-                          direction: Axis.horizontal,
+                    ),
+                  );
+                }),
+                const SizedBox(height: CustomSize.sm),
+                Obx(() {
+                  return DropdownSearch<PartMotorModel>(
+                    items: partMotorController.filteredPartMotorModel,
+                    itemAsString: (PartMotorModel kendaraan) =>
+                        kendaraan.namaPart,
+                    selectedItem: partMotorController
+                            .selectedWilayah.value.isNotEmpty
+                        ? partMotorController.filteredPartMotorModel.firstWhere(
+                            (kendaraan) =>
+                                kendaraan.namaPart ==
+                                partMotorController.selectedWilayah.value,
+                            orElse: () => PartMotorModel(
+                              idPart: 0,
+                              namaPart: '',
+                            ),
+                          )
+                        : null,
+                    dropdownBuilder: (context, PartMotorModel? selectedItem) {
+                      return Text(
+                        selectedItem != null
+                            ? selectedItem.namaPart
+                            : 'Pilih part motor',
+                        style: TextStyle(
+                            fontSize: CustomSize.fontSizeSm,
+                            color: selectedItem == null
+                                ? Colors.grey
+                                : Colors.black,
+                            fontWeight: FontWeight.w600),
+                      );
+                    },
+                    onChanged: (PartMotorModel? kendaraan) {
+                      if (kendaraan != null) {
+                        partMotorController.selectedWilayah.value =
+                            kendaraan.namaPart;
+                        print(
+                            'ini nama kapal : ${partMotorController.selectedWilayah.value}');
+                      } else {
+                        partMotorController.resetSelectedKendaraan();
+                      }
+                    },
+                    popupProps: const PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: TextFieldProps(
+                        decoration: InputDecoration(
+                          hintText: 'Search part motor...',
                         ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: CustomSize.sm),
+                const Text('Jumlah'),
+                TextFormField(
+                  controller: controller.jumlahDefectController,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Data tidak boleh kosong!';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: CustomSize.spaceBtwItems),
+                Obx(() {
+                  bool checkStDetail = controller.defectModel
+                      .any((element) => element.status == 0);
+
+                  return Row(
+                    children: [
+                      Expanded(
+                        flex: 2, // Tombol selesai flex 2
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Get.back();
+                          },
+                          style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.success)),
+                          child: const Text(
+                            'Kembali',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                          width: CustomSize.sm), // Jarak antar tombol
+                      Expanded(
+                        flex:
+                            1, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (!controller.addDefectKey.currentState!
+                                    .validate() ||
+                                controller.selectedMotor.value.isEmpty ||
+                                partMotorController
+                                    .selectedWilayah.value.isEmpty) {
+                              SnackbarLoader.warningSnackBar(
+                                  title: 'Oops 🤣',
+                                  message:
+                                      'Harap mengisi seluruh form yang ada');
+                              return;
+                            }
+                            controller.addDataDefect(
+                              model.idDooring,
+                              CustomHelperFunctions.formattedTime,
+                              CustomHelperFunctions.getFormattedDateDatabase(
+                                  DateTime.now()),
+                              controller.selectedMotor.value,
+                              partMotorController.selectedWilayah.value,
+                              int.parse(controller.jumlahDefectController.text
+                                  .trim()),
+                            );
+                          },
+                          // onPressed: () {
+                          //   print('ini id dooring: ${model.idDooring}');
+                          //   print(
+                          //       'ini jam dooring: ${CustomHelperFunctions.formattedTime}');
+                          //   print(
+                          //       'ini tgl dooring: ${CustomHelperFunctions.getFormattedDateDatabase(DateTime.now())}');
+                          //   print(
+                          //       'ini typeMotor dooring: ${controller.selectedMotor.value}');
+                          //   print(
+                          //       'ini part dooring: ${partMotorController.selectedWilayah.value}');
+                          //   print(
+                          //       'ini jumlah dooring: ${int.parse(controller.jumlahDefectController.text)}');
+                          // },
+                          child: const Text(
+                            'Tambah',
+                          ),
+                        ),
+                      ),
+                      if (controller.defectModel.isNotEmpty && !checkStDetail)
+                        const SizedBox(width: CustomSize.sm),
+                      Visibility(
+                          visible: controller.defectModel.isNotEmpty &&
+                              !checkStDetail,
+                          child: Expanded(
+                            flex: 1,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  CustomDialogs.konfirmasiDialog(
+                                    context: context,
+                                    onConfirm: () => controller
+                                        .selesaiDefect(model.idDooring),
+                                  );
+                                },
+                                child: const Text('Selesai')),
+                          ))
                     ],
                   );
-                }
-              }),
-              const SizedBox(height: CustomSize.spaceBtwItems),
-              Form(
-                key: controller.addDefectKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Obx(() {
-                      return DropdownSearch<TypeMotorModel>(
-                        items: controller.filteredMotorModel,
-                        itemAsString: (TypeMotorModel kendaraan) =>
-                            kendaraan.typeMotor,
-                        selectedItem: controller.selectedMotor.value.isNotEmpty
-                            ? controller.filteredMotorModel.firstWhere(
-                                (kendaraan) =>
-                                    kendaraan.typeMotor ==
-                                    controller.selectedMotor.value,
-                                orElse: () => TypeMotorModel(
-                                  idType: 0,
-                                  merk: '',
-                                  typeMotor: '',
-                                ),
-                              )
-                            : null,
-                        dropdownBuilder:
-                            (context, TypeMotorModel? selectedItem) {
-                          return Text(
-                            selectedItem != null
-                                ? selectedItem.typeMotor
-                                : 'Pilih type motor',
-                            style: TextStyle(
-                                fontSize: CustomSize.fontSizeSm,
-                                color: selectedItem == null
-                                    ? Colors.grey
-                                    : Colors.black,
-                                fontWeight: FontWeight.w600),
-                          );
-                        },
-                        onChanged: (TypeMotorModel? kendaraan) {
-                          if (kendaraan != null) {
-                            controller.selectedMotor.value =
-                                kendaraan.typeMotor;
-                            print(
-                                'ini nama kapal : ${controller.selectedMotor.value}');
-                          } else {
-                            controller.resetSelectedKendaraan();
-                          }
-                        },
-                        popupProps: const PopupProps.menu(
-                          showSearchBox: true,
-                          searchFieldProps: TextFieldProps(
-                            decoration: InputDecoration(
-                              hintText: 'Search Type Motor...',
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: CustomSize.sm),
-                    Obx(() {
-                      return DropdownSearch<PartMotorModel>(
-                        items: partMotorController.filteredPartMotorModel,
-                        itemAsString: (PartMotorModel kendaraan) =>
-                            kendaraan.namaPart,
-                        selectedItem: partMotorController
-                                .selectedWilayah.value.isNotEmpty
-                            ? partMotorController.filteredPartMotorModel
-                                .firstWhere(
-                                (kendaraan) =>
-                                    kendaraan.namaPart ==
-                                    partMotorController.selectedWilayah.value,
-                                orElse: () => PartMotorModel(
-                                  idPart: 0,
-                                  namaPart: '',
-                                ),
-                              )
-                            : null,
-                        dropdownBuilder:
-                            (context, PartMotorModel? selectedItem) {
-                          return Text(
-                            selectedItem != null
-                                ? selectedItem.namaPart
-                                : 'Pilih part motor',
-                            style: TextStyle(
-                                fontSize: CustomSize.fontSizeSm,
-                                color: selectedItem == null
-                                    ? Colors.grey
-                                    : Colors.black,
-                                fontWeight: FontWeight.w600),
-                          );
-                        },
-                        onChanged: (PartMotorModel? kendaraan) {
-                          if (kendaraan != null) {
-                            partMotorController.selectedWilayah.value =
-                                kendaraan.namaPart;
-                            print(
-                                'ini nama kapal : ${partMotorController.selectedWilayah.value}');
-                          } else {
-                            partMotorController.resetSelectedKendaraan();
-                          }
-                        },
-                        popupProps: const PopupProps.menu(
-                          showSearchBox: true,
-                          searchFieldProps: TextFieldProps(
-                            decoration: InputDecoration(
-                              hintText: 'Search part motor...',
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: CustomSize.sm),
-                    const Text('Jumlah'),
-                    TextFormField(
-                      controller: controller.jumlahDefectController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Data tidak boleh kosong!';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.spaceBtwItems),
-                    Obx(() {
-                      bool checkStDetail = controller.defectModel
-                          .any((element) => element.status == 0);
-
-                      return Row(
-                        children: [
-                          Expanded(
-                            flex: 2, // Tombol selesai flex 2
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(
-                                      color: AppColors.success)),
-                              child: const Text(
-                                'Kembali',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                              width: CustomSize.sm), // Jarak antar tombol
-                          Expanded(
-                            flex:
-                                1, // Tombol tambah flex 1 jika ada data, flex 3 jika tidak ada
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (!controller.addDefectKey.currentState!
-                                        .validate() ||
-                                    controller.selectedMotor.value.isEmpty ||
-                                    partMotorController
-                                        .selectedWilayah.value.isEmpty) {
-                                  SnackbarLoader.warningSnackBar(
-                                      title: 'Oops 🤣',
-                                      message:
-                                          'Harap mengisi seluruh form yang ada');
-                                  return;
-                                }
-                                controller.addDataDefect(
-                                  model.idDooring,
-                                  CustomHelperFunctions.formattedTime,
-                                  CustomHelperFunctions
-                                      .getFormattedDateDatabase(DateTime.now()),
-                                  controller.selectedMotor.value,
-                                  partMotorController.selectedWilayah.value,
-                                  int.parse(controller
-                                      .jumlahDefectController.text
-                                      .trim()),
-                                );
-                              },
-                              // onPressed: () {
-                              //   print('ini id dooring: ${model.idDooring}');
-                              //   print(
-                              //       'ini jam dooring: ${CustomHelperFunctions.formattedTime}');
-                              //   print(
-                              //       'ini tgl dooring: ${CustomHelperFunctions.getFormattedDateDatabase(DateTime.now())}');
-                              //   print(
-                              //       'ini typeMotor dooring: ${controller.selectedMotor.value}');
-                              //   print(
-                              //       'ini part dooring: ${partMotorController.selectedWilayah.value}');
-                              //   print(
-                              //       'ini jumlah dooring: ${int.parse(controller.jumlahDefectController.text)}');
-                              // },
-                              child: const Text(
-                                'Tambah',
-                              ),
-                            ),
-                          ),
-                          if (controller.defectModel.isNotEmpty &&
-                              !checkStDetail)
-                            const SizedBox(width: CustomSize.sm),
-                          Visibility(
-                              visible: controller.defectModel.isNotEmpty &&
-                                  !checkStDetail,
-                              child: Expanded(
-                                flex: 1,
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      CustomDialogs.konfirmasiDialog(
-                                        context: context,
-                                        onConfirm: () => controller
-                                            .selesaiDefect(model.idDooring),
-                                      );
-                                    },
-                                    child: const Text('Selesai')),
-                              ))
-                        ],
-                      );
-                    }),
-                  ],
-                ),
-              )
-            ],
+                }),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

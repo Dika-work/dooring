@@ -18,6 +18,9 @@ class TambahDefectDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DetailDefectController());
+    final TextEditingController noMesinController = TextEditingController();
+    final TextEditingController noRangkaController = TextEditingController();
+    final TextEditingController noContainerController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
@@ -138,34 +141,44 @@ class TambahDefectDetail extends StatelessWidget {
                     } else {
                       final dataSource = DetailDefectSource(
                         onEdited: (DetailDefectModel modelDetailDefect) {
+                          noMesinController.text = modelDetailDefect.noMesin;
+                          noRangkaController.text = modelDetailDefect.noRangka;
+                          noContainerController.text = modelDetailDefect.noCT;
                           CustomDialogs.defaultDialog(
                             context: context,
                             contentWidget: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('Detail Data Deffect',
+                                Text('Detail Data Defect',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineMedium),
                                 const SizedBox(
                                     height: CustomSize.spaceBtwItems),
                                 TextFormField(
-                                  controller: controller.nomorMesinController,
+                                  controller: noContainerController,
                                   decoration: const InputDecoration(
-                                      label: Text('No Mesin')),
+                                      label: Text('No Container')),
                                   onChanged: (value) {
-                                    controller.nomorMesinController.text =
-                                        value;
+                                    noContainerController.text = value;
                                   },
                                 ),
                                 const SizedBox(height: CustomSize.sm),
                                 TextFormField(
-                                  controller: controller.nomorRangkaController,
+                                  controller: noMesinController,
+                                  decoration: const InputDecoration(
+                                      label: Text('No Mesin')),
+                                  onChanged: (value) {
+                                    noMesinController.text = value;
+                                  },
+                                ),
+                                const SizedBox(height: CustomSize.sm),
+                                TextFormField(
+                                  controller: noRangkaController,
                                   decoration: const InputDecoration(
                                       label: Text('No Rangka')),
                                   onChanged: (value) {
-                                    controller.nomorMesinController.text =
-                                        value;
+                                    noRangkaController.text = value;
                                   },
                                 ),
                                 const SizedBox(
@@ -183,7 +196,19 @@ class TambahDefectDetail extends StatelessWidget {
                                         child: const Text('Close')),
                                     ElevatedButton(
                                       onPressed: () {
-                                        print('nambah data wilayah');
+                                        print(
+                                            'ini no mesin baru : ${noMesinController.text}');
+                                        print(
+                                            'ini no rangka baru : ${noRangkaController.text}');
+                                        print(
+                                            'ini no container baru : ${noContainerController.text}');
+                                        controller.editDefectTable(
+                                            model.idDetail,
+                                            model.idDooring,
+                                            idDefect,
+                                            noMesinController.text,
+                                            noRangkaController.text,
+                                            noContainerController.text);
                                       },
                                       style: ElevatedButton.styleFrom(
                                           padding: const EdgeInsets.symmetric(
@@ -378,9 +403,10 @@ class TambahDefectDetail extends StatelessWidget {
                                 TextFormField(
                                   controller:
                                       controller.nomorContainerController,
+                                  keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Field ini harus di isi';
+                                      return 'Bagian ini harus di isi';
                                     }
                                     return null;
                                   },
@@ -389,9 +415,10 @@ class TambahDefectDetail extends StatelessWidget {
                                 const Text('Nomor Mesin'),
                                 TextFormField(
                                   controller: controller.nomorMesinController,
+                                  keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Field ini harus di isi';
+                                      return 'Bagian ini harus di isi';
                                     }
                                     return null;
                                   },
@@ -400,9 +427,10 @@ class TambahDefectDetail extends StatelessWidget {
                                 const Text('Nomor Rangka'),
                                 TextFormField(
                                   controller: controller.nomorRangkaController,
+                                  keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Field ini harus di isi';
+                                      return 'Bagian ini harus di isi';
                                     }
                                     return null;
                                   },

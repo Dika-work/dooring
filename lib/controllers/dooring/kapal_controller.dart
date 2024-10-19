@@ -593,6 +593,7 @@ class TypeMotorController extends GetxController {
     await dooringController.fetchDooringData();
     CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
   }
 
   List<TypeMotorModel> get filteredMotorModel {

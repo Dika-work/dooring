@@ -108,6 +108,7 @@ class DetailDefectController extends GetxController {
     // Fetch updated data
     await fetchDetailDefect(idDefect);
 
+    nomorContainerController.clear();
     nomorMesinController.clear();
     nomorRangkaController.clear();
     CustomHelperFunctions.stopLoading();
@@ -151,6 +152,40 @@ class DetailDefectController extends GetxController {
     CustomHelperFunctions.stopLoading();
   }
 
+  // Edit table detail defect
+  Future<void> editDefectTable(
+    int idDetail,
+    int idDooring,
+    int idDefect,
+    String noMesin,
+    String noRangka,
+    String noCt,
+  ) async {
+    CustomDialogs.loadingIndicator();
+
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
+      CustomHelperFunctions.stopLoading();
+      SnackbarLoader.errorSnackBar(
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
+    }
+
+    await deleteDefectRepo.editDefect(
+      idDetail,
+      idDooring,
+      idDefect,
+      noMesin,
+      noRangka,
+      noCt,
+    );
+    await fetchDetailDefect(idDefect);
+
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+  }
+
   // selesai detail defect
   Future<void> selesaiDetailDefect(int idDefect, int idDooring) async {
     CustomDialogs.loadingIndicator();
@@ -165,9 +200,8 @@ class DetailDefectController extends GetxController {
     }
 
     await detailDefectRepo.selesaiDetailDefect(idDefect);
-
-    CustomHelperFunctions.stopLoading();
     await defectController.fetchDefetchTable(idDooring);
+    CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
 }
