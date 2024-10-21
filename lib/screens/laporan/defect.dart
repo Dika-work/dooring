@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../helpers/connectivity.dart';
 import '../../utils/constant/custom_size.dart';
+import '../../utils/loader/shimmer.dart';
 import '../../utils/popups/snackbar.dart';
 import '../../utils/source/laporan/laporan_defect_source.dart';
+import '../../utils/theme/app_colors.dart';
 import '../../widgets/dropdown.dart';
 
 class LaporanDefect extends StatefulWidget {
@@ -54,13 +57,15 @@ class _LaporanDefectState extends State<LaporanDefect> {
 
   LaporanDefectTypeSource? typeSource;
   LaporanDefectPartSource? partSource;
+  LaporanAllDefectTypeSource? allTypeSource;
+  LaporanAllDefectPartSource? allPartSource;
   final controller = Get.put(LaporanDefectController());
   final networkConn = Get.find<NetworkManager>();
 
   int rowsPerPage = 10;
   int currentPage = 0;
   double rowHeight = 50.0;
-  double headerHeight = 65.0;
+  double headerHeight = 55.0;
 
   @override
   void initState() {
@@ -98,13 +103,33 @@ class _LaporanDefectState extends State<LaporanDefect> {
       user.wilayah,
     );
 
+    // ini all data dari defect type dan part
+    await controller.allFetchDefectType(
+      int.parse(formattedMonth),
+      int.parse(selectedYear),
+      user.wilayah,
+    );
+    await controller.allFetchDefectPart(
+      int.parse(formattedMonth),
+      int.parse(selectedYear),
+      user.wilayah,
+    );
+
     // Debugging log
-    print('ini bulan: $formattedMonth');
-    print('ini tahun: $selectedYear');
-    print('ini wilayah user yang login: ${user.wilayah}');
+    // print('ini bulan: $formattedMonth');
+    // print('ini tahun: $selectedYear');
+    // print('ini wilayah user yang login: ${user.wilayah}');
+
+    // Debugging: print data lengths to ensure correct fetching
+    print(
+        'Fetched defectTypeModel length: ${controller.defectTypeModel.length}');
+    print(
+        'Fetched defectPartModel length: ${controller.defectPartModel.length}');
 
     _updateTypeSource();
     _updatePartDefect();
+    _updateAllTypeSource();
+    _updateAllPartDefect();
   }
 
   void _updateTypeSource() {
@@ -125,9 +150,36 @@ class _LaporanDefectState extends State<LaporanDefect> {
     });
   }
 
+  // ini all data dari defect type dan part
+  void _updateAllTypeSource() {
+    totalRows = controller.defectTypeModel.length;
+    setState(() {
+      allTypeSource = LaporanAllDefectTypeSource(
+        detailDefectModel: controller.allDefectTypeModel,
+        startIndex: currentPage * rowsPerPage,
+      );
+    });
+  }
+
+  void _updateAllPartDefect() {
+    setState(() {
+      allPartSource = LaporanAllDefectPartSource(
+          detailDefectModel: controller.allDefectPartModel,
+          startIndex: currentPage * rowsPerPage);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    double gridHeight = headerHeight + (rowHeight * 10);
+    // Calculate gridHeight dynamically based on the number of rows
+    int typeSourceLength = controller.defectTypeModel.length;
+    int partSourceLength = controller.defectPartModel.length;
+
+    // Grid height should be dynamically calculated
+    double gridHeightType = headerHeight +
+        (rowHeight * (typeSourceLength > 0 ? typeSourceLength : 1));
+    double gridHeightPart = headerHeight +
+        (rowHeight * (partSourceLength > 0 ? partSourceLength : 1));
 
     return Scaffold(
       appBar: AppBar(
@@ -147,65 +199,116 @@ class _LaporanDefectState extends State<LaporanDefect> {
           padding: const EdgeInsets.symmetric(
               vertical: CustomSize.md, horizontal: CustomSize.sm),
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: DropDownWidget(
-                    // Pastikan 'selectedMonth' ada dalam List 'months'
-                    value:
-                        selectedMonth, // Format singkatan: 'Jan', 'Feb', dst.
-                    items: months,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedMonth = newValue!; // Simpan nilai yang dipilih
-                        _fetchDataAndRefreshSource(); // Fetch data baru
-                      });
-                    },
+            typeSource != null &&
+                    partSource != null &&
+                    allTypeSource != null &&
+                    allPartSource != null
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: DropDownWidget(
+                          // Pastikan 'selectedMonth' ada dalam List 'months'
+                          value:
+                              selectedMonth, // Format singkatan: 'Jan', 'Feb', dst.
+                          items: months,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedMonth =
+                                  newValue!; // Simpan nilai yang dipilih
+                              _fetchDataAndRefreshSource(); // Fetch data baru
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: CustomSize.sm),
+                      Expanded(
+                        flex: 2,
+                        child: DropDownWidget(
+                          value:
+                              selectedYear, // Pastikan 'selectedYear' ada dalam List 'years'
+                          items: years,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedYear =
+                                  newValue!; // Simpan nilai yang dipilih
+                              _fetchDataAndRefreshSource(); // Fetch data baru
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: CustomSize.sm),
+                      Expanded(
+                        flex: 1,
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            await _fetchDataAndRefreshSource(); // Fetch data dengan parameter bulan/tahun baru
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: CustomSize.md),
+                          ),
+                          child: const Icon(Iconsax.calendar_search),
+                        ),
+                      ),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                          flex: 2,
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          )),
+                      const SizedBox(width: CustomSize.sm),
+                      Expanded(
+                          flex: 2,
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          )),
+                      const SizedBox(width: CustomSize.sm),
+                      Expanded(
+                          flex: 1,
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          )),
+                    ],
                   ),
-                ),
-                const SizedBox(width: CustomSize.sm),
-                Expanded(
-                  flex: 2,
-                  child: DropDownWidget(
-                    value:
-                        selectedYear, // Pastikan 'selectedYear' ada dalam List 'years'
-                    items: years,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedYear = newValue!; // Simpan nilai yang dipilih
-                        _fetchDataAndRefreshSource(); // Fetch data baru
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: CustomSize.sm),
-                Expanded(
-                  flex: 1,
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      await _fetchDataAndRefreshSource(); // Fetch data dengan parameter bulan/tahun baru
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: CustomSize.md),
-                    ),
-                    child: const Icon(Iconsax.calendar_search),
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             Center(
-              child: Text('SELURUH DATA DEFECT TYPE MOTOR',
+              child: Text('TOP 10 DATA DEFECT TYPE MOTOR',
                   style: Theme.of(context).textTheme.headlineMedium),
             ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             typeSource != null
-                ? Container(
-                    height: gridHeight,
-                    color: Colors.red,
+                ? SizedBox(
+                    height: gridHeightType,
                     child: SfDataGrid(
                       source: typeSource!,
                       columnWidthMode: ColumnWidthMode.fill,
@@ -272,16 +375,19 @@ class _LaporanDefectState extends State<LaporanDefect> {
                       ],
                     ),
                   )
-                : const Center(child: CircularProgressIndicator()),
+                : const CustomShimmerEffect(
+                    height: 200,
+                    width: double.infinity,
+                  ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             Center(
-              child: Text('SELURUH DATA DEFECT PART MOTOR',
+              child: Text('TOP 10 DATA DEFECT PART MOTOR',
                   style: Theme.of(context).textTheme.headlineMedium),
             ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             partSource != null
                 ? SizedBox(
-                    height: gridHeight,
+                    height: gridHeightPart,
                     child: SfDataGrid(
                       source: partSource!,
                       columnWidthMode: ColumnWidthMode.fill,
@@ -348,7 +454,188 @@ class _LaporanDefectState extends State<LaporanDefect> {
                       ],
                     ),
                   )
-                : const Center(child: CircularProgressIndicator()),
+                : const CustomShimmerEffect(
+                    height: 200,
+                    width: double.infinity,
+                  ),
+            const SizedBox(height: CustomSize.spaceBtwInputFields),
+            Center(
+              child: Text('SELURUH DATA DEFECT TYPE MOTOR',
+                  style: Theme.of(context).textTheme.headlineMedium),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwInputFields),
+            allTypeSource != null
+                ? SizedBox(
+                    height: gridHeightType,
+                    child: SfDataGrid(
+                      source: allTypeSource!,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      verticalScrollPhysics:
+                          const NeverScrollableScrollPhysics(),
+                      columns: [
+                        GridColumn(
+                          width: 50,
+                          columnName: 'No',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'No',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          columnName: 'Type Motor',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Type Motor', // Menampilkan nama bulan (Jan, Feb, dst.)
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          width: 100,
+                          columnName: 'Total Defect',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Total Defect',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const CustomShimmerEffect(
+                    height: 200,
+                    width: double.infinity,
+                  ),
+            if (allTypeSource != null)
+              if (controller.allDefectTypeModel.length > 10)
+                Center(
+                  child: SfDataPager(
+                    delegate: allTypeSource!,
+                    pageCount: (controller.allDefectTypeModel.length / 10)
+                        .ceilToDouble(),
+                    direction: Axis.horizontal,
+                  ),
+                ),
+            const SizedBox(height: CustomSize.spaceBtwInputFields),
+            Center(
+              child: Text('SELURUH DATA DEFECT PART MOTOR',
+                  style: Theme.of(context).textTheme.headlineMedium),
+            ),
+            const SizedBox(height: CustomSize.spaceBtwInputFields),
+            allPartSource != null
+                ? SizedBox(
+                    height: gridHeightType,
+                    child: SfDataGrid(
+                      source: allPartSource!,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      verticalScrollPhysics:
+                          const NeverScrollableScrollPhysics(),
+                      columns: [
+                        GridColumn(
+                          width: 50,
+                          columnName: 'No',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'No',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          columnName: 'Type Motor',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Type Motor', // Menampilkan nama bulan (Jan, Feb, dst.)
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        GridColumn(
+                          width: 100,
+                          columnName: 'Total Defect',
+                          label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Total Defect',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const CustomShimmerEffect(
+                    height: 200,
+                    width: double.infinity,
+                  ),
+            if (allPartSource != null)
+              if (controller.allDefectPartModel.length > 10)
+                Center(
+                  child: SfDataPager(
+                    delegate: allPartSource!,
+                    pageCount: (controller.allDefectPartModel.length / 10)
+                        .ceilToDouble(),
+                    direction: Axis.horizontal,
+                  ),
+                ),
           ],
         ),
       ),

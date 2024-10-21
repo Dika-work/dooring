@@ -2,10 +2,12 @@ import 'package:dooring/screens/laporan/defect.dart';
 import 'package:get/get.dart';
 
 import '../controllers/dooring/dooring_controller.dart';
+import '../controllers/dooring/jadwal_kapal_acc_controller.dart';
 import '../controllers/dooring/jadwal_kapal_controller.dart';
 import '../controllers/dooring/kapal_controller.dart';
 import '../screens/dooring/jadwal_kapal.dart';
 // import '../screens/dooring/jadwal_kapal_acc.dart';
+import '../screens/dooring/jadwal_kapal_acc.dart';
 import '../screens/laporan/total_unit.dart';
 import '../screens/dooring/dooring.dart';
 import '../screens/profile.dart';
@@ -50,12 +52,12 @@ class AppRoutes {
             binding: BindingsBuilder(() {
               Get.put(JadwalKapalController());
             })),
-        // GetPage(
-        //     name: '/jadwal-kapal-acc',
-        //     page: () => const JadwalKapalAcc(),
-        //     binding: BindingsBuilder(() {
-        //       Get.put(JadwalKapalController());
-        //     })),
+        GetPage(
+            name: '/jadwal-kapal-acc',
+            page: () => const JadwalKapalAcc(),
+            binding: BindingsBuilder(() {
+              Get.put(JadwalKapalAccController());
+            })),
         // master data
         GetPage(
             name: '/master-kapal',

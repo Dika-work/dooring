@@ -256,8 +256,7 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     ),
                     ListTile(
-                      // onTap: () => Get.toNamed('/jadwal-kapal-acc'),
-                      onTap: () {},
+                      onTap: () => Get.toNamed('/jadwal-kapal-acc'),
                       leading: const Icon(
                         Iconsax.record,
                         color: AppColors.darkExpandableContent,
