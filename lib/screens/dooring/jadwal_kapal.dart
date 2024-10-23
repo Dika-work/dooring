@@ -3,6 +3,7 @@ import 'package:dooring/utils/popups/dialogs.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -344,10 +345,10 @@ class JadwalKapal extends GetView<JadwalKapalController> {
                               if (value == null || value.isEmpty) {
                                 return 'Total CT 20" harus diisi';
                               }
-                              // model.feet20 = int.tryParse(value) ?? 0;
-                              // if (model.feet20 < model.ct20Dooring) {
-                              //   return 'Total CT 20" tidak boleh kurang dari CT 20 yang telah di bongkar, CT 20 yang telah di bongkar sebanyak ${model.ct20Dooring}';
-                              // }
+                              model.feet20 = int.tryParse(value) ?? 0;
+                              if (model.feet20 < model.ct20Dooring) {
+                                return 'Total CT 20" tidak boleh kurang dari CT 20 yang telah di bongkar, CT 20 yang telah di bongkar sebanyak ${model.ct20Dooring}';
+                              }
                               return null;
                             },
                           ),
@@ -535,7 +536,7 @@ class JadwalKapal extends GetView<JadwalKapalController> {
                     ));
               }
             },
-            jadwalKapalModel: controller.jadwalKapalModel,
+            jadwalKapalModel: controller.displayedData,
           );
 
           List<GridColumn> columns = [
@@ -806,16 +807,110 @@ class JadwalKapal extends GetView<JadwalKapalController> {
           //   print('Column name: ${column.columnName}');
           // }
           return RefreshIndicator(
-              onRefresh: () async {
-                await controller.fetchJadwalKapal();
-              },
-              child: SfDataGrid(
-                  source: dataSource,
-                  frozenColumnsCount: 2,
-                  columnWidthMode: ColumnWidthMode.auto,
-                  gridLinesVisibility: GridLinesVisibility.both,
-                  headerGridLinesVisibility: GridLinesVisibility.both,
-                  columns: columns));
+            onRefresh: () async {
+              await controller.fetchJadwalKapal();
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      CustomSize.sm, CustomSize.sm, CustomSize.sm, 0),
+                  child: Obx(() {
+                    return Stack(
+                      children: [
+                        DropdownSearch<KapalModel>(
+                          items: kapalController.filteredKapalModel,
+                          itemAsString: (KapalModel kendaraan) =>
+                              kendaraan.namaKapal,
+                          selectedItem: kapalController
+                                  .selectedKapal.value.isNotEmpty
+                              ? kapalController.filteredKapalModel.firstWhere(
+                                  (kendaraan) =>
+                                      kendaraan.namaKapal ==
+                                      kapalController.selectedKapal.value,
+                                  orElse: () => KapalModel(
+                                    idPelayaran: 0,
+                                    namaKapal: '',
+                                    namaPelayaran: '',
+                                  ),
+                                )
+                              : null,
+                          dropdownBuilder: (context, KapalModel? selectedItem) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  selectedItem != null
+                                      ? selectedItem.namaKapal
+                                      : 'Pilih nama kapal',
+                                  style: TextStyle(
+                                    fontSize: CustomSize.fontSizeSm,
+                                    color: selectedItem == null
+                                        ? Colors.grey
+                                        : Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                if (kapalController
+                                    .selectedKapal.value.isNotEmpty)
+                                  IconButton(
+                                    icon: const Icon(
+                                      Iconsax.trash,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      // Reset the dropdown
+                                      kapalController.selectedKapal.value = '';
+                                      // Clear the filter and show all data
+                                      controller
+                                          .filterJadwalKapalByNamaKapal('');
+                                    },
+                                  ),
+                              ],
+                            );
+                          },
+                          onChanged: (KapalModel? kendaraan) {
+                            if (kendaraan != null) {
+                              kapalController.selectedKapal.value =
+                                  kendaraan.namaKapal;
+                              // Panggil fungsi filter ketika kapal dipilih
+                              controller.filterJadwalKapalByNamaKapal(
+                                  kendaraan.namaKapal);
+                            } else {
+                              kapalController.resetSelectedKendaraan();
+                              // Jika tidak ada kapal yang dipilih, tampilkan semua data
+                              controller.filterJadwalKapalByNamaKapal('');
+                            }
+                          },
+                          popupProps: const PopupProps.menu(
+                            showSearchBox: true,
+                            searchFieldProps: TextFieldProps(
+                              decoration: InputDecoration(
+                                hintText: 'Cari nama kapal...',
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Show clear icon when a selection is made
+                      ],
+                    );
+                  }),
+                ),
+                const SizedBox(height: CustomSize.gridViewSpacing),
+                Expanded(
+                  child: SfDataGrid(
+                    source: dataSource,
+                    frozenColumnsCount: 2,
+                    verticalScrollController: controller.scrollController,
+                    columnWidthMode: ColumnWidthMode.auto,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    columns: columns,
+                  ),
+                ),
+              ],
+            ),
+          );
         }
       }),
       floatingActionButton: FloatingActionButton.extended(

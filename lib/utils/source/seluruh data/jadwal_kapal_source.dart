@@ -38,21 +38,6 @@ class JadwalKapalSource extends DataGridSource {
     int rowIndex = dooringData.indexOf(row);
     bool isEvenRow = rowIndex % 2 == 0;
 
-    int daysDifference = 0;
-    if (jadwalKapalModel[rowIndex].tglAcc.isNotEmpty) {
-      try {
-        DateTime tglAcc =
-            DateTime.parse(jadwalKapalModel[rowIndex].tglAcc); // Parse date
-        DateTime currentDate = DateTime.now();
-
-        // Step 3: Calculate the difference in days
-        daysDifference = currentDate.difference(tglAcc).inDays;
-      } catch (e) {
-        print(
-            'Error parsing tglAcc for ${jadwalKapalModel[rowIndex].namaKapal}: $e');
-      }
-    }
-
     List<Widget> cells = [
       ...row.getCells().map<Widget>((e) {
         // print(
@@ -228,18 +213,16 @@ class JadwalKapalSource extends DataGridSource {
               textAlign: TextAlign.center,
             ),
           ] else if (jadwalKapalModel[rowIndex].statusJadwal == 1) ...[
-            daysDifference < 7
-                ? IconButton(
-                    onPressed: () {
-                      if (onEdited != null && jadwalKapalModel.isNotEmpty) {
-                        onEdited!(jadwalKapalModel[rowIndex], 'cross');
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.cancel_outlined,
-                    ),
-                  )
-                : const SizedBox.shrink()
+            IconButton(
+              onPressed: () {
+                if (onEdited != null && jadwalKapalModel.isNotEmpty) {
+                  onEdited!(jadwalKapalModel[rowIndex], 'cross');
+                }
+              },
+              icon: const Icon(
+                Icons.cancel_outlined,
+              ),
+            )
           ]
         ],
       ));

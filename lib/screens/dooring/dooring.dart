@@ -462,7 +462,8 @@ class TambahDefect extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(CustomSize.md),
+        padding: const EdgeInsets.symmetric(
+            horizontal: CustomSize.md, vertical: CustomSize.sm),
         children: [
           const Text('Nama Kapal'),
           TextFormField(

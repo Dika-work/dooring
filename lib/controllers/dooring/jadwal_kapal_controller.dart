@@ -14,6 +14,7 @@ import 'kapal_controller.dart';
 class JadwalKapalController extends GetxController {
   final storageUtil = StorageUtil();
   final isLoading = Rx<bool>(false);
+  final isLoadingMore = Rx<bool>(false);
   final tgl =
       CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()).obs;
   final jumlahUnitBongkarController = TextEditingController();
@@ -59,8 +60,10 @@ class JadwalKapalController extends GetxController {
   TextEditingController toolsetController = TextEditingController();
 
   String nameUser = '';
+  var selectedKapal = ''.obs;
 
   RxList<JadwalKapalModel> jadwalKapalModel = <JadwalKapalModel>[].obs;
+  RxList<JadwalKapalModel> displayedData = <JadwalKapalModel>[].obs;
   // RxList<SeluruhJadwalKapal> seluruhJadwalKapalModel =
   //     <SeluruhJadwalKapal>[].obs;
   RxList<LihatJadwalKapalModel> lihatJadwalKapalModel =
@@ -68,6 +71,11 @@ class JadwalKapalController extends GetxController {
   final networkManager = Get.find<NetworkManager>();
   GlobalKey<FormState> jadwalKapalKey = GlobalKey<FormState>();
   GlobalKey<FormState> addDooringKey = GlobalKey<FormState>();
+
+  // lazy loading
+  final ScrollController scrollController = ScrollController();
+  int initialDataCount = 20;
+  int loadMoreCount = 5;
 
   String roleUser = '';
   String roleWilayah = '';
@@ -98,7 +106,20 @@ class JadwalKapalController extends GetxController {
       print('ini nilai dari edit : $editRole');
     }
 
-    print('Total jadwalKapalModel: ${jadwalKapalModel.length}');
+    scrollController.addListener(scrollListener);
+  }
+
+  // filterisasi table sesuai dengan nama kapal yg dicari
+  void filterJadwalKapalByNamaKapal(String namaKapal) {
+    if (namaKapal.isEmpty) {
+      // Jika tidak ada kapal yang dipilih, tampilkan semua data
+      displayedData.assignAll(jadwalKapalModel);
+    } else {
+      // Filter berdasarkan nama kapal
+      displayedData.assignAll(
+        jadwalKapalModel.where((item) => item.namaKapal == namaKapal).toList(),
+      );
+    }
   }
 
   Future<void> fetchJadwalKapal() async {
@@ -108,16 +129,49 @@ class JadwalKapalController extends GetxController {
       print('Data fetched: ${dataJadwal.length} records');
       if (isAdmin) {
         jadwalKapalModel.assignAll(dataJadwal);
-        print('Data fetched untuk admin: ${dataJadwal.length}');
+        displayedData
+            .assignAll(jadwalKapalModel.take(initialDataCount).toList());
       } else {
         jadwalKapalModel.assignAll(
             dataJadwal.where((item) => item.wilayah == roleWilayah).toList());
-        print('Data fetched bukan admin: ${dataJadwal.length}');
+        displayedData
+            .assignAll(jadwalKapalModel.take(initialDataCount).toList());
       }
     } catch (e) {
       jadwalKapalModel.assignAll([]);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // lazy loading func
+  void scrollListener() {
+    print(
+        "Scroll Position: ${scrollController.position.pixels}, Max Scroll: ${scrollController.position.maxScrollExtent}");
+    if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent &&
+        !isLoading.value &&
+        !isLoadingMore.value) {
+      // Load more data when reaching the bottom
+      loadMoreData();
+    }
+  }
+
+  void loadMoreData() {
+    // Load additional data if available
+    if (displayedData.length < jadwalKapalModel.length &&
+        !isLoadingMore.value) {
+      print("Loading more data...");
+      isLoadingMore.value = true;
+      final nextData = jadwalKapalModel
+          .skip(displayedData.length)
+          .take(loadMoreCount)
+          .toList();
+      displayedData.addAll(nextData);
+
+      print(
+          'Additional data loaded: ${displayedData.length} items'); // Cetak jumlah data setelah load more
+      isLoadingMore.value = false;
     }
   }
 
