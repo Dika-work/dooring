@@ -162,7 +162,8 @@ class MasterKapal extends GetView<KapalController> {
                   child: Text('Tambah Kapal',
                       style: Theme.of(context).textTheme.headlineMedium),
                 ),
-                const SizedBox(height: CustomSize.spaceBtwItems),
+                const Divider(),
+                const SizedBox(height: CustomSize.sm),
                 Obx(() {
                   return DropdownSearch<PelayaranModel>(
                     items: pelayaranController.filteredPartMotorModel,

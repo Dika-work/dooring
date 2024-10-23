@@ -1,14 +1,8 @@
-import 'dart:io';
-
 import 'package:dooring/models/dooring/jadwal_kapal_model.dart';
 import 'package:dooring/repository/dooring/jadwal_kapal_repo.dart';
 import 'package:dooring/utils/constant/storage_util.dart';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../helpers/connectivity.dart';
 import '../../helpers/helper_func.dart';
@@ -67,6 +61,8 @@ class JadwalKapalController extends GetxController {
   String nameUser = '';
 
   RxList<JadwalKapalModel> jadwalKapalModel = <JadwalKapalModel>[].obs;
+  // RxList<SeluruhJadwalKapal> seluruhJadwalKapalModel =
+  //     <SeluruhJadwalKapal>[].obs;
   RxList<LihatJadwalKapalModel> lihatJadwalKapalModel =
       <LihatJadwalKapalModel>[].obs;
   final networkManager = Get.find<NetworkManager>();
@@ -85,6 +81,8 @@ class JadwalKapalController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('onInit called');
+
     UserModel? user = storageUtil.getUserDetails();
     if (user != null) {
       nameUser = user.username;
@@ -99,18 +97,22 @@ class JadwalKapalController extends GetxController {
       print('ini nilai dari tambah : $tambahRole');
       print('ini nilai dari edit : $editRole');
     }
+
+    print('Total jadwalKapalModel: ${jadwalKapalModel.length}');
   }
 
   Future<void> fetchJadwalKapal() async {
     try {
       isLoading.value = true;
       final dataJadwal = await jadwalRepo.fetchJadwalContent();
-
+      print('Data fetched: ${dataJadwal.length} records');
       if (isAdmin) {
         jadwalKapalModel.assignAll(dataJadwal);
+        print('Data fetched untuk admin: ${dataJadwal.length}');
       } else {
         jadwalKapalModel.assignAll(
             dataJadwal.where((item) => item.wilayah == roleWilayah).toList());
+        print('Data fetched bukan admin: ${dataJadwal.length}');
       }
     } catch (e) {
       jadwalKapalModel.assignAll([]);
@@ -118,6 +120,24 @@ class JadwalKapalController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  // Future<void> fetchSeluruhJadwalKapal() async {
+  //   try {
+  //     isLoading.value = true;
+  //     final dataJadwal = await jadwalRepo.fetchSeluruhJadwalContent();
+
+  //     if (isAdmin) {
+  //       seluruhJadwalKapalModel.assignAll(dataJadwal);
+  //     } else {
+  //       seluruhJadwalKapalModel.assignAll(
+  //           dataJadwal.where((item) => item.wilayah == roleWilayah).toList());
+  //     }
+  //   } catch (e) {
+  //     jadwalKapalModel.assignAll([]);
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
   Future<void> lihatJadwalKapal(int idJadwal) async {
     try {
@@ -133,8 +153,13 @@ class JadwalKapalController extends GetxController {
     }
   }
 
-  Future<void> addDataDooring(int idJadwal, String namaKapal, String wilayah,
-      String etd, String atd) async {
+  Future<void> addDataDooring(
+    int idJadwal,
+    String namaKapal,
+    String wilayah,
+    String etd,
+    String atd,
+  ) async {
     CustomDialogs.loadingIndicator();
 
     final isConnected = await networkManager.isConnected();
@@ -170,6 +195,29 @@ class JadwalKapalController extends GetxController {
         int.parse(buserController.text),
         int.parse(toolsetController.text));
 
+    print('ini id jadwal: $idJadwal');
+    print('ini namaKapal: $namaKapal');
+    print(
+        'ini CustomHelperFunctions.formattedTime: ${CustomHelperFunctions.formattedTime}');
+    print('ini tglInput.value: ${tglInput.value}');
+    print('ini nameUser: $nameUser');
+    print('ini wilayah: $wilayah');
+    print('ini etd: $etd');
+    print('ini atd: $atd');
+    print('ini tglBongkar.value: ${tglBongkar.value}');
+    print(
+        'ini jumlahBongkarController: ${int.parse(jumlahBongkarController.text)}');
+    print('ini ct40Controller: ${int.parse(ct40Controller.text)}');
+    print('ini ct20Controller: ${int.parse(ct20Controller.text)}');
+    print('ini helmController: ${int.parse(helmController.text)}');
+    print('ini accuController: ${int.parse(accuController.text)}');
+    print('ini spionController: ${int.parse(spionController.text)}');
+    print('ini buserController: ${int.parse(buserController.text)}');
+    print('ini toolsetController: ${int.parse(toolsetController.text)}');
+
+    await fetchJadwalKapal();
+    print('berhasil memperbaharui data');
+
     // Clear input fields
     jumlahBongkarController.clear();
     ct40Controller.clear();
@@ -180,7 +228,6 @@ class JadwalKapalController extends GetxController {
     buserController.clear();
     toolsetController.clear();
 
-    await fetchJadwalKapal();
     CustomHelperFunctions.stopLoading();
     CustomHelperFunctions.stopLoading();
   }
@@ -268,141 +315,159 @@ class JadwalKapalController extends GetxController {
     CustomHelperFunctions.stopLoading();
   }
 
-  Future<void> downloadExcelForDooring(int idJadwal) async {
-    try {
-      print('Ini awalan download excel');
-      CustomDialogs.loadingIndicator();
+  Future<void> selesaiJadwalKapal(
+    int idJadwal,
+  ) async {
+    CustomDialogs.loadingIndicator();
 
-      // Cek koneksi internet
-      final isConnected = await networkManager.isConnected();
-      if (!isConnected) {
-        CustomHelperFunctions.stopLoading();
-        SnackbarLoader.errorSnackBar(
-          title: 'Tidak ada koneksi internet',
-          message: 'Silahkan coba lagi setelah koneksi tersedia',
-        );
-        return;
-      }
-
-      // Fetch data dari lihatDooring
-      await lihatJadwalKapal(idJadwal);
-      print('Berhasil mengambil data dooring excel..');
-
-      // Cek apakah detailDefectModel berisi data
-      if (jadwalKapalModel.isEmpty) {
-        CustomHelperFunctions.stopLoading();
-        SnackbarLoader.errorSnackBar(
-          title: 'Error',
-          message: 'Data kosong, tidak ada yang bisa diunduh',
-        );
-        return;
-      }
-
-      var excel = Excel.createExcel();
-      Sheet sheetObject = excel['Sheet1'];
-      print('Proses ekstraksi..');
-
-      // Menambahkan header ke dalam Excel
-      sheetObject.appendRow([
-        TextCellValue('No'),
-        TextCellValue('Nama Kapal'),
-        TextCellValue('ETD'),
-        TextCellValue('ATD'),
-        TextCellValue('Total Unit'),
-        TextCellValue('Total CT 20'),
-        TextCellValue('Total CT 40'),
-        TextCellValue('Wilayah'),
-        TextCellValue('Helm'),
-        TextCellValue('Accu'),
-        TextCellValue('Spion'),
-        TextCellValue('Buser'),
-        TextCellValue('ToolSet'),
-        TextCellValue('Type Motor'),
-        TextCellValue('Part Motor'),
-        TextCellValue('No Mesin'),
-        TextCellValue('No Rangka'),
-        TextCellValue('Jml'),
-      ]);
-
-      // Variabel untuk menambah nomor urut
-      int index = 1;
-
-      // Loop untuk menambahkan data ke dalam Excel
-      for (var item in jadwalKapalModel) {
-        sheetObject.appendRow([
-          IntCellValue(index++), // No
-          TextCellValue(item.namaKapal),
-          TextCellValue(item.etd),
-          TextCellValue(item.atd),
-          IntCellValue(item.unit),
-          IntCellValue(item.feet20),
-          IntCellValue(item.feet40),
-          TextCellValue(item.wilayah),
-          IntCellValue(item.helmL),
-          IntCellValue(item.accuL),
-          IntCellValue(item.spionL),
-          IntCellValue(item.buserL),
-          IntCellValue(item.toolsetL),
-          TextCellValue(item.typeMotor),
-          TextCellValue(item.part),
-          TextCellValue(item.noMesin),
-          TextCellValue(item.noRangka),
-          IntCellValue(item.jumlah),
-        ]);
-      }
-
-      // Mendapatkan direktori eksternal (untuk penyimpanan di folder Downloads)
-      Directory? directory = Directory('/storage/emulated/0/Download');
-
-      if (!await directory.exists()) {
-        directory = await getExternalStorageDirectory();
-      }
-
-      // Ambil nama kapal dan etd, gunakan fallback jika null
-      var namaKapal = jadwalKapalModel.first.namaKapal;
-      var etdString = jadwalKapalModel.first.etd;
-
-      // Coba simpan file Excel
-      var fileBytes = excel.save();
-
-      // Pastikan fileBytes tidak null sebelum menulis ke file
-      if (fileBytes == null) {
-        CustomHelperFunctions.stopLoading();
-        SnackbarLoader.errorSnackBar(
-          title: 'Error',
-          message: 'Gagal menyimpan file Excel, data tidak valid',
-        );
-        return;
-      }
-
-      // Format path penyimpanan menggunakan direktori Downloads
-      String filePath = join(directory!.path, '$namaKapal $etdString.xlsx');
-
-      // Simpan file Excel
-      File(filePath)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(fileBytes);
-
-      // Tampilkan pesan sukses
-      SnackbarLoader.successSnackBar(
-        title: 'Success',
-        message: 'File berhasil disimpan',
-      );
-
-      print('Berhasil menyimpan file excel pada direktori ${directory.path}');
-
-      // Membuka file secara otomatis setelah disimpan
-      OpenFile.open(filePath);
-
+    final isConnected = await networkManager.isConnected();
+    if (!isConnected) {
       CustomHelperFunctions.stopLoading();
-    } catch (e) {
-      // Tangkap semua error dan tampilkan pesan error
       SnackbarLoader.errorSnackBar(
-        title: 'Error',
-        message: 'Gagal mengunduh file excel: $e',
-      );
-      print('Ini err nya: $e');
-      CustomHelperFunctions.stopLoading();
+          title: 'Tidak ada koneksi internet',
+          message: 'Silahkan coba lagi setelah koneksi tersedia');
+      return;
     }
+
+    await jadwalRepo.selesaiDataJadwal(
+      idJadwal,
+      CustomHelperFunctions.formattedTime,
+      CustomHelperFunctions.getFormattedDateDatabase(DateTime.now()),
+      nameUser,
+    );
+
+    await fetchJadwalKapal();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
+    CustomHelperFunctions.stopLoading();
   }
+
+  // Future<void> downloadExcelForDooring(int idJadwal) async {
+  //   try {
+  //     print('Ini awalan download excel');
+  //     CustomDialogs.loadingIndicator();
+
+  //     // Cek koneksi internet
+  //     final isConnected = await networkManager.isConnected();
+  //     if (!isConnected) {
+  //       CustomHelperFunctions.stopLoading();
+  //       SnackbarLoader.errorSnackBar(
+  //         title: 'Tidak ada koneksi internet',
+  //         message: 'Silahkan coba lagi setelah koneksi tersedia',
+  //       );
+  //       return;
+  //     }
+
+  //     // Fetch data dari lihatDooring
+  //     await lihatJadwalKapal(idJadwal);
+  //     print('Berhasil mengambil data dooring excel..');
+
+  //     // Cek apakah detailDefectModel berisi data
+  //     if (seluruhJadwalKapalModel.isEmpty) {
+  //       CustomHelperFunctions.stopLoading();
+  //       SnackbarLoader.errorSnackBar(
+  //         title: 'Error',
+  //         message: 'Data kosong, tidak ada yang bisa diunduh',
+  //       );
+  //       return;
+  //     }
+
+  //     var excel = Excel.createExcel();
+  //     Sheet sheetObject = excel['Sheet1'];
+  //     print('Proses ekstraksi..');
+
+  //     // Menambahkan header ke dalam Excel
+  //     sheetObject.appendRow([
+  //       TextCellValue('No'),
+  //       TextCellValue('Nama Kapal'),
+  //       TextCellValue('ETD'),
+  //       TextCellValue('ATD'),
+  //       TextCellValue('Total Unit'),
+  //       TextCellValue('Total CT 20'),
+  //       TextCellValue('Total CT 40'),
+  //       TextCellValue('Wilayah'),
+  //       TextCellValue('Helm'),
+  //       TextCellValue('Accu'),
+  //       TextCellValue('Spion'),
+  //       TextCellValue('Buser'),
+  //       TextCellValue('ToolSet'),
+  //       TextCellValue('No Rangka'),
+  //     ]);
+
+  //     // Variabel untuk menambah nomor urut
+  //     int index = 1;
+
+  //     // Loop untuk menambahkan data ke dalam Excel
+  //     for (var item in seluruhJadwalKapalModel) {
+  //       sheetObject.appendRow([
+  //         IntCellValue(index++), // No
+  //         TextCellValue(item.namaKapal),
+  //         TextCellValue(item.etd),
+  //         TextCellValue(item.atd),
+  //         IntCellValue(item.unit),
+  //         TextCellValue(item.ct20),
+  //         TextCellValue(item.ct40),
+  //         TextCellValue(item.wilayah),
+  //         IntCellValue(item.helmL),
+  //         IntCellValue(item.accuL),
+  //         IntCellValue(item.spionL),
+  //         IntCellValue(item.buserL),
+  //         IntCellValue(item.toolSetL),
+  //       ]);
+  //     }
+
+  //     // Mendapatkan direktori eksternal (untuk penyimpanan di folder Downloads)
+  //     Directory? directory = Directory('/storage/emulated/0/Download');
+
+  //     if (!await directory.exists()) {
+  //       directory = await getExternalStorageDirectory();
+  //     }
+
+  //     // Ambil nama kapal dan etd, gunakan fallback jika null
+  //     var namaKapal = seluruhJadwalKapalModel.first.namaKapal;
+  //     var etdString = seluruhJadwalKapalModel.first.etd;
+
+  //     // Coba simpan file Excel
+  //     var fileBytes = excel.save();
+
+  //     // Pastikan fileBytes tidak null sebelum menulis ke file
+  //     if (fileBytes == null) {
+  //       CustomHelperFunctions.stopLoading();
+  //       SnackbarLoader.errorSnackBar(
+  //         title: 'Error',
+  //         message: 'Gagal menyimpan file Excel, data tidak valid',
+  //       );
+  //       return;
+  //     }
+
+  //     // Format path penyimpanan menggunakan direktori Downloads
+  //     String filePath = join(directory!.path, '$namaKapal $etdString.xlsx');
+
+  //     // Simpan file Excel
+  //     File(filePath)
+  //       ..createSync(recursive: true)
+  //       ..writeAsBytesSync(fileBytes);
+
+  //     // Tampilkan pesan sukses
+  //     SnackbarLoader.successSnackBar(
+  //       title: 'Success',
+  //       message: 'File berhasil disimpan',
+  //     );
+
+  //     print('Berhasil menyimpan file excel pada direktori ${directory.path}');
+
+  //     // Membuka file secara otomatis setelah disimpan
+  //     OpenFile.open(filePath);
+
+  //     CustomHelperFunctions.stopLoading();
+  //   } catch (e) {
+  //     // Tangkap semua error dan tampilkan pesan error
+  //     SnackbarLoader.errorSnackBar(
+  //       title: 'Error',
+  //       message: 'Gagal mengunduh file excel: $e',
+  //     );
+  //     print('Ini err nya: $e');
+  //     CustomHelperFunctions.stopLoading();
+  //   }
+  // }
 }

@@ -76,7 +76,8 @@ class SemuaDooring extends GetView<DooringController> {
                         child: Text('Konfirmasi Defect Motor',
                             style: Theme.of(context).textTheme.headlineMedium),
                       ),
-                      const SizedBox(height: CustomSize.spaceBtwItems),
+                      const Divider(),
+                      const SizedBox(height: CustomSize.sm),
                       Text('Nama Kapal',
                           style: Theme.of(context).textTheme.labelMedium),
                       TextFormField(

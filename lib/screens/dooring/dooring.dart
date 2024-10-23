@@ -84,7 +84,8 @@ class Dooring extends GetView<DooringController> {
                         child: Text('Konfirmasi Defect Motor',
                             style: Theme.of(context).textTheme.headlineMedium),
                       ),
-                      const SizedBox(height: CustomSize.spaceBtwItems),
+                      const Divider(),
+                      const SizedBox(height: CustomSize.sm),
                       Text('Nama Kapal',
                           style: Theme.of(context).textTheme.labelMedium),
                       TextFormField(
@@ -538,8 +539,8 @@ class TambahDefect extends StatelessWidget {
                           Text('Edit Data Defect',
                               style:
                                   Theme.of(context).textTheme.headlineMedium),
-                          const SizedBox(height: CustomSize.spaceBtwItems),
-
+                          const Divider(),
+                          const SizedBox(height: CustomSize.sm),
                           // Dropdown for selecting Type Motor
                           DropdownSearch<TypeMotorModel>(
                             items: controller.filteredMotorModel,
@@ -709,7 +710,8 @@ class TambahDefect extends StatelessWidget {
                           Text('Detail Rincian Defect',
                               style:
                                   Theme.of(context).textTheme.headlineMedium),
-                          const SizedBox(height: CustomSize.spaceBtwItems),
+                          const Divider(),
+                          const SizedBox(height: CustomSize.sm),
                           TextFormField(
                             controller: TextEditingController(
                                 text: modelDefect.typeMotor),
@@ -1351,7 +1353,8 @@ class _EditDooringState extends State<EditDooring> {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Divider(),
+            const SizedBox(height: CustomSize.sm),
             const Text('Nama Kapal'),
             TextFormField(
               controller: TextEditingController(text: namaKapal),
@@ -1548,7 +1551,8 @@ class _EditDooringState extends State<EditDooring> {
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold, color: AppColors.black)),
             ),
-            const SizedBox(height: CustomSize.md),
+            const Divider(),
+            const SizedBox(height: CustomSize.sm),
             const Text('Helm'),
             TextFormField(
               controller: helm1,

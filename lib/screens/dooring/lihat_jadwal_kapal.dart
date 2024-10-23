@@ -115,7 +115,8 @@ class LihatJadwalKapal extends StatelessWidget {
               child: Text('TOTAL ALAT - ALAT MOTOR',
                   style: Theme.of(context).textTheme.titleSmall),
             ),
-            const SizedBox(height: CustomSize.spaceBtwItems),
+            const Divider(),
+            const SizedBox(height: CustomSize.sm),
             const Text('Helm'),
             TextFormField(
               controller: TextEditingController(text: model.helmL.toString()),
@@ -567,8 +568,9 @@ class LihatJadwalKapal extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: ElevatedButton(
-                      onPressed: () =>
-                          controller.downloadExcelForDooring(model.idJadwal),
+                      onPressed: () {},
+                      // onPressed: () =>
+                      //     controller.downloadExcelForDooring(model.idJadwal),
                       style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.success),
                       child: const Icon(Iconsax.document_download)),

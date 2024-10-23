@@ -39,7 +39,8 @@ class MasterPelayaran extends GetView<PelayaranController> {
                       child: Text('Edit Nama Pelayaran',
                           style: Theme.of(context).textTheme.headlineMedium),
                     ),
-                    const SizedBox(height: CustomSize.spaceBtwItems),
+                    const Divider(),
+                    const SizedBox(height: CustomSize.sm),
                     Form(
                       key: controller.addPartKey,
                       child: TextFormField(
@@ -180,7 +181,8 @@ class MasterPelayaran extends GetView<PelayaranController> {
                   child: Text('Tambah Kapal',
                       style: Theme.of(context).textTheme.headlineMedium),
                 ),
-                const SizedBox(height: CustomSize.spaceBtwItems),
+                const Divider(),
+                const SizedBox(height: CustomSize.sm),
                 Form(
                   key: controller.addPartKey,
                   child: TextFormField(

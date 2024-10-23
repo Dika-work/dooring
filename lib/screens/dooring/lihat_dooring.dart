@@ -92,7 +92,8 @@ class LihatDooring extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold, color: AppColors.black)),
           ),
-          const SizedBox(height: CustomSize.md),
+          const Divider(),
+          const SizedBox(height: CustomSize.sm),
           const Text('Helm'),
           TextFormField(
             controller: TextEditingController(text: model.helm1.toString()),

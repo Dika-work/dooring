@@ -30,9 +30,8 @@ class JadwalKapalAcc extends GetView<JadwalKapalAccController> {
       'Bongkar Unit': 100,
       'Bongkar 20': 100,
       'Bongkar 40': 100,
-      'Lihat': 80,
-      'Add Dooring': double.nan,
-      'Edit': 80,
+      if (controller.lihatRole != 0) 'Lihat': 80,
+      if (controller.editRole != 0) 'Edit': 80,
     };
     return Scaffold(
       appBar: AppBar(
@@ -253,38 +252,40 @@ class JadwalKapalAcc extends GetView<JadwalKapalAccController> {
                                 .bodyMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ))),
-                  GridColumn(
-                      width: columnWidths['Lihat']!,
-                      columnName: 'Lihat',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Lihat',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  GridColumn(
-                      width: columnWidths['Edit']!,
-                      columnName: 'Edit',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Edit',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
+                  if (controller.lihatRole != 0)
+                    GridColumn(
+                        width: columnWidths['Lihat']!,
+                        columnName: 'Lihat',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Lihat',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
+                  if (controller.editRole != 0)
+                    GridColumn(
+                        width: columnWidths['Edit']!,
+                        columnName: 'Edit',
+                        label: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Colors.lightBlue.shade100,
+                            ),
+                            child: Text(
+                              'Edit',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ))),
                 ]),
           );
         }

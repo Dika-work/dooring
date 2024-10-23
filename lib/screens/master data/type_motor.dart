@@ -45,7 +45,8 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 20),
+                      const Divider(),
+                      const SizedBox(height: CustomSize.sm),
                       Obx(() {
                         return DropDownWidget(
                           value: controller.merk.value,
@@ -248,7 +249,8 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
             'Tambah Motor',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          const Divider(),
+          const SizedBox(height: CustomSize.sm),
           Obx(() {
             return DropDownWidget(
               value: controller.merk.value,

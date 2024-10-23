@@ -574,7 +574,8 @@ class TambahAllDefect extends StatelessWidget {
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium),
-                              const SizedBox(height: CustomSize.spaceBtwItems),
+                              const Divider(),
+                              const SizedBox(height: CustomSize.sm),
                               Obx(() {
                                 return DropdownSearch<TypeMotorModel>(
                                   items: controller.filteredMotorModel,
@@ -765,7 +766,8 @@ class TambahAllDefect extends StatelessWidget {
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium),
-                              const SizedBox(height: CustomSize.spaceBtwItems),
+                              const Divider(),
+                              const SizedBox(height: CustomSize.sm),
                               TextFormField(
                                 controller: TextEditingController(
                                     text: modelDefect.typeMotor),
@@ -1678,7 +1680,8 @@ class _EditAllDooringState extends State<EditAllDooring> {
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold, color: AppColors.black)),
           ),
-          const SizedBox(height: CustomSize.md),
+          const Divider(),
+          const SizedBox(height: CustomSize.sm),
           const Text('Helm'),
           TextFormField(
             controller: helm1,

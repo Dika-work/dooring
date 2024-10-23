@@ -44,7 +44,6 @@ class TambahDooring extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: CustomSize.md, vertical: CustomSize.sm),
             children: [
-              Text('ini jadwal kapal ${model.idJadwal}'),
               const Text('Nama Kapal'),
               TextFormField(
                 controller: TextEditingController(text: model.namaKapal),
@@ -309,6 +308,7 @@ class TambahDooring extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
+              const Divider(),
               const SizedBox(height: CustomSize.sm),
               Row(
                 children: [

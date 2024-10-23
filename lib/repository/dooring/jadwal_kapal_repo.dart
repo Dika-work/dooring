@@ -21,6 +21,17 @@ class JadwalKapalRepository {
     }
   }
 
+  // Future<List<SeluruhJadwalKapal>> fetchSeluruhJadwalContent() async {
+  //   final response = await http.get(
+  //       Uri.parse('${storageUtil.baseURL}/jadwal_kapal.php?action=getDataAll'));
+  //   if (response.statusCode == 200) {
+  //     Iterable list = json.decode(response.body);
+  //     return list.map((model) => SeluruhJadwalKapal.fromJson(model)).toList();
+  //   } else {
+  //     throw Exception('Gagal untuk mengambil data kapal☠️');
+  //   }
+  // }
+
   Future<List<LihatJadwalKapalModel>> lihatJadwalKapal(int idJadwal) async {
     final response = await http.get(Uri.parse(
         '${storageUtil.baseURL}/jadwal_kapal.php?action=Lihat&id_jadwal=$idJadwal'));
@@ -181,6 +192,60 @@ class JadwalKapalRepository {
           'total_unit': totalUnit.toString(),
           'feet_20': feet20.toString(),
           'feet_40': feet40.toString(),
+        },
+      );
+
+      print('...BERHASIL DI REPOSITORY...');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          SnackbarLoader.successSnackBar(
+            title: 'Sukses 😃',
+            message: 'DO Global berhasil diubah',
+          );
+        } else {
+          CustomHelperFunctions.stopLoading();
+          SnackbarLoader.errorSnackBar(
+            title: 'Gagal😪',
+            message: responseData['message'] ?? 'Ada yang salah🤷',
+          );
+        }
+        return responseData;
+      } else {
+        CustomHelperFunctions.stopLoading();
+        SnackbarLoader.errorSnackBar(
+          title: 'Gagal😪',
+          message:
+              'Gagal mengedit DO Global, status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      CustomHelperFunctions.stopLoading();
+      print('Error di catch di repository do Global: $e');
+      SnackbarLoader.errorSnackBar(
+        title: 'Gagal😪',
+        message: 'Terjadi kesalahan saat mengedit DO Global',
+      );
+    }
+  }
+
+  Future<void> selesaiDataJadwal(
+    int idJadwal,
+    String jamAcc,
+    String tglAcc,
+    String userAcc,
+  ) async {
+    try {
+      print('...PROSES AWALANAN DI REPOSITORY DO Global...');
+      final response = await http.put(
+        Uri.parse('${storageUtil.baseURL}/jadwal_kapal.php?action=selesai'),
+        body: {
+          'id_jadwal': idJadwal.toString(),
+          'jam_acc': jamAcc,
+          'tgl_acc': tglAcc,
+          'user_acc': userAcc,
+          'st_jadwal': '1',
         },
       );
 

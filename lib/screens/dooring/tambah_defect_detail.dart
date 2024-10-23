@@ -152,8 +152,8 @@ class TambahDefectDetail extends StatelessWidget {
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineMedium),
-                                const SizedBox(
-                                    height: CustomSize.spaceBtwItems),
+                                const Divider(),
+                                const SizedBox(height: CustomSize.sm),
                                 TextFormField(
                                   controller: noContainerController,
                                   decoration: const InputDecoration(

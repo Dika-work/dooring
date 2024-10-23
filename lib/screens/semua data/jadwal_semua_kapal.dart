@@ -34,9 +34,9 @@ class JadwalSemuaKapal extends GetView<JadwalKapalController> {
 
     late Map<String, double> columnWidths = {
       'No': 50,
+      'Nama Pelayaran': 100,
       'Tgl Input': 100,
       if (controller.isAdmin) 'Wilayah': 70,
-      'Nama Pelayaran': 150,
       'ETD': 100,
       'ATD': 100,
       'Total Unit': 80,
@@ -100,7 +100,7 @@ class JadwalSemuaKapal extends GetView<JadwalKapalController> {
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios),
         ),
-        title: Text('Jadwal Kapal',
+        title: Text('Seluruh Jadwal Kapal',
             style: Theme.of(context).textTheme.headlineMedium),
         centerTitle: true,
       ),
@@ -123,218 +123,229 @@ class JadwalSemuaKapal extends GetView<JadwalKapalController> {
                     controller: controller,
                   ));
             },
-            addDooring: (JadwalKapalModel model) async {
-              await Navigator.of(context).push(PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    TambahDooring(
-                  controller: controller,
-                  model: model,
-                ),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  const begin = 0.0;
-                  const end = 1.0;
-                  const curve = Curves.easeInOut;
+            addDooring: (JadwalKapalModel model, String action) async {
+              if (action == 'add') {
+                await Navigator.of(context).push(PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      TambahDooring(
+                    controller: controller,
+                    model: model,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = 0.0;
+                    const end = 1.0;
+                    const curve = Curves.easeInOut;
 
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
+                    var tween = Tween(begin: begin, end: end).chain(
+                      CurveTween(curve: curve),
+                    );
 
-                  return FadeTransition(
-                    opacity: animation.drive(tween),
-                    child: child,
-                  );
-                },
-              ));
+                    return FadeTransition(
+                      opacity: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ));
+              } else if (action == 'check') {
+                print('ini btn checllist');
+              }
             },
-            onEdited: (JadwalKapalModel model) {
-              CustomDialogs.defaultDialog(
-                context: context,
-                margin: const EdgeInsets.only(
-                    top: CustomSize.defaultSpace,
-                    bottom: CustomSize.defaultSpace),
-                contentWidget: Form(
-                  key: controller.jadwalKapalKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Text(
-                            'Edit Data Dooring',
-                            style: Theme.of(context).textTheme.headlineMedium,
+            onEdited: (JadwalKapalModel model, String action) {
+              if (action == 'edit') {
+                CustomDialogs.defaultDialog(
+                  context: context,
+                  margin: const EdgeInsets.only(
+                      top: CustomSize.defaultSpace,
+                      bottom: CustomSize.defaultSpace),
+                  contentWidget: Form(
+                    key: controller.jadwalKapalKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text(
+                              'Edit Data Dooring',
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: CustomSize.spaceBtwItems),
-                        Text('Nama Kapal',
-                            style: Theme.of(context).textTheme.labelMedium),
-                        Obx(() {
-                          return DropdownSearch<KapalModel>(
-                            items: kapalController.filteredKapalModel,
-                            itemAsString: (KapalModel kapal) => kapal.namaKapal,
-                            selectedItem:
-                                kapalController.filteredKapalModel.firstWhere(
-                              (kapal) => kapal.namaKapal == model.namaKapal,
-                              orElse: () => KapalModel(
-                                  idPelayaran: 0,
-                                  namaKapal: '',
-                                  namaPelayaran: ''),
-                            ),
-                            onChanged: (KapalModel? kapal) {
-                              if (kapal != null) {
-                                model.namaKapal = kapal.namaKapal;
-                              }
-                            },
-                            popupProps: const PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                decoration: InputDecoration(
-                                  hintText: 'Cari nama kapal...',
+                          const Divider(),
+                          const SizedBox(height: CustomSize.sm),
+                          Text('Nama Kapal',
+                              style: Theme.of(context).textTheme.labelMedium),
+                          Obx(() {
+                            return DropdownSearch<KapalModel>(
+                              items: kapalController.filteredKapalModel,
+                              itemAsString: (KapalModel kapal) =>
+                                  kapal.namaKapal,
+                              selectedItem:
+                                  kapalController.filteredKapalModel.firstWhere(
+                                (kapal) => kapal.namaKapal == model.namaKapal,
+                                orElse: () => KapalModel(
+                                    idPelayaran: 0,
+                                    namaKapal: '',
+                                    namaPelayaran: ''),
+                              ),
+                              onChanged: (KapalModel? kapal) {
+                                if (kapal != null) {
+                                  model.namaKapal = kapal.namaKapal;
+                                }
+                              },
+                              popupProps: const PopupProps.menu(
+                                showSearchBox: true,
+                                searchFieldProps: TextFieldProps(
+                                  decoration: InputDecoration(
+                                    hintText: 'Cari nama kapal...',
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }),
-                        const SizedBox(height: CustomSize.sm),
-                        buildDateField(
-                          context: context,
-                          label: 'ETD',
-                          value: model.etd,
-                          onDateSelected: (date) => model.etd = date,
-                        ),
-                        const SizedBox(height: CustomSize.sm),
-                        buildDateField(
-                          context: context,
-                          label: 'ATD',
-                          value: model.atd,
-                          onDateSelected: (date) => model.atd = date,
-                        ),
-                        const SizedBox(height: CustomSize.sm),
-                        Text('Total Motor',
-                            style: Theme.of(context).textTheme.labelMedium),
-                        TextFormField(
-                          initialValue: model.totalUnit.toString(),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) =>
-                              model.totalUnit = int.tryParse(value) ?? 0,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Total Motor harus diisi';
-                            }
-                            model.totalUnit = int.tryParse(value) ?? 0;
-                            if (model.totalUnit < model.unitDooring) {
-                              return 'Total motor tidak boleh kurang dari unit yang telah di bongkar, unit yang telah di bongkar sebanyak ${model.unitDooring} unit';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: CustomSize.sm),
-                        Text('Total CT 20"',
-                            style: Theme.of(context).textTheme.labelMedium),
-                        TextFormField(
-                          initialValue: model.feet20.toString(),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) =>
-                              model.feet20 = int.tryParse(value) ?? 0,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Total CT 20" harus diisi';
-                            }
-                            model.feet20 = int.tryParse(value) ?? 0;
-                            if (model.feet20 < model.unitDooring) {
-                              return 'Total CT 20" tidak boleh kurang dari CT 20 yang telah di bongkar, CT 20 yang telah di bongkar sebanyak ${model.ct20Dooring}';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: CustomSize.sm),
-                        Text('Total CT 40"',
-                            style: Theme.of(context).textTheme.labelMedium),
-                        TextFormField(
-                          initialValue: model.feet40.toString(),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) =>
-                              model.feet40 = int.tryParse(value) ?? 0,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Total CT 40" harus diisi';
-                            }
-                            model.feet40 = int.tryParse(value) ?? 0;
-                            if (model.feet40 < model.unitDooring) {
-                              return 'Total CT 40" tidak boleh kurang dari CT 40 yang telah di bongkar, CT 40 yang telah di bongkar sebanyak ${model.ct40Dooring}';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: CustomSize.sm),
-                        Text('Wilayah',
-                            style: Theme.of(context).textTheme.labelMedium),
-                        Obx(() {
-                          return DropdownSearch<WilayahModel>(
-                            items: wilayahController.filteredWilayahModel,
-                            itemAsString: (WilayahModel wilayah) =>
-                                wilayah.wilayah,
-                            selectedItem: wilayahController.filteredWilayahModel
-                                .firstWhere(
-                              (wilayah) => wilayah.wilayah == model.wilayah,
-                              orElse: () =>
-                                  WilayahModel(idWilayah: 0, wilayah: ''),
-                            ),
-                            onChanged: (WilayahModel? wilayah) {
-                              if (wilayah != null) {
-                                model.wilayah = wilayah.wilayah;
+                            );
+                          }),
+                          const SizedBox(height: CustomSize.sm),
+                          buildDateField(
+                            context: context,
+                            label: 'ETD',
+                            value: model.etd,
+                            onDateSelected: (date) => model.etd = date,
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          buildDateField(
+                            context: context,
+                            label: 'ATD',
+                            value: model.atd,
+                            onDateSelected: (date) => model.atd = date,
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          Text('Total Motor',
+                              style: Theme.of(context).textTheme.labelMedium),
+                          TextFormField(
+                            initialValue: model.totalUnit.toString(),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) =>
+                                model.totalUnit = int.tryParse(value) ?? 0,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Total Motor harus diisi';
                               }
+                              model.totalUnit = int.tryParse(value) ?? 0;
+                              if (model.totalUnit < model.unitDooring) {
+                                return 'Total motor tidak boleh kurang dari unit yang telah di bongkar, unit yang telah di bongkar sebanyak ${model.unitDooring} unit';
+                              }
+                              return null;
                             },
-                            popupProps: const PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                decoration: InputDecoration(
-                                  hintText: 'Search Wilayah...',
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          Text('Total CT 20"',
+                              style: Theme.of(context).textTheme.labelMedium),
+                          TextFormField(
+                            initialValue: model.feet20.toString(),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) =>
+                                model.feet20 = int.tryParse(value) ?? 0,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Total CT 20" harus diisi';
+                              }
+                              model.feet20 = int.tryParse(value) ?? 0;
+                              if (model.feet20 < model.unitDooring) {
+                                return 'Total CT 20" tidak boleh kurang dari CT 20 yang telah di bongkar, CT 20 yang telah di bongkar sebanyak ${model.ct20Dooring}';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          Text('Total CT 40"',
+                              style: Theme.of(context).textTheme.labelMedium),
+                          TextFormField(
+                            initialValue: model.feet40.toString(),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) =>
+                                model.feet40 = int.tryParse(value) ?? 0,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Total CT 40" harus diisi';
+                              }
+                              model.feet40 = int.tryParse(value) ?? 0;
+                              if (model.feet40 < model.unitDooring) {
+                                return 'Total CT 40" tidak boleh kurang dari CT 40 yang telah di bongkar, CT 40 yang telah di bongkar sebanyak ${model.ct40Dooring}';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: CustomSize.sm),
+                          Text('Wilayah',
+                              style: Theme.of(context).textTheme.labelMedium),
+                          Obx(() {
+                            return DropdownSearch<WilayahModel>(
+                              items: wilayahController.filteredWilayahModel,
+                              itemAsString: (WilayahModel wilayah) =>
+                                  wilayah.wilayah,
+                              selectedItem: wilayahController
+                                  .filteredWilayahModel
+                                  .firstWhere(
+                                (wilayah) => wilayah.wilayah == model.wilayah,
+                                orElse: () =>
+                                    WilayahModel(idWilayah: 0, wilayah: ''),
+                              ),
+                              onChanged: (WilayahModel? wilayah) {
+                                if (wilayah != null) {
+                                  model.wilayah = wilayah.wilayah;
+                                }
+                              },
+                              popupProps: const PopupProps.menu(
+                                showSearchBox: true,
+                                searchFieldProps: TextFieldProps(
+                                  decoration: InputDecoration(
+                                    hintText: 'Search Wilayah...',
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }),
-                        const SizedBox(height: CustomSize.spaceBtwSections),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            OutlinedButton(
-                              onPressed: () => Get.back(),
-                              child: const Text('Close'),
-                            ),
-                            const SizedBox(width: CustomSize.sm),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  print('Nama Kapal: ${model.namaKapal}');
-                                  print('ETD: ${model.etd}');
-                                  print('ATD: ${model.atd}');
-                                  print('Total Unit: ${model.totalUnit}');
-                                  print('Total CT 20": ${model.feet20}');
-                                  print('Total CT 40": ${model.feet40}');
-                                  print('Wilayah: ${model.wilayah}');
-                                  controller.editKapalContent(
-                                      model.idJadwal,
-                                      model.namaKapal,
-                                      model.wilayah,
-                                      model.etd,
-                                      model.atd,
-                                      model.totalUnit,
-                                      model.feet20,
-                                      model.feet40);
-                                },
-                                child: const Text('Update'),
+                            );
+                          }),
+                          const SizedBox(height: CustomSize.spaceBtwSections),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              OutlinedButton(
+                                onPressed: () => Get.back(),
+                                child: const Text('Close'),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: CustomSize.sm),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    print('Nama Kapal: ${model.namaKapal}');
+                                    print('ETD: ${model.etd}');
+                                    print('ATD: ${model.atd}');
+                                    print('Total Unit: ${model.totalUnit}');
+                                    print('Total CT 20": ${model.feet20}');
+                                    print('Total CT 40": ${model.feet40}');
+                                    print('Wilayah: ${model.wilayah}');
+                                    controller.editKapalContent(
+                                        model.idJadwal,
+                                        model.namaKapal,
+                                        model.wilayah,
+                                        model.etd,
+                                        model.atd,
+                                        model.totalUnit,
+                                        model.feet20,
+                                        model.feet40);
+                                  },
+                                  child: const Text('Update'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
+                );
+              } else if (action == 'cross') {
+                print('ini membatalkan jadwal kapal');
+              }
             },
             jadwalKapalModel: controller.jadwalKapalModel,
           );
@@ -366,6 +377,39 @@ class JadwalSemuaKapal extends GetView<JadwalKapalController> {
                                 .bodyMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ))),
+                  GridColumn(
+                      width: columnWidths['Nama Pelayaran']!,
+                      columnName: 'Nama Pelayaran',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'Nama Pelayaran',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
+                  GridColumn(
+                      width: columnWidths['Tgl Input']!,
+                      columnName: 'Tgl Input',
+                      label: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.lightBlue.shade100,
+                          ),
+                          child: Text(
+                            'Tgl Input',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ))),
                   if (controller.isAdmin)
                     GridColumn(
                         width: columnWidths['Wilayah']!,
@@ -383,38 +427,6 @@ class JadwalSemuaKapal extends GetView<JadwalKapalController> {
                                   .bodyMedium
                                   ?.copyWith(fontWeight: FontWeight.bold),
                             ))),
-                  GridColumn(
-                      width: columnWidths['Tgl Input']!,
-                      columnName: 'Tgl Input',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Tgl Input',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  GridColumn(
-                      width: columnWidths['Nama Pelayaran']!,
-                      columnName: 'Nama Pelayaran',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Nama Pelayaran',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
                   GridColumn(
                       width: columnWidths['ETD']!,
                       columnName: 'ETD',
@@ -625,7 +637,8 @@ class JadwalSemuaKapal extends GetView<JadwalKapalController> {
                         child: Text('Tambah Jadwal Kapal',
                             style: Theme.of(context).textTheme.headlineMedium),
                       ),
-                      const SizedBox(height: CustomSize.spaceBtwItems),
+                      const Divider(),
+                      const SizedBox(height: CustomSize.sm),
                       Text('Nama Kapal',
                           style: Theme.of(context).textTheme.labelMedium),
                       Obx(() {

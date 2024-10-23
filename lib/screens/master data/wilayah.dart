@@ -43,7 +43,8 @@ class MasterWilayah extends GetView<WilayahController> {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 20),
+                    const Divider(),
+                    const SizedBox(height: CustomSize.sm),
                     TextFormField(
                       controller: controller.namaWilayahController,
                       validator: (value) {
@@ -172,7 +173,8 @@ class MasterWilayah extends GetView<WilayahController> {
             'Tambah Wilayah',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          const Divider(),
+          const SizedBox(height: CustomSize.sm),
           TextFormField(
             controller: controller.namaWilayahController,
             validator: (value) {

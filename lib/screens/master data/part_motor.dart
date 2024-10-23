@@ -43,7 +43,8 @@ class PartMotor extends GetView<PartMotorController> {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 20),
+                    const Divider(),
+                    const SizedBox(height: CustomSize.sm),
                     TextFormField(
                       controller: controller.partMotorController,
                       validator: (value) {
@@ -174,7 +175,8 @@ class PartMotor extends GetView<PartMotorController> {
             'Tambah Part',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          const Divider(),
+          const SizedBox(height: CustomSize.sm),
           TextFormField(
             controller: controller.partMotorController,
             validator: (value) {

@@ -38,8 +38,8 @@ class JadwalKapalAccSource extends DataGridSource {
 
     List<Widget> cells = [
       ...row.getCells().map<Widget>((e) {
-        print(
-            'Membuat sel untuk kolom: ${e.columnName} dengan nilai: ${e.value}');
+        // print(
+        //     'Membuat sel untuk kolom: ${e.columnName} dengan nilai: ${e.value}');
         return Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: CustomSize.md),
@@ -148,7 +148,6 @@ class JadwalKapalAccSource extends DataGridSource {
           ];
 
           // Cetak jumlah kolom yang digunakan dalam setiap baris
-          print('Total kolom yang dibuat: ${columns.length}');
           return DataGridRow(cells: columns);
         },
       ).toList();
