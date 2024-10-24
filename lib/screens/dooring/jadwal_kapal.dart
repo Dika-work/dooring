@@ -842,7 +842,7 @@ class JadwalKapal extends GetView<JadwalKapalController> {
                                 Text(
                                   selectedItem != null
                                       ? selectedItem.namaKapal
-                                      : 'Pilih nama kapal',
+                                      : 'Cari berdasarkan nama kapal',
                                   style: TextStyle(
                                     fontSize: CustomSize.fontSizeSm,
                                     color: selectedItem == null
@@ -851,21 +851,20 @@ class JadwalKapal extends GetView<JadwalKapalController> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                if (kapalController
-                                    .selectedKapal.value.isNotEmpty)
-                                  IconButton(
-                                    icon: const Icon(
-                                      Iconsax.trash,
-                                      color: Colors.red,
-                                    ),
-                                    onPressed: () {
-                                      // Reset the dropdown
-                                      kapalController.selectedKapal.value = '';
-                                      // Clear the filter and show all data
-                                      controller
-                                          .filterJadwalKapalByNamaKapal('');
-                                    },
-                                  ),
+                                kapalController.selectedKapal.value.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(
+                                          Iconsax.trash,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          kapalController.selectedKapal.value =
+                                              '';
+                                          controller
+                                              .filterJadwalKapalByNamaKapal('');
+                                        },
+                                      )
+                                    : const Center(child: Icon(Icons.search)),
                               ],
                             );
                           },

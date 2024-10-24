@@ -15,154 +15,158 @@ class PartMotor extends GetView<PartMotorController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: const Icon(Icons.arrow_back_ios_new),
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () => Get.back(),
+            icon: const Icon(Icons.arrow_back_ios_new),
+          ),
+          title: Text(
+            'Master Part',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          centerTitle: true,
         ),
-        title: Text(
-          'Master Part',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        centerTitle: true,
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value && controller.partMotorModel.isEmpty) {
-          return const CustomCircularLoader();
-        } else {
-          final dataSource = PartMotorSource(
-            onEdited: (PartMotorModel model) {
-              controller.partMotorController.text = model.namaPart;
-              CustomDialogs.defaultDialog(
-                context: context,
-                contentWidget: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Edit Part motor',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(),
-                    const SizedBox(height: CustomSize.sm),
-                    TextFormField(
-                      controller: controller.partMotorController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Part motor harus di isi';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Part motor',
+        body: Obx(() {
+          if (controller.isLoading.value && controller.partMotorModel.isEmpty) {
+            return const CustomCircularLoader();
+          } else {
+            final dataSource = PartMotorSource(
+              onEdited: (PartMotorModel model) {
+                controller.partMotorController.text = model.namaPart;
+                CustomDialogs.defaultDialog(
+                  context: context,
+                  contentWidget: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Edit Part motor',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      onChanged: (value) {
-                        controller.partMotorController.text = value;
-                      },
-                    ),
-                    const SizedBox(height: CustomSize.spaceBtwSections),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OutlinedButton(
-                            onPressed: () => Get.back(),
-                            style: OutlinedButton.styleFrom(
+                      const Divider(),
+                      const SizedBox(height: CustomSize.sm),
+                      TextFormField(
+                        controller: controller.partMotorController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Part motor harus di isi';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Part motor',
+                        ),
+                        onChanged: (value) {
+                          controller.partMotorController.text = value;
+                        },
+                      ),
+                      const SizedBox(height: CustomSize.spaceBtwSections),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: CustomSize.lg,
+                                      vertical: CustomSize.md)),
+                              child: const Text('Close')),
+                          ElevatedButton(
+                            onPressed: () {
+                              controller.editPart(model.idPart,
+                                  controller.partMotorController.text);
+                            },
+                            style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: CustomSize.lg,
                                     vertical: CustomSize.md)),
-                            child: const Text('Close')),
-                        ElevatedButton(
-                          onPressed: () {
-                            controller.editPart(model.idPart,
-                                controller.partMotorController.text);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: CustomSize.lg,
-                                  vertical: CustomSize.md)),
-                          child: const Text('Tambahkan'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-            partMotorModel: controller.partMotorModel,
-          );
+                            child: const Text('Tambahkan'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+              partMotorModel: controller.partMotorModel,
+            );
 
-          return SfDataGrid(
-            source: dataSource,
-            columnWidthMode:
-                ColumnWidthMode.fill, // Kolom akan mengisi seluruh lebar layar
-            gridLinesVisibility: GridLinesVisibility.both,
-            headerGridLinesVisibility: GridLinesVisibility.both,
-            horizontalScrollPhysics: const NeverScrollableScrollPhysics(),
-            columns: [
-              GridColumn(
-                width: 50,
-                columnName: 'No',
-                label: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    color: Colors.lightBlue.shade100,
-                  ),
-                  child: Text(
-                    'No',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-              ),
-              GridColumn(
-                columnName: 'Nama Part',
-                label: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    color: Colors.lightBlue.shade100,
-                  ),
-                  child: Text(
-                    'Nama Part',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+            return SfDataGrid(
+              source: dataSource,
+              columnWidthMode: ColumnWidthMode
+                  .fill, // Kolom akan mengisi seluruh lebar layar
+              gridLinesVisibility: GridLinesVisibility.both,
+              verticalScrollController: controller.scrollController,
+              headerGridLinesVisibility: GridLinesVisibility.both,
+              horizontalScrollPhysics: const NeverScrollableScrollPhysics(),
+              columns: [
+                GridColumn(
+                  width: 50,
+                  columnName: 'No',
+                  label: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      color: Colors.lightBlue.shade100,
+                    ),
+                    child: Text(
+                      'No',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                   ),
                 ),
-              ),
-              GridColumn(
-                width: 80,
-                columnName: 'Edit',
-                label: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    color: Colors.lightBlue.shade100,
-                  ),
-                  child: Text(
-                    'Edit',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                GridColumn(
+                  columnName: 'Nama Part',
+                  label: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      color: Colors.lightBlue.shade100,
+                    ),
+                    child: Text(
+                      'Nama Part',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        }
-      }),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xff03dac6),
-        foregroundColor: Colors.black,
-        onPressed: () {
-          showDialogWithAnimation(context);
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah Part'),
-      ),
-    );
+                GridColumn(
+                  width: 80,
+                  columnName: 'Edit',
+                  label: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      color: Colors.lightBlue.shade100,
+                    ),
+                    child: Text(
+                      'Edit',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        }),
+        floatingActionButton: Obx(() {
+          return controller.isFabVisible.value
+              ? FloatingActionButton.extended(
+                  backgroundColor: const Color(0xff03dac6),
+                  foregroundColor: Colors.black,
+                  onPressed: () {
+                    showDialogWithAnimation(context);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Tambah Part'),
+                )
+              : const SizedBox.shrink();
+        }));
   }
 
   void showDialogWithAnimation(BuildContext context) {

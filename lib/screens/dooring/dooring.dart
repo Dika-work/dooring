@@ -1,14 +1,18 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dooring/utils/popups/snackbar.dart';
 import 'package:dooring/widgets/dropdown.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../controllers/dooring/detail_defect_controller.dart';
 import '../../controllers/dooring/dooring_controller.dart';
 import '../../controllers/dooring/kapal_controller.dart';
+import '../../helpers/connectivity.dart';
 import '../../helpers/helper_func.dart';
 import '../../models/dooring/defect_model.dart';
 import '../../models/dooring/dooring_model.dart';
@@ -29,9 +33,26 @@ class Dooring extends GetView<DooringController> {
 
   @override
   Widget build(BuildContext context) {
+    final networkConn = Get.find<NetworkManager>();
+
+    final RxBool isConnected = true.obs;
+    final RxBool hasFetchedData = false.obs;
+
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        controller.fetchDooringData();
+      (_) async {
+        if (!await networkConn.isConnected()) {
+          isConnected.value = false;
+          SnackbarLoader.errorSnackBar(
+            title: 'Tidak ada internet',
+            message: 'Silahkan coba lagi setelah koneksi tersedia',
+          );
+          return;
+        }
+        isConnected.value = true;
+        if (!hasFetchedData.value) {
+          await controller.fetchDooringData();
+          // controller.scrollController.addListener(controller.scrollListener);
+        }
       },
     );
 
@@ -48,6 +69,7 @@ class Dooring extends GetView<DooringController> {
       if (controller.editRole != 0) 'Edit': 80,
     };
     final typeMotorController = Get.put(TypeMotorController());
+    final kapalController = Get.put(KapalController());
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -60,7 +82,7 @@ class Dooring extends GetView<DooringController> {
       body: Obx(() {
         if (controller.isLoading.value && controller.dooringModel.isEmpty) {
           return const CustomCircularLoader();
-        } else if (controller.dooringModel.isEmpty) {
+        } else if (controller.originalDooringModel.isEmpty) {
           return CustomAnimationLoaderWidget(
             text: 'Tidak ada data saat ini',
             animation: 'assets/animations/404.json',
@@ -250,182 +272,353 @@ class Dooring extends GetView<DooringController> {
             },
             dooringModel: controller.dooringModel,
           );
-          return RefreshIndicator(
-            onRefresh: () async {
-              await controller.fetchDooringData();
+          return StreamBuilder<ConnectivityResult>(
+            stream: networkConn.connectionStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final connectionStatus = snapshot.data;
+
+                if (connectionStatus == ConnectivityResult.none) {
+                  isConnected.value = false;
+                } else {
+                  isConnected.value = true;
+                  print(('koneksi tersambung'));
+                  if (!hasFetchedData.value) {
+                    SchedulerBinding.instance.addPostFrameCallback((_) {
+                      controller.fetchDooringData();
+                      hasFetchedData.value = true; // Set flag true
+                    });
+                  }
+                }
+              }
+              return isConnected.value
+                  ? Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                              CustomSize.sm, CustomSize.sm, CustomSize.sm, 0),
+                          child: Obx(() {
+                            return DropdownSearch<KapalModel>(
+                              items: kapalController.filteredKapalModel,
+                              itemAsString: (KapalModel kendaraan) =>
+                                  kendaraan.namaKapal,
+                              selectedItem: kapalController
+                                      .selectedKapal.value.isNotEmpty
+                                  ? kapalController.filteredKapalModel
+                                      .firstWhere(
+                                      (kendaraan) =>
+                                          kendaraan.namaKapal ==
+                                          kapalController.selectedKapal.value,
+                                      orElse: () => KapalModel(
+                                        idPelayaran: 0,
+                                        namaKapal: '',
+                                        namaPelayaran: '',
+                                      ),
+                                    )
+                                  : null,
+                              dropdownBuilder:
+                                  (context, KapalModel? selectedItem) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      selectedItem != null
+                                          ? selectedItem.namaKapal
+                                          : 'Cari berdasarkan nama kapal',
+                                      style: TextStyle(
+                                        fontSize: CustomSize.fontSizeSm,
+                                        color: selectedItem == null
+                                            ? Colors.grey
+                                            : Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    kapalController
+                                            .selectedKapal.value.isNotEmpty
+                                        ? IconButton(
+                                            icon: const Icon(
+                                              Iconsax.trash,
+                                              color: Colors.red,
+                                            ),
+                                            onPressed: () {
+                                              kapalController
+                                                  .selectedKapal.value = '';
+                                              controller
+                                                  .filterJadwalKapalByNamaKapal(
+                                                      '');
+                                            },
+                                          )
+                                        : const Center(
+                                            child: Icon(Icons.search)),
+                                  ],
+                                );
+                              },
+                              onChanged: (KapalModel? kendaraan) {
+                                if (kendaraan != null) {
+                                  kapalController.selectedKapal.value =
+                                      kendaraan.namaKapal;
+                                  // Panggil fungsi filter ketika kapal dipilih
+                                  controller.filterJadwalKapalByNamaKapal(
+                                      kendaraan.namaKapal);
+                                } else {
+                                  kapalController.resetSelectedKendaraan();
+                                  // Jika tidak ada kapal yang dipilih, tampilkan semua data
+                                  controller.filterJadwalKapalByNamaKapal('');
+                                }
+                              },
+                              popupProps: const PopupProps.menu(
+                                showSearchBox: true,
+                                searchFieldProps: TextFieldProps(
+                                  decoration: InputDecoration(
+                                    hintText: 'Cari nama kapal...',
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: CustomSize.gridViewSpacing),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              await controller.fetchDooringData();
+                            },
+                            child: SfDataGrid(
+                                source: dataSource,
+                                frozenColumnsCount: 2,
+                                columnWidthMode: ColumnWidthMode.auto,
+                                gridLinesVisibility: GridLinesVisibility.both,
+                                headerGridLinesVisibility:
+                                    GridLinesVisibility.both,
+                                columns: [
+                                  GridColumn(
+                                      width: columnWidths['No']!,
+                                      columnName: 'No',
+                                      label: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            color: Colors.lightBlue.shade100,
+                                          ),
+                                          child: Text(
+                                            'No',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ))),
+                                  if (controller.isAdmin)
+                                    GridColumn(
+                                        width: columnWidths['Wilayah']!,
+                                        columnName: 'Wilayah',
+                                        label: Container(
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              color: Colors.lightBlue.shade100,
+                                            ),
+                                            child: Text(
+                                              'Wilayah',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ))),
+                                  GridColumn(
+                                      width: columnWidths['Tgl Input']!,
+                                      columnName: 'Tgl Input',
+                                      label: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            color: Colors.lightBlue.shade100,
+                                          ),
+                                          child: Text(
+                                            'Tgl Input',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ))),
+                                  GridColumn(
+                                      width: columnWidths['Nama Pelayaran']!,
+                                      columnName: 'Nama Pelayaran',
+                                      label: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            color: Colors.lightBlue.shade100,
+                                          ),
+                                          child: Text(
+                                            'Nama Pelayaran',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ))),
+                                  GridColumn(
+                                      width: columnWidths['ETD']!,
+                                      columnName: 'ETD',
+                                      label: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            color: Colors.lightBlue.shade100,
+                                          ),
+                                          child: Text(
+                                            'ETD',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ))),
+                                  GridColumn(
+                                      width: columnWidths['Tgl Bongkar']!,
+                                      columnName: 'Tgl Bongkar',
+                                      label: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            color: Colors.lightBlue.shade100,
+                                          ),
+                                          child: Text(
+                                            'Tgl Bongkar',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ))),
+                                  GridColumn(
+                                      width: columnWidths['Unit Bongkar']!,
+                                      columnName: 'Unit Bongkar',
+                                      label: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            color: Colors.lightBlue.shade100,
+                                          ),
+                                          child: Text(
+                                            'Unit Bongkar',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ))),
+                                  if (controller.lihatRole != 0)
+                                    GridColumn(
+                                        width: columnWidths['Lihat']!,
+                                        columnName: 'Lihat',
+                                        label: Container(
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              color: Colors.lightBlue.shade100,
+                                            ),
+                                            child: Text(
+                                              'Lihat',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ))),
+                                  if (controller.tambahRole != 0)
+                                    GridColumn(
+                                        width: columnWidths['Defect']!,
+                                        columnName: 'Defect',
+                                        label: Container(
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              color: Colors.lightBlue.shade100,
+                                            ),
+                                            child: Text(
+                                              'Defect',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ))),
+                                  if (controller.editRole != 0)
+                                    GridColumn(
+                                        width: columnWidths['Edit']!,
+                                        columnName: 'Edit',
+                                        label: Container(
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              color: Colors.lightBlue.shade100,
+                                            ),
+                                            child: Text(
+                                              'Edit',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ))),
+                                ]),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const CustomAnimationLoaderWidget(
+                          text:
+                              'Koneksi internet terputus\nsilakan tekan tombol refresh untuk mencoba kembali.',
+                          animation: 'assets/animations/404.json',
+                        ),
+                        const SizedBox(height: 20),
+                        OutlinedButton(
+                          onPressed: () async {
+                            // Coba refresh dan cek koneksi kembali
+                            if (await networkConn.isConnected()) {
+                              await controller.fetchDooringData();
+                            } else {
+                              SnackbarLoader.errorSnackBar(
+                                title: 'Tidak ada internet',
+                                message:
+                                    'Silahkan coba lagi setelah koneksi tersedia',
+                              );
+                            }
+                          },
+                          child: const Text('Refresh'),
+                        ),
+                      ],
+                    );
             },
-            child: SfDataGrid(
-                source: dataSource,
-                frozenColumnsCount: 2,
-                columnWidthMode: ColumnWidthMode.auto,
-                gridLinesVisibility: GridLinesVisibility.both,
-                headerGridLinesVisibility: GridLinesVisibility.both,
-                columns: [
-                  GridColumn(
-                      width: columnWidths['No']!,
-                      columnName: 'No',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'No',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  if (controller.isAdmin)
-                    GridColumn(
-                        width: columnWidths['Wilayah']!,
-                        columnName: 'Wilayah',
-                        label: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              color: Colors.lightBlue.shade100,
-                            ),
-                            child: Text(
-                              'Wilayah',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ))),
-                  GridColumn(
-                      width: columnWidths['Tgl Input']!,
-                      columnName: 'Tgl Input',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Tgl Input',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  GridColumn(
-                      width: columnWidths['Nama Pelayaran']!,
-                      columnName: 'Nama Pelayaran',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Nama Pelayaran',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  GridColumn(
-                      width: columnWidths['ETD']!,
-                      columnName: 'ETD',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'ETD',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  GridColumn(
-                      width: columnWidths['Tgl Bongkar']!,
-                      columnName: 'Tgl Bongkar',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Tgl Bongkar',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  GridColumn(
-                      width: columnWidths['Unit Bongkar']!,
-                      columnName: 'Unit Bongkar',
-                      label: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            color: Colors.lightBlue.shade100,
-                          ),
-                          child: Text(
-                            'Unit Bongkar',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ))),
-                  if (controller.lihatRole != 0)
-                    GridColumn(
-                        width: columnWidths['Lihat']!,
-                        columnName: 'Lihat',
-                        label: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              color: Colors.lightBlue.shade100,
-                            ),
-                            child: Text(
-                              'Lihat',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ))),
-                  if (controller.tambahRole != 0)
-                    GridColumn(
-                        width: columnWidths['Defect']!,
-                        columnName: 'Defect',
-                        label: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              color: Colors.lightBlue.shade100,
-                            ),
-                            child: Text(
-                              'Defect',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ))),
-                  if (controller.editRole != 0)
-                    GridColumn(
-                        width: columnWidths['Edit']!,
-                        columnName: 'Edit',
-                        label: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              color: Colors.lightBlue.shade100,
-                            ),
-                            child: Text(
-                              'Edit',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ))),
-                ]),
           );
         }
       }),

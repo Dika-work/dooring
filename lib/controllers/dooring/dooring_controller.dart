@@ -15,7 +15,11 @@ class DooringController extends GetxController {
   final storageUtil = StorageUtil();
   final isLoading = Rx<bool>(false);
   RxList<DooringModel> dooringModel = <DooringModel>[].obs;
+  RxList<DooringModel> originalDooringModel = <DooringModel>[].obs;
+
   RxList<AllDooringModel> allDooringModel = <AllDooringModel>[].obs;
+  RxList<AllDooringModel> originalAllDooringModel = <AllDooringModel>[].obs;
+
   final dooringRepo = Get.put(DooringRepository());
   final kapalController = Get.put(KapalController());
   final wilayahController = Get.put(WilayahController());
@@ -66,6 +70,21 @@ class DooringController extends GetxController {
     }
   }
 
+  // filterisasi table sesuai dengan nama kapal yg dicari
+  void filterJadwalKapalByNamaKapal(String namaKapal) {
+    if (namaKapal.isEmpty) {
+      // Jika tidak ada kapal yang dipilih, reset ke data asli
+      dooringModel.assignAll(originalDooringModel);
+    } else {
+      // Filter berdasarkan nama kapal
+      dooringModel.assignAll(
+        originalDooringModel
+            .where((item) => item.namaKapal == namaKapal)
+            .toList(),
+      );
+    }
+  }
+
   Future<void> fetchDooringData() async {
     try {
       print('ini wilayah user nya: $roleWilayah');
@@ -73,31 +92,56 @@ class DooringController extends GetxController {
       final dataDooring = await dooringRepo.fetchDooringContent();
 
       if (isAdmin) {
+        // Jika admin, tampilkan semua data
         dooringModel.assignAll(dataDooring);
+        originalDooringModel.assignAll(dataDooring); // Simpan data asli
       } else {
-        dooringModel.assignAll(
-            dataDooring.where((item) => item.wilayah == roleWilayah).toList());
+        // Jika bukan admin, filter data berdasarkan wilayah user
+        final filteredData =
+            dataDooring.where((item) => item.wilayah == roleWilayah).toList();
+        dooringModel.assignAll(filteredData);
+        originalDooringModel.assignAll(filteredData); // Simpan data asli
       }
     } catch (e) {
+      // Jika terjadi error, kosongkan model dan data asli
       dooringModel.assignAll([]);
+      originalDooringModel.assignAll([]);
     } finally {
       isLoading.value = false;
     }
   }
 
-  // seluruh dooring
+  // --> ini bagian seluruh dooring
+  void filterAllJadwalKapalByNamaKapal(String namaKapal) {
+    if (namaKapal.isEmpty) {
+      // Jika tidak ada kapal yang dipilih, reset ke data asli
+      allDooringModel.assignAll(originalAllDooringModel);
+    } else {
+      // Filter berdasarkan nama kapal
+      allDooringModel.assignAll(
+        originalAllDooringModel
+            .where((item) => item.namaKapal == namaKapal)
+            .toList(),
+      );
+    }
+  }
+
   Future<void> fetchAllDooringData() async {
     try {
       isLoading.value = true;
       final dataDooring = await dooringRepo.fetchAllDooringContent();
       if (isAdmin) {
         allDooringModel.assignAll(dataDooring);
+        originalAllDooringModel.assignAll(dataDooring); // Simpan data asli
       } else {
-        allDooringModel.assignAll(
-            dataDooring.where((item) => item.wilayah == roleWilayah).toList());
+        final filteredData =
+            dataDooring.where((item) => item.wilayah == roleWilayah).toList();
+        allDooringModel.assignAll(filteredData);
+        originalAllDooringModel.assignAll(filteredData); // Simpan data asli
       }
     } catch (e) {
       allDooringModel.assignAll([]);
+      originalAllDooringModel.assignAll([]); // Pastikan data asli juga kosong
     } finally {
       isLoading.value = false;
     }

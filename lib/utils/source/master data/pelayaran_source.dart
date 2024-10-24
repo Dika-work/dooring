@@ -85,33 +85,17 @@ class PelayaranSource extends DataGridSource {
     );
   }
 
-  List<DataGridRow> _generateEmptyRows(int count) {
-    return List.generate(count, (index) {
-      return const DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'No', value: '-'),
-        DataGridCell<String>(columnName: 'Nama Pelayaran', value: '-'),
-        DataGridCell<String>(columnName: 'Nama Kapal', value: '-'),
-      ]);
-    });
-  }
-
   void _updateDataPager(List<PelayaranModel> kapalModel) {
-    if (kapalModel.isEmpty) {
-      print('Model is empty, generating empty rows');
-      dooringData = _generateEmptyRows(1);
-    } else {
-      print('Model has data, generating rows based on model');
-      dooringData = kapalModel.map<DataGridRow>(
-        (e) {
-          index++;
-          return DataGridRow(cells: [
-            DataGridCell<int>(columnName: 'No', value: index),
-            DataGridCell<String>(columnName: 'Nama Kapal', value: e.namaPel),
-          ]);
-        },
-      ).toList();
-      notifyListeners();
-    }
+    dooringData = kapalModel.map<DataGridRow>(
+      (e) {
+        index++;
+        return DataGridRow(cells: [
+          DataGridCell<int>(columnName: 'No', value: index),
+          DataGridCell<String>(columnName: 'Nama Kapal', value: e.namaPel),
+        ]);
+      },
+    ).toList();
+    notifyListeners();
   }
 
   @override

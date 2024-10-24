@@ -227,14 +227,20 @@ class MasterTypeMotor extends GetView<TypeMotorController> {
           );
         }
       }),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xff03dac6),
-        foregroundColor: Colors.black,
-        onPressed: () {
-          showDialogWithAnimation(context);
+      floatingActionButton: Obx(
+        () {
+          return controller.isFabVisible.value
+              ? FloatingActionButton.extended(
+                  backgroundColor: const Color(0xff03dac6),
+                  foregroundColor: Colors.black,
+                  onPressed: () {
+                    showDialogWithAnimation(context);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Tambah Motor'),
+                )
+              : const SizedBox.shrink();
         },
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah Motor'),
       ),
     );
   }

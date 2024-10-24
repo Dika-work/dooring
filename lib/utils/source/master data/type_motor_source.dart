@@ -118,7 +118,7 @@ class TypeMotorSource extends DataGridSource {
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         left: position.dx,
-        top: position.dy - 30, // Position above the long-pressed cell
+        top: position.dy + 30, // Position above the long-pressed cell
         child: Material(
           color: Colors.transparent,
           child: Container(

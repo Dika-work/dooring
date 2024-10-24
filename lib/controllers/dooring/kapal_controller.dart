@@ -24,6 +24,7 @@ class KapalController extends GetxController {
   final kapalRepo = Get.put(KapalRepository());
   final isLoading = Rx<bool>(false);
   final isLoadingMore = Rx<bool>(false);
+  final isFabVisible = true.obs;
 
   RxList<KapalModel> kapalModel = <KapalModel>[].obs;
   RxList<KapalModel> displayedData = <KapalModel>[].obs;
@@ -57,10 +58,30 @@ class KapalController extends GetxController {
     }
   }
 
+  void filterNamaKapal(String namaKapal) {
+    if (namaKapal.isEmpty) {
+      // Jika tidak ada kapal yang dipilih, reset ke data asli
+      displayedData.assignAll(kapalModel);
+    } else {
+      // Filter berdasarkan nama kapal
+      displayedData.assignAll(
+        kapalModel.where((item) => item.namaKapal == namaKapal).toList(),
+      );
+    }
+  }
+
   // lazy loading func
   void scrollListener() {
-    print(
-        "Scroll Position: ${scrollController.position.pixels}, Max Scroll: ${scrollController.position.maxScrollExtent}");
+    // Ketika scroll mencapai batas bawah
+    if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent &&
+        !isLoadingMore.value) {
+      isFabVisible.value = false; // Sembunyikan FAB
+    } else if (scrollController.position.pixels <
+        scrollController.position.maxScrollExtent) {
+      isFabVisible.value = true; // Tampilkan FAB
+    }
+
     if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent &&
         !isLoading.value &&
@@ -222,6 +243,7 @@ class TypeMotorController extends GetxController {
 
   final isLoading = Rx<bool>(false);
   final isLoadingMore = Rx<bool>(false);
+  final isFabVisible = true.obs;
 
   final storageUtil = StorageUtil();
   GlobalKey<FormState> addDefectKey = GlobalKey<FormState>();
@@ -326,8 +348,16 @@ class TypeMotorController extends GetxController {
 
   // lazy loading func
   void scrollListener() {
-    print(
-        "Scroll Position: ${scrollController.position.pixels}, Max Scroll: ${scrollController.position.maxScrollExtent}");
+    // Ketika scroll mencapai batas bawah
+    if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent &&
+        !isLoadingMore.value) {
+      isFabVisible.value = false; // Sembunyikan FAB
+    } else if (scrollController.position.pixels <
+        scrollController.position.maxScrollExtent) {
+      isFabVisible.value = true; // Tampilkan FAB
+    }
+
     if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent &&
         !isLoading.value &&
@@ -646,10 +676,14 @@ class PartMotorController extends GetxController {
   RxString selectedWilayah = ''.obs;
   RxString selectedJenisWilayah = ''.obs;
 
+  final ScrollController scrollController = ScrollController();
+  final isFabVisible = true.obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchWilayahData();
+    scrollController.addListener(scrollListener);
   }
 
   Future<void> fetchWilayahData() async {
@@ -661,6 +695,17 @@ class PartMotorController extends GetxController {
       partMotorModel.assignAll([]);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void scrollListener() {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent) {
+      // Hide FAB when reaching the bottom
+      isFabVisible.value = false;
+    } else {
+      // Show FAB when scrolling up
+      isFabVisible.value = true;
     }
   }
 
@@ -682,7 +727,7 @@ class PartMotorController extends GetxController {
     }
 
     await partRepo.addPartMotor(namaPart);
-    print('Stopped loading dialog');
+    partMotorController.clear();
 
     await fetchWilayahData();
     CustomHelperFunctions.stopLoading();

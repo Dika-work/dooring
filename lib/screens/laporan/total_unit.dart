@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../controllers/laporan/jumlah_defect_controller.dart';
@@ -9,6 +10,7 @@ import '../../helpers/connectivity.dart';
 import '../../models/laporan/jumlah_defect_model.dart';
 import '../../models/laporan/total_unit_model.dart';
 import '../../utils/constant/custom_size.dart';
+import '../../utils/loader/shimmer.dart';
 import '../../utils/popups/snackbar.dart';
 import '../../utils/source/laporan/jumlah_defect_source.dart';
 import '../../utils/source/laporan/total_unit_source.dart';
@@ -198,38 +200,71 @@ class _TotalUnitState extends State<TotalUnit> {
           padding: const EdgeInsets.symmetric(
               vertical: CustomSize.md, horizontal: CustomSize.sm),
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: DropDownWidget(
-                    value: selectedYear,
-                    items: years,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedYear = newValue!;
-                        print('INI TAHUN YANG DI PILIH $selectedYear');
-                        _fetchDataAndRefreshSource();
-                      });
-                    },
+            totalUnitSource != null && jumlahDefectSource != null
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: DropDownWidget(
+                          value: selectedYear,
+                          items: years,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedYear = newValue!;
+                              print('INI TAHUN YANG DI PILIH $selectedYear');
+                              _fetchDataAndRefreshSource();
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: CustomSize.sm),
+                      Expanded(
+                        flex: 1,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _fetchDataAndRefreshSource();
+                          },
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: CustomSize.md)),
+                          child: const Icon(Iconsax.calendar_search),
+                        ),
+                      )
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                          flex: 2,
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          )),
+                      const SizedBox(width: CustomSize.sm),
+                      Expanded(
+                          flex: 1,
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          )),
+                    ],
                   ),
-                ),
-                const SizedBox(width: CustomSize.sm),
-                Expanded(
-                  flex: 1,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      _fetchDataAndRefreshSource();
-                    },
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: CustomSize.md)),
-                    child: const Icon(Iconsax.calendar_search),
-                  ),
-                )
-              ],
-            ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             SizedBox(
               height: gridHeight,
@@ -342,9 +377,10 @@ class _TotalUnitState extends State<TotalUnit> {
                         ),
                       ],
                     )
-                  : const Center(
-                      child:
-                          CircularProgressIndicator()), // Tampilkan loading jika null
+                  : const CustomShimmerEffect(
+                      height: 200,
+                      width: double.infinity,
+                    ), // Tampilkan loading jika null
             ),
             const SizedBox(height: CustomSize.spaceBtwInputFields),
             SizedBox(
@@ -458,9 +494,10 @@ class _TotalUnitState extends State<TotalUnit> {
                         ),
                       ],
                     )
-                  : const Center(
-                      child:
-                          CircularProgressIndicator()), // Tampilkan loading jika null
+                  : const CustomShimmerEffect(
+                      height: 200,
+                      width: double.infinity,
+                    ), // Tampilkan loading jika null
             )
           ],
         ),
