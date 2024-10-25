@@ -66,32 +66,17 @@ class PartMotorSource extends DataGridSource {
     );
   }
 
-  List<DataGridRow> _generateEmptyRows(int count) {
-    return List.generate(count, (index) {
-      return const DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'No', value: '-'),
-        DataGridCell<String>(columnName: 'Nama Part', value: '-'),
-      ]);
-    });
-  }
-
   void _updateDataPager(List<PartMotorModel> partMotorModel) {
-    if (partMotorModel.isEmpty) {
-      print('Model is empty, generating empty rows');
-      wilayahData = _generateEmptyRows(1);
-    } else {
-      print('Model has data, generating rows based on model');
-      wilayahData = partMotorModel.map<DataGridRow>(
-        (e) {
-          index++;
-          return DataGridRow(cells: [
-            DataGridCell<int>(columnName: 'No', value: index),
-            DataGridCell<String>(columnName: 'Nama Part', value: e.namaPart),
-          ]);
-        },
-      ).toList();
-      notifyListeners();
-    }
+    wilayahData = partMotorModel.map<DataGridRow>(
+      (e) {
+        index++;
+        return DataGridRow(cells: [
+          DataGridCell<int>(columnName: 'No', value: index),
+          DataGridCell<String>(columnName: 'Nama Part', value: e.namaPart),
+        ]);
+      },
+    ).toList();
+    notifyListeners();
   }
 
   @override

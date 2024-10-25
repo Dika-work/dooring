@@ -26,6 +26,8 @@ class NetworkManager extends GetxController {
     return result != ConnectivityResult.none;
   }
 
+  ConnectivityResult get connectionStatus => _connectionStatus.value;
+
   Stream<ConnectivityResult> get connectionStream =>
       _connectivity.onConnectivityChanged;
 

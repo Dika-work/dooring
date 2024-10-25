@@ -258,7 +258,7 @@ class TypeMotorController extends GetxController {
 
   // lazy loading
   final ScrollController scrollController = ScrollController();
-  int initialDataCount = 15;
+  int initialDataCount = 20;
   int loadMoreCount = 5;
 
   final networkManager = Get.find<NetworkManager>();
